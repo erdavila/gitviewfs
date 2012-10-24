@@ -1,0 +1,6 @@
+- Check if dir is Git repository
+- Branches with "/"
+- Tags with "/"
+- Bare repository
+- Detached-head
+- Repository initialized but without any commit yet

@@ -1,10 +1,13 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import os, sys
-from errno import *
-from stat import *
+from errno import *   # REMOVE!
+from stat import *    # REMOVE!
 import fcntl
 import fuse
 from fuse import Fuse
+from dirs import RootDir
+import errno
 
 
 if not hasattr(fuse, '__version__'):
@@ -55,9 +58,12 @@ class GitViewFS(Fuse):
 		return os.readlink("." + path)
 
 	def readdir(self, path, offset):
-		for e in os.listdir("." + path):
-			yield fuse.Direntry(e)
-
+		if path == RootDir.PATH:
+			for item in RootDir().list():
+				yield fuse.Direntry(item)
+		else:
+			raise RuntimeError(-errno.EINVAL)
+	
 	def unlink(self, path):
 		os.unlink("." + path)
 
@@ -142,7 +148,6 @@ class GitViewFS(Fuse):
 			- f_files - total number of file inodes
 			- f_ffree - nunber of free file inodes
 		"""
-
 		return os.statvfs(".")
 
 	def fsinit(self):
@@ -250,7 +255,7 @@ def main():
 		if server.fuse_args.mount_expected():
 			os.chdir(server.root)
 	except OSError:
-		print >> sys.stderr, "can't enter root of underlying filesystem"
+		print("can't enter root of underlying filesystem", file=sys.stderr)
 		sys.exit(1)
 
 	server.main()
