@@ -2,8 +2,6 @@ import unittest
 
 from fs_objects import HeadSymLink
 import stat
-import posix
-import itertools
 
 
 class TestHeadSymLink(unittest.TestCase):
@@ -17,18 +15,11 @@ class TestHeadSymLink(unittest.TestCase):
 		pass
 
 
-	def test_getattr_calls_parent_and_return_symlink_type(self):
-		class Parent(object):
-			getattr_called = False
-			def getattr(self):
-				self.getattr_called = True
-				return posix.stat_result(itertools.repeat(0, 10))
+	def test_getattr_returns_symlink_type(self):
+		head_symlink = HeadSymLink(parent=None)
 		
-		parent = Parent()
-		head_symlink = HeadSymLink(parent=parent)
 		attr = head_symlink.getattr()
 		
-		self.assertTrue(parent.getattr_called)
 		self.assertTrue(stat.S_ISLNK(attr.st_mode))
 
 

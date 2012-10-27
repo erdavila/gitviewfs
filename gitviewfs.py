@@ -1,14 +1,11 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import os, sys
-from errno import *   # REMOVE!
-from stat import *    # REMOVE!
 import fcntl
 import fuse
 from fuse import Fuse
-from fs_objects import RootDir, RefsDir, create_fs_object
+from fs_objects import create_fs_object
 import errno
-import posix
 import stat
 
 
@@ -29,21 +26,6 @@ def flag2mode(flags):
 		m = m.replace('w', 'a', 1)
 
 	return m
-
-
-def without_write_permissions(stat_mode):
-	stat_mode &= ~(stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH)
-	return stat_mode
-
-# TODO: remove!
-def with_symlink_file_type(stat_mode):
-	stat_mode = with_clear_file_type(stat_mode)
-	stat_mode |= stat.S_IFLNK
-	return stat_mode
-	
-def with_clear_file_type(stat_mode):
-	stat_mode ^= stat.S_IFMT(stat_mode)
-	return stat_mode
 
 
 class GitViewFS(Fuse):
@@ -69,16 +51,8 @@ class GitViewFS(Fuse):
 #			print "mythread: ticking"
 
 	def getattr(self, path):
-		st_root = os.lstat('.')
-		
-		attrs = list(st_root)
-		attrs[stat.ST_MODE] = without_write_permissions(attrs[stat.ST_MODE])
-		attrs[stat.ST_NLINK] = 1
-		
-		if path == '/refs/HEAD':
-			attrs[stat.ST_MODE] = with_symlink_file_type(attrs[stat.ST_MODE])
-		
-		return posix.stat_result(attrs)
+		obj = create_fs_object(path)
+		return obj.getattr()
 	
 	def readlink(self, path):
 		return os.readlink("." + path)
@@ -132,7 +106,7 @@ class GitViewFS(Fuse):
 
 	def access(self, path, mode):
 		if not os.access("." + path, mode):
-			return -EACCES
+			return -errno.EACCES
 
 #	This is how we could add stub extended attribute handlers...
 #	(We can't have ones which aptly delegate requests to the underlying fs
@@ -246,14 +220,14 @@ class GitViewFS(Fuse):
 				   fcntl.F_RDLCK : fcntl.LOCK_SH,
 				   fcntl.F_WRLCK : fcntl.LOCK_EX }[kw['l_type']]
 			if cmd == fcntl.F_GETLK:
-				return -EOPNOTSUPP
+				return -errno.EOPNOTSUPP
 			elif cmd == fcntl.F_SETLK:
 				if op != fcntl.LOCK_UN:
 					op |= fcntl.LOCK_NB
 			elif cmd == fcntl.F_SETLKW:
 				pass
 			else:
-				return -EINVAL
+				return -errno.EINVAL
 
 			fcntl.lockf(self.fd, op, kw['l_start'], kw['l_len'])
 
