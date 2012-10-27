@@ -6,6 +6,7 @@ import shutil
 
 import gitviewfs
 from fs_objects import RefsDir
+import stat
 
 
 class Test(unittest.TestCase):
@@ -27,7 +28,7 @@ class Test(unittest.TestCase):
 		subprocess.check_call([
 				self.__gitviewfs_cmd_path(),
 				self.mountpoint,
-				'-o', 'root=' + self.repo,
+				'-o', 'repo=' + self.repo,
 		])
 
 	def tearDown(self):
@@ -44,6 +45,10 @@ class Test(unittest.TestCase):
 		refs_dir = os.path.join(self.mountpoint, RefsDir.NAME)
 		items = os.listdir(refs_dir)
 		self.assertItemsEqual(['HEAD', 'branches', 'tags', 'remotes'], items)
+	
+	def test_HEAD_is_symlink(self):
+		head_ref = os.path.join(self.mountpoint, RefsDir.NAME, 'HEAD')
+		self.assertTrue(os.path.islink(head_ref))
 
 
 if __name__ == "__main__":

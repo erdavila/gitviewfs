@@ -35,6 +35,15 @@ def without_write_permissions(stat_mode):
 	stat_mode &= ~(stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH)
 	return stat_mode
 
+def with_symlink_file_type(stat_mode):
+	stat_mode = with_clear_file_type(stat_mode)
+	stat_mode |= stat.S_IFLNK
+	return stat_mode
+	
+def with_clear_file_type(stat_mode):
+	stat_mode ^= stat.S_IFMT(stat_mode)
+	return stat_mode
+
 
 class GitViewFS(Fuse):
 
@@ -45,7 +54,7 @@ class GitViewFS(Fuse):
 		# do stuff to set up your filesystem here, if you want
 		#import thread
 		#thread.start_new_thread(self.mythread, ())
-		self.root = '.'
+		self.repo = '.'
 
 #	def mythread(self):
 #
@@ -59,11 +68,14 @@ class GitViewFS(Fuse):
 #			print "mythread: ticking"
 
 	def getattr(self, path):
-		st_root = os.lstat(self.root)
+		st_root = os.lstat('.')
 		
 		attrs = list(st_root)
 		attrs[stat.ST_MODE] = without_write_permissions(attrs[stat.ST_MODE])
 		attrs[stat.ST_NLINK] = 1
+		
+		if path == '/refs/HEAD':
+			attrs[stat.ST_MODE] = with_symlink_file_type(attrs[stat.ST_MODE])
 		
 		return posix.stat_result(attrs)
 	
@@ -162,7 +174,7 @@ class GitViewFS(Fuse):
 		return os.statvfs(".")
 
 	def fsinit(self):
-		os.chdir(self.root)
+		os.chdir(self.repo)
 
 	class GitViewFSFile(object):
 
@@ -258,15 +270,15 @@ def main():
 	# XmlFile class with locks, in order to prevent race conditions
 	server.multithreaded = False
 
-	server.parser.add_option(mountopt="root", metavar="PATH", default='.',
+	server.parser.add_option(mountopt="repo", metavar="PATH", default='.',
 							 help="browse Git repository from under PATH [default: %default]")
 	server.parse(values=server, errex=1)
 
 	try:
 		if server.fuse_args.mount_expected():
-			os.chdir(server.root)
+			os.chdir(server.repo)
 	except OSError:
-		print("can't enter root of underlying filesystem", file=sys.stderr)
+		print("can't enter Git repo directory", file=sys.stderr)
 		sys.exit(1)
 
 	server.main()
