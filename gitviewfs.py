@@ -8,6 +8,8 @@ import fuse
 from fuse import Fuse
 from dirs import RootDir
 import errno
+import posix
+import stat
 
 
 if not hasattr(fuse, '__version__'):
@@ -27,6 +29,11 @@ def flag2mode(flags):
 		m = m.replace('w', 'a', 1)
 
 	return m
+
+
+def without_write_permissions(stat_mode):
+	stat_mode &= ~(stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH)
+	return stat_mode
 
 
 class GitViewFS(Fuse):
@@ -52,8 +59,14 @@ class GitViewFS(Fuse):
 #			print "mythread: ticking"
 
 	def getattr(self, path):
-		return os.lstat("." + path)
-
+		st_root = os.lstat(self.root)
+		
+		attrs = list(st_root)
+		attrs[stat.ST_MODE] = without_write_permissions(attrs[stat.ST_MODE])
+		attrs[stat.ST_NLINK] = 1
+		
+		return posix.stat_result(attrs)
+	
 	def readlink(self, path):
 		return os.readlink("." + path)
 
