@@ -6,7 +6,7 @@ from stat import *    # REMOVE!
 import fcntl
 import fuse
 from fuse import Fuse
-from dirs import RootDir
+from fs_objects import RootDir, RefsDir, create_fs_object
 import errno
 import posix
 import stat
@@ -71,11 +71,9 @@ class GitViewFS(Fuse):
 		return os.readlink("." + path)
 
 	def readdir(self, path, offset):
-		if path == RootDir.PATH:
-			for item in RootDir().list():
-				yield fuse.Direntry(item)
-		else:
-			raise RuntimeError(-errno.EINVAL)
+		obj = create_fs_object(path)
+		for item in obj.list():
+			yield fuse.Direntry(item)
 	
 	def unlink(self, path):
 		os.unlink("." + path)

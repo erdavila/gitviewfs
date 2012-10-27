@@ -5,6 +5,7 @@ import tempfile
 import shutil
 
 import gitviewfs
+from fs_objects import RefsDir
 
 
 class Test(unittest.TestCase):
@@ -38,6 +39,11 @@ class Test(unittest.TestCase):
 	def test_list_root_dir(self):
 		items = os.listdir(self.mountpoint)
 		self.assertItemsEqual(['refs', 'objects', 'remotes'], items)
+	
+	def test_list_refs_dir(self):
+		refs_dir = os.path.join(self.mountpoint, RefsDir.NAME)
+		items = os.listdir(refs_dir)
+		self.assertItemsEqual(['HEAD', 'branches', 'tags', 'remotes'], items)
 
 
 if __name__ == "__main__":

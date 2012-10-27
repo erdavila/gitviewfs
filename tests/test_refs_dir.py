@@ -1,6 +1,6 @@
 import unittest
 
-from fs_objects import RootDir
+from fs_objects import RefsDir
 
 
 class Test(unittest.TestCase):
@@ -11,10 +11,10 @@ class Test(unittest.TestCase):
 	def tearDown(self):
 		pass
 
-	def test_list_root_dir(self):
-		dir = RootDir()
+	def test_list_refs_dir(self):
+		dir = RefsDir(None, RefsDir.NAME)
 		items = dir.list()
-		self.assertItemsEqual(['refs', 'objects', 'remotes'], items)
+		self.assertItemsEqual(['HEAD', 'branches', 'tags', 'remotes'], items)
 
 
 if __name__ == "__main__":
