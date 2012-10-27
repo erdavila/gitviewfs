@@ -35,6 +35,7 @@ def without_write_permissions(stat_mode):
 	stat_mode &= ~(stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH)
 	return stat_mode
 
+# TODO: remove!
 def with_symlink_file_type(stat_mode):
 	stat_mode = with_clear_file_type(stat_mode)
 	stat_mode |= stat.S_IFLNK

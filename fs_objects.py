@@ -1,5 +1,17 @@
+import stat
+import posix
 OBJECTS_DIR = 'objects'
 REMOTES_DIR = 'remotes'
+
+
+def with_symlink_file_type(stat_mode):
+	stat_mode = with_clear_file_type(stat_mode)
+	stat_mode |= stat.S_IFLNK
+	return stat_mode
+
+def with_clear_file_type(stat_mode):
+	stat_mode ^= stat.S_IFMT(stat_mode)
+	return stat_mode
 
 
 def create_fs_object(path):
@@ -41,6 +53,22 @@ class RefsDir(object):
 	def create_fs_object(self, path_parts):
 		if len(path_parts) == 0:
 			return self
+		
+		if path_parts == ['HEAD']:
+			head_symlink = HeadSymLink(parent=self)
+			return head_symlink
 	
 	def list(self):
 		return ['HEAD', 'branches', 'tags', 'remotes']
+
+
+class HeadSymLink(object):
+	
+	def __init__(self, parent):
+		self.parent = parent
+	
+	def getattr(self):
+		stat_result = self.parent.getattr()
+		attrs = list(stat_result)
+		attrs[stat.ST_MODE] = with_symlink_file_type(attrs[stat.ST_MODE])
+		return posix.stat_result(attrs)
