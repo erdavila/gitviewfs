@@ -12,7 +12,7 @@ class TestObjectsDir(unittest.TestCase):
 		pass
 
 	def test_list(self):
-		objects_dir = ObjectsDir(parent=None, name='name')
+		objects_dir = ObjectsDir(parent=None)
 		items = objects_dir.list()
 		self.assertItemsEqual(['commits', 'trees', 'blobs', 'all'], items)
 

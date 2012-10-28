@@ -30,13 +30,16 @@ def with_clear_file_type(stat_mode):
 	return stat_mode
 
 
-def create_gitviewfs_object(path):
+def get_gitviewfs_object(path):
 	assert path.startswith('/')
 	
-	path_parts = path.split('/')
-	root_dir = RootDir()
+	if path == '/':
+		rest = []
+	else:
+		path_parts = path.split('/')
+		rest = path_parts[1:]
 	
-	obj = root_dir.create_gitviewfs_object(path_parts[1:])
+	obj = root_dir.get_gitviewfs_object(rest)
 	return obj
 
 
@@ -45,7 +48,6 @@ class GitViewFSObject(object):
 	def __init__(self, parent, name):
 		self.parent = parent
 		self.name = name
-	
 	
 	def getattr(self):
 		st_root = os.lstat('.')
@@ -60,104 +62,107 @@ class GitViewFSObject(object):
 		return 4 <= len(sha1_hash) <= 40
 
 
-class RootDir(GitViewFSObject):
-	
-	PATH = '/'
-	
-	def __init__(self):
-		super(RootDir, self).__init__(parent=None, name='/')
-	
-	def create_gitviewfs_object(self, path_parts):
-		if path_parts == ['']:
-			return self
-		
-		first_part = path_parts[0]
-		
-		if first_part == RefsDir.NAME:
-			refs_dir = RefsDir(parent=self, name=first_part)
-			return refs_dir.create_gitviewfs_object(path_parts[1:])
-		
-		if first_part == ObjectsDir.NAME:
-			objects_dir = ObjectsDir(parent=self, name=first_part)
-			return objects_dir.create_gitviewfs_object(path_parts[1:])
-	
-	def list(self):
-		return [RefsDir.NAME, ObjectsDir.NAME, REMOTES_DIR]
+class Directory(GitViewFSObject):
+	pass
 
 
-class RefsDir(GitViewFSObject):
+class PredefinedDirectory(Directory):
 	
-	NAME = 'refs'
+	def __init__(self, parent, name, items):
+		super(PredefinedDirectory, self).__init__(parent=parent, name=name)
+		self.items = items
 	
-	def __init__(self, parent, name):
-		self.parent = parent
-		self.name = name
-	
-	def create_gitviewfs_object(self, path_parts):
+	def get_gitviewfs_object(self, path_parts):
 		if len(path_parts) == 0:
 			return self
 		
-		if path_parts == ['HEAD']:
-			head_symlink = HeadSymLink(parent=self)
-			return head_symlink
+		first_part = path_parts[0]
+		rest = path_parts[1:]
+		
+		item = self.items[first_part]
+		if isinstance(item, Directory):
+			return item.get_gitviewfs_object(rest)
+		else:
+			return item
 	
 	def list(self):
-		return ['HEAD', 'branches', 'tags', 'remotes']
+		return self.items.keys()
 
 
-class HeadSymLink(GitViewFSObject):
-	
-	def __init__(self, parent):
-		self.parent = parent
+class SymLink(GitViewFSObject):
 	
 	def getattr(self):
-		stat_result = super(HeadSymLink, self).getattr()
+		stat_result = super(SymLink, self).getattr()
 		
 		attrs = list(stat_result)
 		attrs[stat.ST_MODE] = with_symlink_file_type(attrs[stat.ST_MODE])
 		return posix.stat_result(attrs)
 
 
-class ObjectsDir(GitViewFSObject):
+class RootDir(PredefinedDirectory):
+	
+	def __init__(self):
+		items = {
+			RefsDir.NAME    : RefsDir(parent=self),
+			ObjectsDir.NAME : ObjectsDir(parent=self),
+			REMOTES_DIR     : None,
+		}
+		super(RootDir, self).__init__(parent=None, name='/', items=items)
+	
+
+class RefsDir(PredefinedDirectory):
+	
+	NAME = 'refs'
+	
+	def __init__(self, parent):
+		items = {
+			HeadSymLink.NAME : HeadSymLink(parent=self),
+			'branches'       : None,
+			'tags'           : None,
+			'remotes'        : None,
+		}
+		super(RefsDir, self).__init__(parent=parent, name=self.NAME, items=items)
+
+
+class HeadSymLink(SymLink):
+	
+	NAME = 'HEAD'
+	
+	def __init__(self, parent):
+		super(HeadSymLink, self).__init__(parent=parent, name=self.NAME)
+
+
+class ObjectsDir(PredefinedDirectory):
 	
 	NAME = 'objects'
 	
-	def create_gitviewfs_object(self, path_parts):
-		if len(path_parts) == 0:
-			return self
-		
-		first_part = path_parts[0]
-		
-		if first_part == BlobsDir.NAME:
-			blobs_dir = BlobsDir(parent=self, name=first_part)
-			return blobs_dir.create_gitviewfs_object(path_parts[1:])
-		
-		if first_part == TreesDir.NAME:
-			trees_dir = TreesDir(parent=self, name=first_part)
-			return trees_dir.create_gitviewfs_object(path_parts[1:])
-	
-	
-	def list(self):
-		return ['commits', TreesDir.NAME, BlobsDir.NAME, 'all']
+	def __init__(self, parent):
+		items = {
+			'commits'     : None,
+			TreesDir.NAME : TreesDir(parent=self, name=TreesDir.NAME),
+			BlobsDir.NAME : BlobsDir(parent=self, name=BlobsDir.NAME),
+			'all'         : None,
+		}
+		super(ObjectsDir, self).__init__(parent=parent, name=self.NAME, items=items)
 
 
-class TreesDir(GitViewFSObject):
+class TreesDir(Directory):
 	
 	NAME = 'trees'
 	
-	def create_gitviewfs_object(self, path_parts):
+	def get_gitviewfs_object(self, path_parts):
 		if len(path_parts) == 0:
 			return self
 		
 		first_part = path_parts[0]
 		if self._is_valid_sha1_hash(first_part):
 			tree_dir = TreeDir(parent=self, name=first_part)
-			return tree_dir.create_gitviewfs_object(path_parts[1:])
+			return tree_dir.get_gitviewfs_object(path_parts[1:])
 
 
-class TreeDir(GitViewFSObject):
+class TreeDir(Directory):
 	
-	def create_gitviewfs_object(self, path_parts):
+	def get_gitviewfs_object(self, path_parts):
 		if len(path_parts) == 0:
 			return self
 		
@@ -179,21 +184,15 @@ class TreeDir(GitViewFSObject):
 		return items
 
 
-class TreeDirItem(GitViewFSObject):
-	
-	def getattr(self):
-		stat_result = super(TreeDirItem, self).getattr()
-		
-		attrs = list(stat_result)
-		attrs[stat.ST_MODE] = with_symlink_file_type(attrs[stat.ST_MODE])
-		return posix.stat_result(attrs)
+class TreeDirItem(SymLink):
+	pass
 
 
-class BlobsDir(GitViewFSObject):
+class BlobsDir(Directory):
 	
 	NAME = 'blobs'
 
-	def create_gitviewfs_object(self, path_parts):
+	def get_gitviewfs_object(self, path_parts):
 		if len(path_parts) == 0:
 			return self
 		
@@ -223,3 +222,6 @@ class BlobFile(GitViewFSObject):
 	def read(self, length, offset):
 		content = subprocess.check_output(['git', 'cat-file', 'blob', self.name])
 		return content[offset : offset+length]
+
+
+root_dir = RootDir()

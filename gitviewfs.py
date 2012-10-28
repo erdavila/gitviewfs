@@ -4,7 +4,7 @@ import os, sys
 import fcntl
 import fuse
 from fuse import Fuse
-from gitviewfs_objects import create_gitviewfs_object
+from gitviewfs_objects import get_gitviewfs_object
 import errno
 
 
@@ -40,14 +40,14 @@ class GitViewFS(Fuse):
 #			print "mythread: ticking"
 
 	def getattr(self, path):
-		obj = create_gitviewfs_object(path)
+		obj = get_gitviewfs_object(path)
 		return obj.getattr()
 	
 	def readlink(self, path):
 		return os.readlink("." + path)
 
 	def readdir(self, path, offset):
-		obj = create_gitviewfs_object(path)
+		obj = get_gitviewfs_object(path)
 		for item in obj.list():
 			yield fuse.Direntry(item)
 	
@@ -143,7 +143,7 @@ class GitViewFS(Fuse):
 	class GitViewFSFile(object):
 
 		def __init__(self, path, flags, *mode):
-			self.file = create_gitviewfs_object(path)
+			self.file = get_gitviewfs_object(path)
 
 		def read(self, length, offset):
 			return self.file.read(length, offset)

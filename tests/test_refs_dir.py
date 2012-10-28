@@ -12,7 +12,7 @@ class TestRefsDir(unittest.TestCase):
 		pass
 
 	def test_list_refs_dir(self):
-		refs_dir = RefsDir(None, RefsDir.NAME)
+		refs_dir = RefsDir(None)
 		items = refs_dir.list()
 		self.assertItemsEqual(['HEAD', 'branches', 'tags', 'remotes'], items)
 
