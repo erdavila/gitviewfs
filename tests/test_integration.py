@@ -117,15 +117,7 @@ class TestIntegration(unittest.TestCase):
 		self.assertTrue(os.path.isdir(tree_dir))
 	
 	def test_tree_dir_content(self):
-		filename = 'file.txt'
-		with open(filename, 'w') as f:
-			f.write('Some content')
-		subdir = 'sub-dir'
-		os.mkdir(subdir)
-		with open(os.path.join(subdir, 'other-file'), 'w') as f:
-			f.write('Other content')
-		subprocess.check_call(['git', 'add', '.'])
-		subprocess.check_call(['git', 'commit', '-m', 'Add file'])
+		filename, subdirname = self._create_and_commit_file_and_subdir()
 		sha1 = subprocess.check_output(['git', 'rev-parse', 'HEAD^{tree}'])
 		sha1 = sha1.strip()
 		
@@ -133,7 +125,20 @@ class TestIntegration(unittest.TestCase):
 		
 		dir_content = os.listdir(tree_dir)
 		
-		self.assertItemsEqual([filename, subdir], dir_content)
+		self.assertItemsEqual([filename, subdirname], dir_content)
+	
+	def _create_and_commit_file_and_subdir(self):
+		filename = 'file.txt'
+		with open(filename, 'w') as f:
+			f.write('Some content')
+		subdirname = 'sub-dir'
+		os.mkdir(subdirname)
+		with open(os.path.join(subdirname, 'other-file'), 'w') as f:
+			f.write('Other content')
+		subprocess.check_call(['git', 'add', '.'])
+		subprocess.check_call(['git', 'commit', '-m', 'Add file'])
+		
+		return filename, subdirname
 	
 	def test_HEAD_is_symlink(self):
 		head_ref = os.path.join(self.mountpoint, RefsDir.NAME, 'HEAD')

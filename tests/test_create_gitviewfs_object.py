@@ -1,7 +1,7 @@
 import unittest
 
 from gitviewfs_objects import create_gitviewfs_object, RootDir, RefsDir, HeadSymLink,\
-	ObjectsDir, BlobsDir, BlobFile, TreesDir, TreeDir
+	ObjectsDir, BlobsDir, BlobFile, TreesDir, TreeDir, TreeDirItem
 
 
 class TestCreateGitViewFSObject(unittest.TestCase):
@@ -38,11 +38,18 @@ class TestCreateGitViewFSObject(unittest.TestCase):
 		self.assertIsInstance(obj, TreeDir)
 		self.assertEqual(obj.name, sha1)
 	
-	def test_create_fs_object_TreeFile_abbrev(self):
+	def test_create_fs_object_TreeDir_abbrev(self):
 		sha1 = '0123'
 		obj = create_gitviewfs_object("/objects/trees/" + sha1)
 		self.assertIsInstance(obj, TreeDir)
 		self.assertEqual(obj.name, sha1)
+	
+	def test_create_fs_object_TreeDir_item(self):
+		sha1 = '0123456789abcdef0123456789abcdef01234567'
+		item_name = 'filename'
+		obj = create_gitviewfs_object('/objects/trees/' + sha1 + '/' + item_name)
+		self.assertIsInstance(obj, TreeDirItem)
+		self.assertEqual(item_name, obj.name)
 	
 	def test_create_fs_object_BlobsDir(self):
 		obj = create_gitviewfs_object("/objects/blobs")

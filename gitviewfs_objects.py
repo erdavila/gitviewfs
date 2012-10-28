@@ -150,12 +150,21 @@ class TreesDir(GitViewFSObject):
 			return self
 		
 		first_part = path_parts[0]
-		if len(path_parts) == 1  and  self._is_valid_sha1_hash(first_part):
+		if self._is_valid_sha1_hash(first_part):
 			tree_dir = TreeDir(parent=self, name=first_part)
-			return tree_dir
+			return tree_dir.create_gitviewfs_object(path_parts[1:])
 
 
 class TreeDir(GitViewFSObject):
+	
+	def create_gitviewfs_object(self, path_parts):
+		if len(path_parts) == 0:
+			return self
+		
+		first_part = path_parts[0]
+		if len(path_parts) == 1:
+			tree_dir_item = TreeDirItem(parent=self, name=first_part)
+			return tree_dir_item
 	
 	def list(self):
 		items = []
@@ -168,6 +177,10 @@ class TreeDir(GitViewFSObject):
 		proc.wait()
 		
 		return items
+
+
+class TreeDirItem(GitViewFSObject):
+	pass
 
 
 class BlobsDir(GitViewFSObject):
