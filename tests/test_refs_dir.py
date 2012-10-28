@@ -1,9 +1,9 @@
 import unittest
 
-from fs_objects import RefsDir
+from gitviewfs_objects import RefsDir
 
 
-class Test(unittest.TestCase):
+class TestRefsDir(unittest.TestCase):
 
 	def setUp(self):
 		pass
@@ -12,8 +12,8 @@ class Test(unittest.TestCase):
 		pass
 
 	def test_list_refs_dir(self):
-		dir = RefsDir(None, RefsDir.NAME)
-		items = dir.list()
+		refs_dir = RefsDir(None, RefsDir.NAME)
+		items = refs_dir.list()
 		self.assertItemsEqual(['HEAD', 'branches', 'tags', 'remotes'], items)
 
 

@@ -5,11 +5,10 @@ import tempfile
 import shutil
 
 import gitviewfs
-from fs_objects import RefsDir
-import stat
+from gitviewfs_objects import RefsDir
 
 
-class Test(unittest.TestCase):
+class TestIntegration(unittest.TestCase):
 
 	def __gitviewfs_cmd_path(self):
 		main_file_path = gitviewfs.__file__

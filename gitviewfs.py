@@ -4,9 +4,8 @@ import os, sys
 import fcntl
 import fuse
 from fuse import Fuse
-from fs_objects import create_fs_object
+from gitviewfs_objects import create_gitviewfs_object
 import errno
-import stat
 
 
 if not hasattr(fuse, '__version__'):
@@ -51,14 +50,14 @@ class GitViewFS(Fuse):
 #			print "mythread: ticking"
 
 	def getattr(self, path):
-		obj = create_fs_object(path)
+		obj = create_gitviewfs_object(path)
 		return obj.getattr()
 	
 	def readlink(self, path):
 		return os.readlink("." + path)
 
 	def readdir(self, path, offset):
-		obj = create_fs_object(path)
+		obj = create_gitviewfs_object(path)
 		for item in obj.list():
 			yield fuse.Direntry(item)
 	
@@ -83,9 +82,9 @@ class GitViewFS(Fuse):
 	def chown(self, path, user, group):
 		os.chown("." + path, user, group)
 
-	def truncate(self, path, len):
+	def truncate(self, path, length):
 		f = open("." + path, "a")
-		f.truncate(len)
+		f.truncate(length)
 		f.close()
 
 	def mknod(self, path, mode, dev):
@@ -188,8 +187,8 @@ class GitViewFS(Fuse):
 		def fgetattr(self):
 			return os.fstat(self.fd)
 
-		def ftruncate(self, len):
-			self.file.truncate(len)
+		def ftruncate(self, length):
+			self.file.truncate(length)
 
 		def lock(self, cmd, owner, **kw):
 			# The code here is much rather just a demonstration of the locking

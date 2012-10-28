@@ -1,9 +1,9 @@
 import unittest
 
-from fs_objects import create_fs_object, RootDir, RefsDir, HeadSymLink
+from gitviewfs_objects import create_gitviewfs_object, RootDir, RefsDir, HeadSymLink
 
 
-class Test(unittest.TestCase):
+class TestCreateGitViewFSObject(unittest.TestCase):
 
 	def setUp(self):
 		pass
@@ -12,15 +12,15 @@ class Test(unittest.TestCase):
 		pass
 
 	def test_create_fs_object_RootDir(self):
-		obj = create_fs_object("/")
+		obj = create_gitviewfs_object("/")
 		self.assertIsInstance(obj, RootDir)
 	
 	def test_create_fs_object_RefsDir(self):
-		obj = create_fs_object("/refs")
+		obj = create_gitviewfs_object("/refs")
 		self.assertIsInstance(obj, RefsDir)
 	
 	def test_create_fs_object_HeadSymLink(self):
-		obj = create_fs_object("/refs/HEAD")
+		obj = create_gitviewfs_object("/refs/HEAD")
 		self.assertIsInstance(obj, HeadSymLink)
 
 

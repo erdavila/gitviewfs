@@ -1,9 +1,9 @@
 import unittest
 
-from fs_objects import RootDir
+from gitviewfs_objects import RootDir
 
 
-class Test(unittest.TestCase):
+class TestRootDir(unittest.TestCase):
 
 	def setUp(self):
 		pass
@@ -12,8 +12,8 @@ class Test(unittest.TestCase):
 		pass
 
 	def test_list_root_dir(self):
-		dir = RootDir()
-		items = dir.list()
+		root_dir = RootDir()
+		items = root_dir.list()
 		self.assertItemsEqual(['refs', 'objects', 'remotes'], items)
 
 

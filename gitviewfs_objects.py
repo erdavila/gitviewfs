@@ -1,6 +1,8 @@
 import stat
 import posix
 import os
+
+
 OBJECTS_DIR = 'objects'
 REMOTES_DIR = 'remotes'
 
@@ -19,17 +21,17 @@ def with_clear_file_type(stat_mode):
 	return stat_mode
 
 
-def create_fs_object(path):
+def create_gitviewfs_object(path):
 	assert path.startswith('/')
 	
 	path_parts = path.split('/')
 	root_dir = RootDir()
 	
-	obj = root_dir.create_fs_object(path_parts[1:])
+	obj = root_dir.create_gitviewfs_object(path_parts[1:])
 	return obj
 
 
-class GitFSObject(object):
+class GitViewFSObject(object):
 	
 	def __init__(self, parent, name):
 		self.parent = parent
@@ -46,14 +48,14 @@ class GitFSObject(object):
 		return posix.stat_result(attrs)
 
 
-class RootDir(GitFSObject):
+class RootDir(GitViewFSObject):
 	
 	PATH = '/'
 	
 	def __init__(self):
 		super(RootDir, self).__init__(parent=None, name='/')
 	
-	def create_fs_object(self, path_parts):
+	def create_gitviewfs_object(self, path_parts):
 		if path_parts == ['']:
 			return self
 		
@@ -61,13 +63,13 @@ class RootDir(GitFSObject):
 		
 		if first_part == RefsDir.NAME:
 			refs_dir = RefsDir(parent=self, name=first_part)
-			return refs_dir.create_fs_object(path_parts[1:])
+			return refs_dir.create_gitviewfs_object(path_parts[1:])
 		
 	def list(self):
 		return [RefsDir.NAME, OBJECTS_DIR, REMOTES_DIR]
 
 
-class RefsDir(GitFSObject):
+class RefsDir(GitViewFSObject):
 	
 	NAME = 'refs'
 	
@@ -75,7 +77,7 @@ class RefsDir(GitFSObject):
 		self.parent = parent
 		self.name = name
 	
-	def create_fs_object(self, path_parts):
+	def create_gitviewfs_object(self, path_parts):
 		if len(path_parts) == 0:
 			return self
 		
@@ -87,7 +89,7 @@ class RefsDir(GitFSObject):
 		return ['HEAD', 'branches', 'tags', 'remotes']
 
 
-class HeadSymLink(GitFSObject):
+class HeadSymLink(GitViewFSObject):
 	
 	def __init__(self, parent):
 		self.parent = parent

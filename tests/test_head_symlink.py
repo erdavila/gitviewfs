@@ -1,6 +1,6 @@
 import unittest
 
-from fs_objects import HeadSymLink
+from gitviewfs_objects import HeadSymLink
 import stat
 
 
