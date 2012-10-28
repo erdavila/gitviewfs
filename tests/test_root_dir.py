@@ -1,6 +1,8 @@
 import unittest
+import os
 
 from gitviewfs_objects import root_dir
+from tests.test_integration import TestIntegration
 
 
 class TestRootDir(unittest.TestCase):
@@ -13,6 +15,13 @@ class TestRootDir(unittest.TestCase):
 
 	def test_list_root_dir(self):
 		items = root_dir.list()
+		self.assertItemsEqual(['refs', 'objects', 'remotes'], items)
+
+
+class TestRootDirIntegration(TestIntegration):
+	
+	def test_list_root_dir(self):
+		items = os.listdir(self.mountpoint)
 		self.assertItemsEqual(['refs', 'objects', 'remotes'], items)
 
 

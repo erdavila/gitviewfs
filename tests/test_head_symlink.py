@@ -1,7 +1,9 @@
 import unittest
 
-from gitviewfs_objects import HeadSymLink
+from gitviewfs_objects import HeadSymLink, RefsDir
 import stat
+from tests.test_integration import TestIntegration
+import os
 
 
 class TestHeadSymLink(unittest.TestCase):
@@ -21,6 +23,13 @@ class TestHeadSymLink(unittest.TestCase):
 		attr = head_symlink.getattr()
 		
 		self.assertTrue(stat.S_ISLNK(attr.st_mode))
+
+
+class TestHeadSymLinkIntegration(TestIntegration):
+	
+	def test_HEAD_is_symlink(self):
+		head_ref = os.path.join(self.mountpoint, RefsDir.NAME, 'HEAD')
+		self.assertTrue(os.path.islink(head_ref))
 
 
 if __name__ == "__main__":
