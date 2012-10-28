@@ -29,6 +29,7 @@ class TestIntegration(unittest.TestCase):
 				self.mountpoint,
 				'-o', 'repo=' + self.repo,
 		])
+		os.chdir(self.repo)
 
 	def tearDown(self):
 		subprocess.check_call(['fusermount', '-u', self.mountpoint])
@@ -53,6 +54,25 @@ class TestIntegration(unittest.TestCase):
 	def test_blobs_is_directory(self):
 		blobs_path = os.path.join(self.mountpoint, ObjectsDir.NAME, BlobsDir.NAME)
 		self.assertTrue(os.path.isdir(blobs_path))
+	
+	def test_blob_content(self):
+		content = '''This is the content
+		in a Git blob file'''
+		filename = 'file.txt'
+		
+		with open(filename, 'w') as f:
+			f.write(content)
+		
+		subprocess.check_call(['git', 'add', filename])
+		subprocess.check_call(['git', 'commit', '-m', 'Add file'])
+		sha1 = subprocess.check_output(['git', 'hash-object', filename])
+		sha1 = sha1.strip()
+		
+		blob_path = os.path.join(self.mountpoint, ObjectsDir.NAME, BlobsDir.NAME, sha1)
+		with open(blob_path) as f:
+			read_content = f.read()
+		
+		self.assertEqual(read_content, content)
 	
 	def test_HEAD_is_symlink(self):
 		head_ref = os.path.join(self.mountpoint, RefsDir.NAME, 'HEAD')

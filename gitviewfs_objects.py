@@ -1,6 +1,7 @@
 import stat
 import posix
 import os
+import subprocess
 
 
 REMOTES_DIR = 'remotes'
@@ -10,9 +11,18 @@ def without_write_permissions(stat_mode):
 	stat_mode &= ~(stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH)
 	return stat_mode
 
+def without_execution_permissions(stat_mode):
+	stat_mode &= ~(stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+	return stat_mode
+
 def with_symlink_file_type(stat_mode):
 	stat_mode = with_clear_file_type(stat_mode)
 	stat_mode |= stat.S_IFLNK
+	return stat_mode
+
+def with_regular_file_type(stat_mode):
+	stat_mode = with_clear_file_type(stat_mode)
+	stat_mode |= stat.S_IFREG
 	return stat_mode
 
 def with_clear_file_type(stat_mode):
@@ -130,3 +140,23 @@ class BlobsDir(GitViewFSObject):
 	def create_gitviewfs_object(self, path_parts):
 		if len(path_parts) == 0:
 			return self
+		
+		first_part = path_parts[0]
+		if len(path_parts) == 1  and  4 <= len(first_part) <= 40:
+			blob_file = BlobFile(parent=self, name=first_part)
+			return blob_file
+
+
+class BlobFile(GitViewFSObject):
+	
+	def getattr(self):
+		stat_result = super(BlobFile, self).getattr()
+		
+		attrs = list(stat_result)
+		attrs[stat.ST_MODE] = with_regular_file_type(attrs[stat.ST_MODE])
+		attrs[stat.ST_MODE] = without_execution_permissions(attrs[stat.ST_MODE])
+		return posix.stat_result(attrs)
+	
+	def read(self, length, offset):
+		content = subprocess.check_output(['git', 'cat-file', 'blob', self.name])
+		return content[offset : offset+length]

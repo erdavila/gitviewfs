@@ -17,16 +17,6 @@ fuse.fuse_python_api = (0, 2)
 fuse.feature_assert('stateful_files', 'has_init')
 
 
-def flag2mode(flags):
-	md = {os.O_RDONLY: 'r', os.O_WRONLY: 'w', os.O_RDWR: 'w+'}
-	m = md[flags & (os.O_RDONLY | os.O_WRONLY | os.O_RDWR)]
-
-	if flags | os.O_APPEND:
-		m = m.replace('w', 'a', 1)
-
-	return m
-
-
 class GitViewFS(Fuse):
 
 	def __init__(self, *args, **kw):
@@ -153,12 +143,10 @@ class GitViewFS(Fuse):
 	class GitViewFSFile(object):
 
 		def __init__(self, path, flags, *mode):
-			self.fd = os.open("." + path, flags, *mode)
-			self.file = os.fdopen(self.fd, flag2mode(flags))
+			self.file = create_gitviewfs_object(path)
 
 		def read(self, length, offset):
-			self.file.seek(offset)
-			return self.file.read(length)
+			return self.file.read(length, offset)
 
 		def write(self, buf, offset):
 			self.file.seek(offset)
@@ -166,11 +154,10 @@ class GitViewFS(Fuse):
 			return len(buf)
 
 		def release(self, flags):
-			self.file.close()
+			pass
 
 		def _fflush(self):
-			if 'w' in self.file.mode or 'a' in self.file.mode:
-				self.file.flush()
+			pass
 
 		def fsync(self, isfsyncfile):
 			self._fflush()
@@ -180,12 +167,10 @@ class GitViewFS(Fuse):
 				os.fsync(self.fd)
 
 		def flush(self):
-			self._fflush()
-			# cf. xmp_flush() in fusexmp_fh.c
-			os.close(os.dup(self.fd))
+			pass
 
 		def fgetattr(self):
-			return os.fstat(self.fd)
+			return self.file.getattr()
 
 		def ftruncate(self, length):
 			self.file.truncate(length)
@@ -215,20 +200,7 @@ class GitViewFS(Fuse):
 
 			# Convert fcntl-ish lock parameters to Python's weird
 			# lockf(3)/flock(2) medley locking API...
-			op = { fcntl.F_UNLCK : fcntl.LOCK_UN,
-				   fcntl.F_RDLCK : fcntl.LOCK_SH,
-				   fcntl.F_WRLCK : fcntl.LOCK_EX }[kw['l_type']]
-			if cmd == fcntl.F_GETLK:
-				return -errno.EOPNOTSUPP
-			elif cmd == fcntl.F_SETLK:
-				if op != fcntl.LOCK_UN:
-					op |= fcntl.LOCK_NB
-			elif cmd == fcntl.F_SETLKW:
-				pass
-			else:
-				return -errno.EINVAL
-
-			fcntl.lockf(self.fd, op, kw['l_start'], kw['l_len'])
+			pass
 
 
 	def main(self, *a, **kw):
