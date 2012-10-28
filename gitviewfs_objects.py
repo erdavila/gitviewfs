@@ -55,6 +55,9 @@ class GitViewFSObject(object):
 		attrs[stat.ST_NLINK] = 1
 		
 		return posix.stat_result(attrs)
+	
+	def _is_valid_sha1_hash(self, sha1_hash):
+		return 4 <= len(sha1_hash) <= 40
 
 
 class RootDir(GitViewFSObject):
@@ -145,6 +148,15 @@ class TreesDir(GitViewFSObject):
 	def create_gitviewfs_object(self, path_parts):
 		if len(path_parts) == 0:
 			return self
+		
+		first_part = path_parts[0]
+		if len(path_parts) == 1  and  self._is_valid_sha1_hash(first_part):
+			tree_dir = TreeDir(parent=self, name=first_part)
+			return tree_dir
+
+
+class TreeDir(GitViewFSObject):
+	pass
 
 
 class BlobsDir(GitViewFSObject):
@@ -156,7 +168,7 @@ class BlobsDir(GitViewFSObject):
 			return self
 		
 		first_part = path_parts[0]
-		if len(path_parts) == 1  and  4 <= len(first_part) <= 40:
+		if len(path_parts) == 1  and  self._is_valid_sha1_hash(first_part):
 			blob_file = BlobFile(parent=self, name=first_part)
 			return blob_file
 

@@ -77,12 +77,18 @@ class TestIntegration(unittest.TestCase):
 		
 		self.assertEqual(st.st_size, len(content))
 		
-		self.assertTrue(stat.S_ISREG(st.st_mode))
-		
 		self.assertFalse(st.st_mode & stat.S_IXUSR)
 		self.assertFalse(st.st_mode & stat.S_IXGRP)
 		self.assertFalse(st.st_mode & stat.S_IXOTH)
 	
+	def test_blob_is_regular_file(self):
+		filename, _ = self._create_and_commit_file()
+		sha1 = subprocess.check_output(['git', 'hash-object', filename])
+		sha1 = sha1.strip()
+		
+		blob_path = os.path.join(self.mountpoint, ObjectsDir.NAME, BlobsDir.NAME, sha1)
+		
+		self.assertTrue(os.path.isfile(blob_path))
 	
 	def _create_and_commit_file(self):
 		content = '''This is the content
@@ -100,6 +106,15 @@ class TestIntegration(unittest.TestCase):
 	def test_trees_dir_is_directory(self):
 		trees_dir = os.path.join(self.mountpoint, ObjectsDir.NAME, TreesDir.NAME)
 		self.assertTrue(os.path.isdir(trees_dir))
+	
+	def test_tree_dir_is_directory(self):
+		self._create_and_commit_file()
+		sha1 = subprocess.check_output(['git', 'rev-parse', 'HEAD^{tree}'])
+		sha1 = sha1.strip()
+		
+		tree_dir = os.path.join(self.mountpoint, ObjectsDir.NAME, TreesDir.NAME, sha1)
+		
+		self.assertTrue(os.path.isdir(tree_dir))
 	
 	def test_HEAD_is_symlink(self):
 		head_ref = os.path.join(self.mountpoint, RefsDir.NAME, 'HEAD')
