@@ -6,6 +6,7 @@ import shutil
 
 import gitviewfs
 from gitviewfs_objects import RefsDir, ObjectsDir, BlobsDir
+import stat
 
 
 class TestIntegration(unittest.TestCase):
@@ -56,6 +57,34 @@ class TestIntegration(unittest.TestCase):
 		self.assertTrue(os.path.isdir(blobs_path))
 	
 	def test_blob_content(self):
+		filename, content = self._create_and_commit_file()
+		sha1 = subprocess.check_output(['git', 'hash-object', filename])
+		sha1 = sha1.strip()
+		
+		blob_path = os.path.join(self.mountpoint, ObjectsDir.NAME, BlobsDir.NAME, sha1)
+		with open(blob_path) as f:
+			read_content = f.read()
+		
+		self.assertEqual(read_content, content)
+	
+	def test_blob_attributes(self):
+		filename, content = self._create_and_commit_file()
+		sha1 = subprocess.check_output(['git', 'hash-object', filename])
+		sha1 = sha1.strip()
+		blob_path = os.path.join(self.mountpoint, ObjectsDir.NAME, BlobsDir.NAME, sha1)
+		
+		st = os.stat(blob_path)
+		
+		self.assertEqual(st.st_size, len(content))
+		
+		self.assertTrue(stat.S_ISREG(st.st_mode))
+		
+		self.assertFalse(st.st_mode & stat.S_IXUSR)
+		self.assertFalse(st.st_mode & stat.S_IXGRP)
+		self.assertFalse(st.st_mode & stat.S_IXOTH)
+	
+	
+	def _create_and_commit_file(self):
 		content = '''This is the content
 		in a Git blob file'''
 		filename = 'file.txt'
@@ -65,14 +94,8 @@ class TestIntegration(unittest.TestCase):
 		
 		subprocess.check_call(['git', 'add', filename])
 		subprocess.check_call(['git', 'commit', '-m', 'Add file'])
-		sha1 = subprocess.check_output(['git', 'hash-object', filename])
-		sha1 = sha1.strip()
 		
-		blob_path = os.path.join(self.mountpoint, ObjectsDir.NAME, BlobsDir.NAME, sha1)
-		with open(blob_path) as f:
-			read_content = f.read()
-		
-		self.assertEqual(read_content, content)
+		return filename, content
 	
 	def test_HEAD_is_symlink(self):
 		head_ref = os.path.join(self.mountpoint, RefsDir.NAME, 'HEAD')

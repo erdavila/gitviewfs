@@ -155,7 +155,14 @@ class BlobFile(GitViewFSObject):
 		attrs = list(stat_result)
 		attrs[stat.ST_MODE] = with_regular_file_type(attrs[stat.ST_MODE])
 		attrs[stat.ST_MODE] = without_execution_permissions(attrs[stat.ST_MODE])
+		attrs[stat.ST_SIZE] = self._get_blob_size()
 		return posix.stat_result(attrs)
+	
+	def _get_blob_size(self):
+		subprocess.call(['git', 'cat-file', '-s', self.name])
+		size_string = subprocess.check_output(['git', 'cat-file', '-s', self.name])
+		size = int(size_string)
+		return size
 	
 	def read(self, length, offset):
 		content = subprocess.check_output(['git', 'cat-file', 'blob', self.name])
