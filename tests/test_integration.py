@@ -5,7 +5,7 @@ import tempfile
 import shutil
 
 import gitviewfs
-from gitviewfs_objects import RefsDir
+from gitviewfs_objects import RefsDir, ObjectsDir
 
 
 class TestIntegration(unittest.TestCase):
@@ -44,6 +44,11 @@ class TestIntegration(unittest.TestCase):
 		refs_dir = os.path.join(self.mountpoint, RefsDir.NAME)
 		items = os.listdir(refs_dir)
 		self.assertItemsEqual(['HEAD', 'branches', 'tags', 'remotes'], items)
+	
+	def test_list_objects_dir(self):
+		refs_dir = os.path.join(self.mountpoint, ObjectsDir.NAME)
+		items = os.listdir(refs_dir)
+		self.assertItemsEqual(['all', 'blobs', 'commits', 'trees'], items)
 	
 	def test_HEAD_is_symlink(self):
 		head_ref = os.path.join(self.mountpoint, RefsDir.NAME, 'HEAD')

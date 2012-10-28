@@ -3,7 +3,6 @@ import posix
 import os
 
 
-OBJECTS_DIR = 'objects'
 REMOTES_DIR = 'remotes'
 
 
@@ -65,8 +64,12 @@ class RootDir(GitViewFSObject):
 			refs_dir = RefsDir(parent=self, name=first_part)
 			return refs_dir.create_gitviewfs_object(path_parts[1:])
 		
+		if first_part == ObjectsDir.NAME:
+			objects_dir = ObjectsDir(parent=self, name=first_part)
+			return objects_dir.create_gitviewfs_object(path_parts[1:])
+	
 	def list(self):
-		return [RefsDir.NAME, OBJECTS_DIR, REMOTES_DIR]
+		return [RefsDir.NAME, ObjectsDir.NAME, REMOTES_DIR]
 
 
 class RefsDir(GitViewFSObject):
@@ -100,3 +103,15 @@ class HeadSymLink(GitViewFSObject):
 		attrs = list(stat_result)
 		attrs[stat.ST_MODE] = with_symlink_file_type(attrs[stat.ST_MODE])
 		return posix.stat_result(attrs)
+
+
+class ObjectsDir(GitViewFSObject):
+	
+	NAME = 'objects'
+	
+	def create_gitviewfs_object(self, path_parts):
+		if len(path_parts) == 0:
+			return self
+	
+	def list(self):
+		return ['commits', 'trees', 'blobs', 'all']

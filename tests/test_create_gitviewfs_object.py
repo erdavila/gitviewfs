@@ -1,6 +1,7 @@
 import unittest
 
-from gitviewfs_objects import create_gitviewfs_object, RootDir, RefsDir, HeadSymLink
+from gitviewfs_objects import create_gitviewfs_object, RootDir, RefsDir, HeadSymLink,\
+	ObjectsDir
 
 
 class TestCreateGitViewFSObject(unittest.TestCase):
@@ -22,6 +23,10 @@ class TestCreateGitViewFSObject(unittest.TestCase):
 	def test_create_fs_object_HeadSymLink(self):
 		obj = create_gitviewfs_object("/refs/HEAD")
 		self.assertIsInstance(obj, HeadSymLink)
+	
+	def test_create_fs_object_ObjectsDir(self):
+		obj = create_gitviewfs_object("/objects")
+		self.assertIsInstance(obj, ObjectsDir)
 
 
 if __name__ == "__main__":
