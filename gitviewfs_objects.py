@@ -112,6 +112,21 @@ class ObjectsDir(GitViewFSObject):
 	def create_gitviewfs_object(self, path_parts):
 		if len(path_parts) == 0:
 			return self
+		
+		first_part = path_parts[0]
+		
+		if first_part == BlobsDir.NAME:
+			blobs_dir = BlobsDir(parent=self, name=first_part)
+			return blobs_dir.create_gitviewfs_object(path_parts[1:])
 	
 	def list(self):
-		return ['commits', 'trees', 'blobs', 'all']
+		return ['commits', 'trees', BlobsDir.NAME, 'all']
+
+
+class BlobsDir(GitViewFSObject):
+	
+	NAME = 'blobs'
+
+	def create_gitviewfs_object(self, path_parts):
+		if len(path_parts) == 0:
+			return self

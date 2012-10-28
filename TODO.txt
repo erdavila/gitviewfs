@@ -5,3 +5,4 @@
 - Detached-head (refs/HEAD?)
 - Repository initialized but without any commit yet (refs/HEAD? refs/commits/?)
 - getattr() should always return read-only
+- Signed tags
