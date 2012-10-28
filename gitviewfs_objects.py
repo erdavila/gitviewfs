@@ -156,7 +156,18 @@ class TreesDir(GitViewFSObject):
 
 
 class TreeDir(GitViewFSObject):
-	pass
+	
+	def list(self):
+		items = []
+		
+		proc = subprocess.Popen(['git', 'cat-file', '-p', self.name], stdout=subprocess.PIPE)
+		for line in proc.stdout:
+			tab = line.index('\t')
+			item = line[tab+1:].strip()
+			items.append(item)
+		proc.wait()
+		
+		return items
 
 
 class BlobsDir(GitViewFSObject):

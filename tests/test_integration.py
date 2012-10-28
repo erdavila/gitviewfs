@@ -116,6 +116,25 @@ class TestIntegration(unittest.TestCase):
 		
 		self.assertTrue(os.path.isdir(tree_dir))
 	
+	def test_tree_dir_content(self):
+		filename = 'file.txt'
+		with open(filename, 'w') as f:
+			f.write('Some content')
+		subdir = 'sub-dir'
+		os.mkdir(subdir)
+		with open(os.path.join(subdir, 'other-file'), 'w') as f:
+			f.write('Other content')
+		subprocess.check_call(['git', 'add', '.'])
+		subprocess.check_call(['git', 'commit', '-m', 'Add file'])
+		sha1 = subprocess.check_output(['git', 'rev-parse', 'HEAD^{tree}'])
+		sha1 = sha1.strip()
+		
+		tree_dir = os.path.join(self.mountpoint, ObjectsDir.NAME, TreesDir.NAME, sha1)
+		
+		dir_content = os.listdir(tree_dir)
+		
+		self.assertItemsEqual([filename, subdir], dir_content)
+	
 	def test_HEAD_is_symlink(self):
 		head_ref = os.path.join(self.mountpoint, RefsDir.NAME, 'HEAD')
 		self.assertTrue(os.path.islink(head_ref))
