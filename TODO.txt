@@ -1,4 +1,4 @@
-- Check if dir is Git repository
+- Check if repo argument is Git repository
 - Branches with "/" in name
 - Tags with "/" in name
 - Bare repository (refs/HEAD?)

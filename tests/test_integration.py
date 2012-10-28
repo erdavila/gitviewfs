@@ -5,7 +5,7 @@ import tempfile
 import shutil
 
 import gitviewfs
-from gitviewfs_objects import RefsDir, ObjectsDir, BlobsDir
+from gitviewfs_objects import RefsDir, ObjectsDir, BlobsDir, TreesDir
 import stat
 
 
@@ -96,6 +96,10 @@ class TestIntegration(unittest.TestCase):
 		subprocess.check_call(['git', 'commit', '-m', 'Add file'])
 		
 		return filename, content
+	
+	def test_trees_dir_is_directory(self):
+		trees_dir = os.path.join(self.mountpoint, ObjectsDir.NAME, TreesDir.NAME)
+		self.assertTrue(os.path.isdir(trees_dir))
 	
 	def test_HEAD_is_symlink(self):
 		head_ref = os.path.join(self.mountpoint, RefsDir.NAME, 'HEAD')
