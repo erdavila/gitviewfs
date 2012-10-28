@@ -127,6 +127,17 @@ class TestIntegration(unittest.TestCase):
 		
 		self.assertItemsEqual([filename, subdirname], dir_content)
 	
+	def test_tree_items_are_symbolic_links(self):
+		filename, subdirname = self._create_and_commit_file_and_subdir()
+		sha1 = subprocess.check_output(['git', 'rev-parse', 'HEAD^{tree}'])
+		sha1 = sha1.strip()
+		
+		file_path = os.path.join(self.mountpoint, ObjectsDir.NAME, TreesDir.NAME, sha1, filename)
+		self.assertTrue(os.path.islink(file_path))
+		
+		subdir_path = os.path.join(self.mountpoint, ObjectsDir.NAME, TreesDir.NAME, sha1, subdirname)
+		self.assertTrue(os.path.islink(subdir_path))
+	
 	def _create_and_commit_file_and_subdir(self):
 		filename = 'file.txt'
 		with open(filename, 'w') as f:

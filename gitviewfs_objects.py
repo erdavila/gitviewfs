@@ -180,7 +180,13 @@ class TreeDir(GitViewFSObject):
 
 
 class TreeDirItem(GitViewFSObject):
-	pass
+	
+	def getattr(self):
+		stat_result = super(TreeDirItem, self).getattr()
+		
+		attrs = list(stat_result)
+		attrs[stat.ST_MODE] = with_symlink_file_type(attrs[stat.ST_MODE])
+		return posix.stat_result(attrs)
 
 
 class BlobsDir(GitViewFSObject):
