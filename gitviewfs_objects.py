@@ -185,7 +185,8 @@ class TreeDir(Directory):
 	def list(self):
 		items = []
 		
-		proc = subprocess.Popen(['git', 'cat-file', '-p', self.name], stdout=subprocess.PIPE)
+		tree_sha1 = self.name
+		proc = subprocess.Popen(['git', 'cat-file', '-p', tree_sha1], stdout=subprocess.PIPE)
 		for line in proc.stdout:
 			tab = line.index('\t')
 			item = line[tab+1:].strip()
@@ -196,7 +197,24 @@ class TreeDir(Directory):
 
 
 class TreeDirItem(SymLink):
-	pass
+	
+	def readlink(self):
+		tree_sha1 = self.parent.name
+		proc = subprocess.Popen(['git', 'cat-file', '-p', tree_sha1], stdout=subprocess.PIPE)
+		for line in proc.stdout:
+			tab = line.index('\t')
+			item = line[tab+1:].strip()
+			if item == self.name:
+				perms, item_type, sha1 = line[:tab].split(' ')
+				break
+		proc.wait()
+		
+		if item_type == 'blob':
+			target_path = '/objects/blobs/' + sha1
+		elif item_type == 'tree':
+			target_path ='/objects/trees/' + sha1
+		
+		return os.path.relpath(target_path, self.parent.get_path())
 
 
 class BlobsDir(Directory):

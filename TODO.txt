@@ -9,3 +9,4 @@
 - Handle errors:
 	- ls MOUNT-POINT/objects/trees
 	- ls MOUNT-POINT/objects/objects
+- SymbolicLink.getattr() must report correct size

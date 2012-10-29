@@ -44,7 +44,8 @@ class GitViewFS(Fuse):
 		return obj.getattr()
 	
 	def readlink(self, path):
-		return os.readlink("." + path)
+		obj = get_gitviewfs_object(path)
+		return obj.readlink()
 
 	def readdir(self, path, offset):
 		obj = get_gitviewfs_object(path)
