@@ -1,7 +1,7 @@
 import unittest
 
 from gitviewfs_objects import get_gitviewfs_object, RootDir, RefsDir, HeadSymLink,\
-	ObjectsDir, BlobsDir, BlobFile, TreesDir, TreeDir, TreeDirItem
+	ObjectsDir, BlobsDir, BlobFile, TreesDir, TreeDir, TreeDirItem, CommitsDir
 
 
 class TestGetGitViewFSObject(unittest.TestCase):
@@ -27,6 +27,10 @@ class TestGetGitViewFSObject(unittest.TestCase):
 	def test_get_fs_object_ObjectsDir(self):
 		obj = get_gitviewfs_object("/objects")
 		self.assertIsInstance(obj, ObjectsDir)
+	
+	def test_get_fs_object_CommitsDir(self):
+		obj = get_gitviewfs_object("/objects/commits")
+		self.assertIsInstance(obj, CommitsDir)
 	
 	def test_get_fs_object_TreesDir(self):
 		obj = get_gitviewfs_object("/objects/trees")

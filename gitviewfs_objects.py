@@ -145,12 +145,26 @@ class ObjectsDir(PredefinedDirectory):
 	
 	def __init__(self, parent):
 		items = {
-			'commits'     : None,
-			TreesDir.NAME : TreesDir(parent=self, name=TreesDir.NAME),
-			BlobsDir.NAME : BlobsDir(parent=self, name=BlobsDir.NAME),
-			'all'         : None,
+			CommitsDir.NAME : CommitsDir(parent=self),
+			TreesDir.NAME   : TreesDir(parent=self, name=TreesDir.NAME),
+			BlobsDir.NAME   : BlobsDir(parent=self, name=BlobsDir.NAME),
+			'all'           : None,
 		}
 		super(ObjectsDir, self).__init__(parent=parent, name=self.NAME, items=items)
+
+
+class CommitsDir(Directory):
+	
+	NAME = 'commits'
+	INSTANCE = None
+	
+	def __init__(self, parent):
+		super(CommitsDir, self).__init__(parent=parent, name=self.NAME)
+		CommitsDir.INSTANCE = self
+	
+	def get_gitviewfs_object(self, path_parts):
+		if len(path_parts) == 0:
+			return self
 
 
 class TreesDir(Directory):
