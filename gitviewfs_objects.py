@@ -2,6 +2,7 @@ import stat
 import posix
 import os
 import subprocess
+from collections import namedtuple
 
 
 REMOTES_DIR = 'remotes'
@@ -185,36 +186,42 @@ class TreeDir(Directory):
 	def list(self):
 		items = []
 		
-		tree_sha1 = self.name
-		proc = subprocess.Popen(['git', 'cat-file', '-p', tree_sha1], stdout=subprocess.PIPE)
-		for line in proc.stdout:
-			tab = line.index('\t')
-			item = line[tab+1:].strip()
-			items.append(item)
-		proc.wait()
+		for item in self._read_tree_items():
+			items.append(item.name)
 		
 		return items
+	
+	Item = namedtuple('Item', 'name, sha1, type, perms')
+	
+	def _read_tree_items(self):
+		tree_sha1 = self.name
+		proc = subprocess.Popen(['git', 'cat-file', '-p', tree_sha1], stdout=subprocess.PIPE)
+		try:
+			for line in proc.stdout:
+				line = line.strip()
+				perms_and_type_and_sha1, item_name = line.split('\t')
+				item_perms, item_type, item_sha1 = perms_and_type_and_sha1.split(' ')
+				yield self.Item(item_name, item_sha1, item_type, item_perms)
+		finally:
+			proc.wait()
 
 
 class TreeDirItem(SymLink):
 	
 	def readlink(self):
-		tree_sha1 = self.parent.name
-		proc = subprocess.Popen(['git', 'cat-file', '-p', tree_sha1], stdout=subprocess.PIPE)
-		for line in proc.stdout:
-			tab = line.index('\t')
-			item = line[tab+1:].strip()
-			if item == self.name:
-				perms, item_type, sha1 = line[:tab].split(' ')
+		for item in self.parent._read_tree_items():
+			if item.name == self.name:
 				break
-		proc.wait()
 		
-		if item_type == 'blob':
-			target_path = '/objects/blobs/' + sha1
-		elif item_type == 'tree':
-			target_path ='/objects/trees/' + sha1
+		if item.type == 'blob':
+			dir_object = BlobsDir.INSTANCE
+		elif item.type == 'tree':
+			dir_object = TreesDir.INSTANCE
 		
-		return os.path.relpath(target_path, self.parent.get_path())
+		target_object = dir_object.get_gitviewfs_object([item.sha1])
+		target_path = target_object.get_path()
+		symlink_path = os.path.relpath(target_path, self.parent.get_path())
+		return symlink_path
 
 
 class BlobsDir(Directory):
