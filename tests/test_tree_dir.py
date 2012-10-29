@@ -1,9 +1,9 @@
 import unittest
 import os
+import subprocess
 
 from tests.test_integration import TestIntegration
 from gitviewfs_objects import ObjectsDir, TreesDir
-import subprocess
 
 
 class TestTreeDir(unittest.TestCase):

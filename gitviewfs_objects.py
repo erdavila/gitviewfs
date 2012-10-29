@@ -165,6 +165,29 @@ class CommitsDir(Directory):
 	def get_gitviewfs_object(self, path_parts):
 		if len(path_parts) == 0:
 			return self
+		
+		first_part = path_parts[0]
+		rest = path_parts[1:]
+		if self._is_valid_sha1_hash(first_part):
+			commit_dir = CommitDir(parent=self, name=first_part)
+			return commit_dir.get_gitviewfs_object(rest)
+
+
+class CommitDir(PredefinedDirectory):
+	
+	def __init__(self, parent, name):
+		items = {
+			'message' : None,
+			'author' : None,
+			'committer' : None,
+			'parents' : None,
+			'tree' : None,
+		}
+		super(CommitDir, self).__init__(parent=parent, name=name, items=items)
+	
+	def get_gitviewfs_object(self, path_parts):
+		if len(path_parts) == 0:
+			return self
 
 
 class TreesDir(Directory):
