@@ -3,24 +3,10 @@ import os
 import subprocess
 
 from tests.test_integration import TestIntegration
-from gitviewfs_objects import ObjectsDir, TreesDir, CommitsDir
+from gitviewfs_objects import ObjectsDir, CommitsDir
 
 
 class TestCommitDir(unittest.TestCase):
-
-	def setUp(self):
-		pass
-
-	def tearDown(self):
-		pass
-	
-	def test_get_path(self):
-		commits_dir = CommitsDir.INSTANCE
-		commit_dir = commits_dir.get_gitviewfs_object(['a1b2c3d4'])
-		
-		path = commit_dir.get_path()
-		
-		self.assertEqual('/objects/commits/a1b2c3d4', path)
 	
 	def test_list(self):
 		commits_dir = CommitsDir.INSTANCE

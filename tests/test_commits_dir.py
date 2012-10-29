@@ -12,11 +12,6 @@ class TestCommitsDir(unittest.TestCase):
 
 	def tearDown(self):
 		pass
-	
-	def test_get_path(self):
-		commits_dir = CommitsDir.INSTANCE
-		path = commits_dir.get_path()
-		self.assertEqual('/objects/commits', path)
 
 
 class TestCommitsDirIntegration(TestIntegration):

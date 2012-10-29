@@ -13,15 +13,15 @@ class TestRefsDir(unittest.TestCase):
 	def tearDown(self):
 		pass
 
-	def test_list_refs_dir(self):
-		refs_dir = RefsDir(None)
+	def test_list(self):
+		refs_dir = RefsDir.INSTANCE
 		items = refs_dir.list()
 		self.assertItemsEqual(['HEAD', 'branches', 'tags', 'remotes'], items)
 
 
 class TestRefsDirIntegration(TestIntegration):
 	
-	def test_list_refs_dir(self):
+	def test_list(self):
 		refs_dir = os.path.join(self.mountpoint, RefsDir.NAME)
 		items = os.listdir(refs_dir)
 		self.assertItemsEqual(['HEAD', 'branches', 'tags', 'remotes'], items)

@@ -13,19 +13,11 @@ class TestTreeDir(unittest.TestCase):
 
 	def tearDown(self):
 		pass
-	
-	def test_get_path(self):
-		trees_dir = TreesDir.INSTANCE
-		tree_dir = trees_dir.get_gitviewfs_object(['a1b2c3d4'])
-		
-		path = tree_dir.get_path()
-		
-		self.assertEqual('/objects/trees/a1b2c3d4', path)
 
 
 class TestTreeDirIntegration(TestIntegration):
 	
-	def test_tree_dir_is_directory(self):
+	def test_is_directory(self):
 		self.create_and_commit_file()
 		sha1 = subprocess.check_output(['git', 'rev-parse', 'HEAD^{tree}'])
 		sha1 = sha1.strip()
@@ -34,7 +26,7 @@ class TestTreeDirIntegration(TestIntegration):
 		
 		self.assertTrue(os.path.isdir(tree_dir))
 	
-	def test_tree_dir_list(self):
+	def test_list(self):
 		filename, subdirname = self.create_and_commit_file_and_subdir()
 		sha1 = subprocess.check_output(['git', 'rev-parse', 'HEAD^{tree}'])
 		sha1 = sha1.strip()

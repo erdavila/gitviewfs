@@ -40,6 +40,7 @@ def get_gitviewfs_object(path):
 		path_parts = path.split('/')
 		rest = path_parts[1:]
 	
+	root_dir = RootDir.INSTANCE
 	obj = root_dir.get_gitviewfs_object(rest)
 	return obj
 
@@ -60,7 +61,12 @@ class GitViewFSObject(object):
 		return posix.stat_result(attrs)
 	
 	def get_path(self):
-		return self.parent.get_path() + '/' + self.name
+		parent_path = self.parent.get_path()
+		if parent_path == '/':
+			path = '/' + self.name
+		else:
+			path = parent_path + '/' + self.name
+		return path
 	
 	def _is_valid_sha1_hash(self, sha1_hash):
 		return 4 <= len(sha1_hash) <= 40
@@ -105,6 +111,8 @@ class SymLink(GitViewFSObject):
 
 class RootDir(PredefinedDirectory):
 	
+	INSTANCE = None
+	
 	def __init__(self):
 		items = {
 			RefsDir.NAME    : RefsDir(parent=self),
@@ -112,14 +120,16 @@ class RootDir(PredefinedDirectory):
 			REMOTES_DIR     : None,
 		}
 		super(RootDir, self).__init__(parent=None, name='/', items=items)
+		RootDir.INSTANCE = self
 	
 	def get_path(self):
-		return ''
+		return '/'
 	
 
 class RefsDir(PredefinedDirectory):
 	
 	NAME = 'refs'
+	INSTANCE = None
 	
 	def __init__(self, parent):
 		items = {
@@ -129,19 +139,23 @@ class RefsDir(PredefinedDirectory):
 			'remotes'        : None,
 		}
 		super(RefsDir, self).__init__(parent=parent, name=self.NAME, items=items)
+		RefsDir.INSTANCE = self
 
 
 class HeadSymLink(SymLink):
 	
 	NAME = 'HEAD'
+	INSTANCE = None
 	
 	def __init__(self, parent):
 		super(HeadSymLink, self).__init__(parent=parent, name=self.NAME)
+		HeadSymLink.INSTANCE = self
 
 
 class ObjectsDir(PredefinedDirectory):
 	
 	NAME = 'objects'
+	INSTANCE = None
 	
 	def __init__(self, parent):
 		items = {
@@ -151,6 +165,7 @@ class ObjectsDir(PredefinedDirectory):
 			'all'           : None,
 		}
 		super(ObjectsDir, self).__init__(parent=parent, name=self.NAME, items=items)
+		ObjectsDir.INSTANCE = self
 
 
 class CommitsDir(Directory):
@@ -302,4 +317,4 @@ class BlobFile(GitViewFSObject):
 		return content[offset : offset+length]
 
 
-root_dir = RootDir()
+RootDir()
