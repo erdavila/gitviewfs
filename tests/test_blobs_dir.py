@@ -1,6 +1,6 @@
 import unittest
 
-from gitviewfs_objects import BlobsDir, ObjectsDir
+from gitviewfs_objects import BlobsDir, ObjectsDir, get_gitviewfs_object
 import stat
 from tests.test_integration import TestIntegration
 import os
@@ -20,6 +20,13 @@ class TestBlobsDir(unittest.TestCase):
 		attr = blobs_dir.getattr()
 		
 		self.assertTrue(stat.S_ISDIR(attr.st_mode))
+	
+	def get_path(self):
+		blobs_dir = BlobsDir.INSTANCE
+		
+		path = blobs_dir.get_path()
+		
+		self.assertEqual('/objects/blobs', path)
 
 
 class TestBlobsDirIntegration(TestIntegration):

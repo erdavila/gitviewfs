@@ -58,6 +58,9 @@ class GitViewFSObject(object):
 		
 		return posix.stat_result(attrs)
 	
+	def get_path(self):
+		return self.parent.get_path() + '/' + self.name
+	
 	def _is_valid_sha1_hash(self, sha1_hash):
 		return 4 <= len(sha1_hash) <= 40
 
@@ -109,6 +112,9 @@ class RootDir(PredefinedDirectory):
 		}
 		super(RootDir, self).__init__(parent=None, name='/', items=items)
 	
+	def get_path(self):
+		return ''
+	
 
 class RefsDir(PredefinedDirectory):
 	
@@ -149,6 +155,11 @@ class ObjectsDir(PredefinedDirectory):
 class TreesDir(Directory):
 	
 	NAME = 'trees'
+	INSTANCE = None
+	
+	def __init__(self, *args, **kwargs):
+		super(TreesDir, self).__init__(*args, **kwargs)
+		TreesDir.INSTANCE = self
 	
 	def get_gitviewfs_object(self, path_parts):
 		if len(path_parts) == 0:
@@ -191,7 +202,12 @@ class TreeDirItem(SymLink):
 class BlobsDir(Directory):
 	
 	NAME = 'blobs'
-
+	INSTANCE = None
+	
+	def __init__(self, *args, **kwargs):
+		super(BlobsDir, self).__init__(*args, **kwargs)
+		BlobsDir.INSTANCE = self
+	
 	def get_gitviewfs_object(self, path_parts):
 		if len(path_parts) == 0:
 			return self

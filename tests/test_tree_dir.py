@@ -13,6 +13,14 @@ class TestTreeDir(unittest.TestCase):
 
 	def tearDown(self):
 		pass
+	
+	def test_get_path(self):
+		trees_dir = TreesDir.INSTANCE
+		tree_dir = trees_dir.get_gitviewfs_object(['a1b2c3d4'])
+		
+		path = tree_dir.get_path()
+		
+		self.assertEqual('/objects/trees/a1b2c3d4', path)
 
 
 class TestTreeDirIntegration(TestIntegration):

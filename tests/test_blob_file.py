@@ -3,7 +3,7 @@ import subprocess
 import os
 import stat
 
-from gitviewfs_objects import ObjectsDir, BlobsDir
+from gitviewfs_objects import ObjectsDir, BlobsDir, get_gitviewfs_object
 from tests.test_integration import TestIntegration
 
 
@@ -14,6 +14,14 @@ class TestBlobFile(unittest.TestCase):
 
 	def tearDown(self):
 		pass
+	
+	def test_get_path(self):
+		blobs_dir = BlobsDir.INSTANCE
+		blob_file = blobs_dir.get_gitviewfs_object(['a1b2c3d4'])
+		
+		path = blob_file.get_path()
+		
+		self.assertEqual('/objects/blobs/a1b2c3d4', path)
 
 
 class TestBlobFileIntegration(TestIntegration):

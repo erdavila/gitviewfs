@@ -13,9 +13,13 @@ class TestRootDir(unittest.TestCase):
 	def tearDown(self):
 		pass
 
-	def test_list_root_dir(self):
+	def test_list(self):
 		items = root_dir.list()
 		self.assertItemsEqual(['refs', 'objects', 'remotes'], items)
+	
+	def test_get_path(self):
+		path = root_dir.get_path()
+		self.assertEqual('', path)
 
 
 class TestRootDirIntegration(TestIntegration):
