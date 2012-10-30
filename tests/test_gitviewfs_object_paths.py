@@ -2,24 +2,25 @@ import unittest
 
 from gitviewfs_objects import get_gitviewfs_object, RootDir, RefsDir,\
 	HeadSymLink, ObjectsDir, CommitsDir, CommitDir, TreesDir, TreeDir, TreeDirItem,\
-	BlobsDir, BlobFile
+	BlobsDir, BlobFile, CommitTreeSymLink
 
 
 SAMPLE_HASH = 'a1b2c3d4'
 SAMPLE_FILENAME = 'filename'
 
 class Path(object):
-	ROOT_DIR      = '/'
-	REFS_DIR      = '/refs'
-	HEAD_SYMLINK  = '/refs/HEAD'
-	OBJECTS_DIR   = '/objects'
-	COMMITS_DIR   = '/objects/commits'
-	COMMIT_DIR    = '/objects/commits/' + SAMPLE_HASH
-	TREES_DIR     = '/objects/trees'
-	TREE_DIR      = '/objects/trees/' + SAMPLE_HASH
-	TREE_DIR_ITEM = '/objects/trees/' + SAMPLE_HASH + '/' + SAMPLE_FILENAME
-	BLOBS_DIR     = '/objects/blobs'
-	BLOB_FILE     = '/objects/blobs/' + SAMPLE_HASH
+	ROOT_DIR            = '/'
+	REFS_DIR            = '/refs'
+	HEAD_SYMLINK        = '/refs/HEAD'
+	OBJECTS_DIR         = '/objects'
+	COMMITS_DIR         = '/objects/commits'
+	COMMIT_DIR	        = '/objects/commits/' + SAMPLE_HASH
+	COMMIT_TREE_SYMLINK = '/objects/commits/' + SAMPLE_HASH + '/tree'
+	TREES_DIR           = '/objects/trees'
+	TREE_DIR 	        = '/objects/trees/' + SAMPLE_HASH
+	TREE_DIR_ITEM 	    = '/objects/trees/' + SAMPLE_HASH + '/' + SAMPLE_FILENAME
+	BLOBS_DIR	        = '/objects/blobs'
+	BLOB_FILE           = '/objects/blobs/' + SAMPLE_HASH
 
 
 class TestGetGitViewFSObject(unittest.TestCase):
@@ -48,6 +49,10 @@ class TestGetGitViewFSObject(unittest.TestCase):
 		obj = get_gitviewfs_object(Path.COMMIT_DIR)
 		self.assertIsInstance(obj, CommitDir)
 		self.assertEqual(obj.name, SAMPLE_HASH)
+	
+	def test_CommitTreeSymLink(self):
+		obj = get_gitviewfs_object(Path.COMMIT_TREE_SYMLINK)
+		self.assertIsInstance(obj, CommitTreeSymLink)
 	
 	def test_TreesDir(self):
 		obj = get_gitviewfs_object(Path.TREES_DIR)
@@ -105,6 +110,13 @@ class TestGetPath(unittest.TestCase):
 		commit_dir = commits_dir.get_gitviewfs_object([SAMPLE_HASH])
 		path = commit_dir.get_path()
 		self.assertEqual(Path.COMMIT_DIR, path)
+
+	def test_CommitTreeSymLink(self):
+		commits_dir = CommitsDir.INSTANCE
+		commit_dir = commits_dir.get_gitviewfs_object([SAMPLE_HASH])
+		commit_tree_symlink = commit_dir.get_gitviewfs_object([CommitTreeSymLink.NAME])
+		path = commit_tree_symlink.get_path()
+		self.assertEqual(Path.COMMIT_TREE_SYMLINK, path)
 	
 	def test_TreesDir(self):
 		trees_dir = TreesDir.INSTANCE

@@ -192,17 +192,22 @@ class CommitDir(PredefinedDirectory):
 	
 	def __init__(self, parent, name):
 		items = {
-			'message' : None,
-			'author' : None,
-			'committer' : None,
-			'parents' : None,
-			'tree' : None,
+			'message'              : None,
+			'author'               : None,
+			'committer'            : None,
+			'parents'              : None,
+			CommitTreeSymLink.NAME : CommitTreeSymLink(parent=self),
 		}
 		super(CommitDir, self).__init__(parent=parent, name=name, items=items)
+
+
+class CommitTreeSymLink(SymLink):
 	
-	def get_gitviewfs_object(self, path_parts):
-		if len(path_parts) == 0:
-			return self
+	NAME = 'tree'
+	
+	def __init__(self, parent):
+		assert isinstance(parent, CommitDir)
+		super(CommitTreeSymLink, self).__init__(parent=parent, name=CommitTreeSymLink.NAME)
 
 
 class TreesDir(Directory):
