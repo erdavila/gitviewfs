@@ -160,8 +160,8 @@ class ObjectsDir(PredefinedDirectory):
 	def __init__(self, parent):
 		items = {
 			CommitsDir.NAME : CommitsDir(parent=self),
-			TreesDir.NAME   : TreesDir(parent=self, name=TreesDir.NAME),
-			BlobsDir.NAME   : BlobsDir(parent=self, name=BlobsDir.NAME),
+			TreesDir.NAME   : TreesDir(parent=self),
+			BlobsDir.NAME   : BlobsDir(parent=self),
 			'all'           : None,
 		}
 		super(ObjectsDir, self).__init__(parent=parent, name=self.NAME, items=items)
@@ -210,8 +210,8 @@ class TreesDir(Directory):
 	NAME = 'trees'
 	INSTANCE = None
 	
-	def __init__(self, *args, **kwargs):
-		super(TreesDir, self).__init__(*args, **kwargs)
+	def __init__(self, parent):
+		super(TreesDir, self).__init__(parent=parent, name=self.NAME)
 		TreesDir.INSTANCE = self
 	
 	def get_gitviewfs_object(self, path_parts):
@@ -260,6 +260,11 @@ class TreeDir(Directory):
 
 class TreeDirItem(SymLink):
 	
+	def __init__(self, parent, name):
+		assert isinstance(parent, TreeDir)
+		super(TreeDirItem, self).__init__(parent, name)
+	
+	
 	def readlink(self):
 		for item in self.parent._read_tree_items():
 			if item.name == self.name:
@@ -281,8 +286,8 @@ class BlobsDir(Directory):
 	NAME = 'blobs'
 	INSTANCE = None
 	
-	def __init__(self, *args, **kwargs):
-		super(BlobsDir, self).__init__(*args, **kwargs)
+	def __init__(self, parent):
+		super(BlobsDir, self).__init__(parent=parent, name=self.NAME)
 		BlobsDir.INSTANCE = self
 	
 	def get_gitviewfs_object(self, path_parts):
