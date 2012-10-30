@@ -28,6 +28,17 @@ class TestCommitTreeSymLinkIntegration(TestIntegration):
 		commit_tree_symlink_path = self.make_commit_tree_symlink_path(commit_sha1)
 		
 		self.assertTrue(os.path.islink(commit_tree_symlink_path))
+	
+	def test_readlink(self):
+		self.create_and_commit_file()
+		commit_sha1 = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip()
+		tree_sha1 = subprocess.check_output(['git', 'rev-parse', 'HEAD^{tree}']).strip()
+		commit_tree_symlink_path = self.make_commit_tree_symlink_path(commit_sha1)
+		
+		target_path = os.readlink(commit_tree_symlink_path)
+		
+		self.assertEqual('../../trees/' + tree_sha1, target_path)
+		
 
 
 if __name__ == "__main__":

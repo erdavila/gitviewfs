@@ -208,6 +208,15 @@ class CommitTreeSymLink(SymLink):
 	def __init__(self, parent):
 		assert isinstance(parent, CommitDir)
 		super(CommitTreeSymLink, self).__init__(parent=parent, name=CommitTreeSymLink.NAME)
+	
+	def readlink(self):
+		commit_sha1 = self.parent.name
+		tree_sha1 = subprocess.check_output(['git', 'rev-parse', commit_sha1 + '^{tree}']).strip()
+		trees_dir = TreesDir.INSTANCE
+		tree_dir = trees_dir.get_gitviewfs_object([tree_sha1])
+		target_path = tree_dir.get_path()
+		symlink_path = os.path.relpath(target_path, self.parent.get_path())
+		return symlink_path
 
 
 class TreesDir(Directory):
