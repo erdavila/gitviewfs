@@ -3,7 +3,7 @@ import os
 import subprocess
 
 from tests.test_integration import TestIntegration
-from gitviewfs_objects import ObjectsDir, CommitsDir
+from gitviewfs_objects import CommitsDir
 
 
 class TestCommitDir(unittest.TestCase):
@@ -23,9 +23,9 @@ class TestCommitDirIntegration(TestIntegration):
 		self.create_and_commit_file()
 		commit_sha1 = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip()
 		
-		commit_dir = os.path.join(self.mountpoint, ObjectsDir.NAME, CommitsDir.NAME, commit_sha1)
+		commit_dir_path = self.make_commit_dir_path(commit_sha1)
 		
-		self.assertTrue(os.path.isdir(commit_dir))
+		self.assertTrue(os.path.isdir(commit_dir_path))
 
 
 if __name__ == "__main__":

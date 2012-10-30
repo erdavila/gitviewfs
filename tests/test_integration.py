@@ -5,9 +5,10 @@ import tempfile
 import shutil
 
 import gitviewfs
+from tests.paths import PathMaker
 
 
-class TestIntegration(unittest.TestCase):
+class TestIntegration(unittest.TestCase, PathMaker):
 
 	def __gitviewfs_cmd_path(self):
 		main_file_path = gitviewfs.__file__

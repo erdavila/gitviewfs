@@ -2,7 +2,6 @@ import unittest
 import os.path
 
 from tests.test_integration import TestIntegration
-from gitviewfs_objects import ObjectsDir, CommitsDir
 
 
 class TestCommitsDir(unittest.TestCase):
@@ -17,7 +16,7 @@ class TestCommitsDir(unittest.TestCase):
 class TestCommitsDirIntegration(TestIntegration):
 
 	def test_is_directory(self):
-		commits_dir_path = os.path.join(self.mountpoint, ObjectsDir.NAME, CommitsDir.NAME)
+		commits_dir_path = self.make_commits_dir_path()
 		
 		self.assertTrue(os.path.isdir(commits_dir_path))
 

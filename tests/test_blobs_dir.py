@@ -2,7 +2,7 @@ import unittest
 import stat
 import os
 
-from gitviewfs_objects import BlobsDir, ObjectsDir
+from gitviewfs_objects import BlobsDir
 from tests.test_integration import TestIntegration
 
 
@@ -25,7 +25,7 @@ class TestBlobsDir(unittest.TestCase):
 class TestBlobsDirIntegration(TestIntegration):
 	
 	def test_is_directory(self):
-		blobs_path = os.path.join(self.mountpoint, ObjectsDir.NAME, BlobsDir.NAME)
+		blobs_path = self.make_blobs_dir_path()
 		self.assertTrue(os.path.isdir(blobs_path))
 
 

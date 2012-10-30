@@ -16,7 +16,7 @@ class TestObjectsDir(unittest.TestCase):
 class TestObjectsDirIntegration(TestIntegration):
 
 	def test_list(self):
-		refs_dir = os.path.join(self.mountpoint, ObjectsDir.NAME)
+		refs_dir = self.make_objects_dir_path()
 		items = os.listdir(refs_dir)
 		self.assertItemsEqual(['all', 'blobs', 'commits', 'trees'], items)
 

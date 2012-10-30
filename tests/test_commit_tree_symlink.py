@@ -3,7 +3,7 @@ import stat
 import os
 import subprocess
 
-from gitviewfs_objects import CommitsDir, CommitTreeSymLink, ObjectsDir
+from gitviewfs_objects import CommitsDir, CommitTreeSymLink
 from tests.test_integration import TestIntegration
 
 
@@ -25,7 +25,7 @@ class TestCommitTreeSymLinkIntegration(TestIntegration):
 		self.create_and_commit_file()
 		commit_sha1 = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip()
 		
-		commit_tree_symlink_path = os.path.join(self.mountpoint, ObjectsDir.NAME, CommitsDir.NAME, commit_sha1, CommitTreeSymLink.NAME)
+		commit_tree_symlink_path = self.make_commit_tree_symlink_path(commit_sha1)
 		
 		self.assertTrue(os.path.islink(commit_tree_symlink_path))
 

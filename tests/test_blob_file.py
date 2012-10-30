@@ -3,7 +3,6 @@ import subprocess
 import os
 import stat
 
-from gitviewfs_objects import ObjectsDir, BlobsDir, get_gitviewfs_object
 from tests.test_integration import TestIntegration
 
 
@@ -20,10 +19,9 @@ class TestBlobFileIntegration(TestIntegration):
 	
 	def test_blob_content(self):
 		filename, content = self.create_and_commit_file()
-		sha1 = subprocess.check_output(['git', 'hash-object', filename])
-		sha1 = sha1.strip()
+		blob_sha1 = subprocess.check_output(['git', 'hash-object', filename]).strip()
 		
-		blob_path = os.path.join(self.mountpoint, ObjectsDir.NAME, BlobsDir.NAME, sha1)
+		blob_path = self.make_blob_file_path(blob_sha1)
 		with open(blob_path) as f:
 			read_content = f.read()
 		
@@ -31,9 +29,8 @@ class TestBlobFileIntegration(TestIntegration):
 	
 	def test_blob_attributes(self):
 		filename, content = self.create_and_commit_file()
-		sha1 = subprocess.check_output(['git', 'hash-object', filename])
-		sha1 = sha1.strip()
-		blob_path = os.path.join(self.mountpoint, ObjectsDir.NAME, BlobsDir.NAME, sha1)
+		blob_sha1 = subprocess.check_output(['git', 'hash-object', filename]).strip()
+		blob_path = self.make_blob_file_path(blob_sha1)
 		
 		st = os.stat(blob_path)
 		
@@ -45,10 +42,9 @@ class TestBlobFileIntegration(TestIntegration):
 	
 	def test_blob_is_regular_file(self):
 		filename, _ = self.create_and_commit_file()
-		sha1 = subprocess.check_output(['git', 'hash-object', filename])
-		sha1 = sha1.strip()
+		blob_sha1 = subprocess.check_output(['git', 'hash-object', filename]).strip()
 		
-		blob_path = os.path.join(self.mountpoint, ObjectsDir.NAME, BlobsDir.NAME, sha1)
+		blob_path = self.make_blob_file_path(blob_sha1)
 		
 		self.assertTrue(os.path.isfile(blob_path))
 
