@@ -107,6 +107,13 @@ class SymLink(GitViewFSObject):
 		attrs = list(stat_result)
 		attrs[stat.ST_MODE] = with_symlink_file_type(attrs[stat.ST_MODE])
 		return posix.stat_result(attrs)
+	
+	def readlink(self):
+		target_object = self.get_target_object()
+		
+		target_path = target_object.get_path()
+		symlink_path = os.path.relpath(target_path, self.parent.get_path())
+		return symlink_path
 
 
 class RootDir(PredefinedDirectory):
@@ -209,14 +216,12 @@ class CommitTreeSymLink(SymLink):
 		assert isinstance(parent, CommitDir)
 		super(CommitTreeSymLink, self).__init__(parent=parent, name=CommitTreeSymLink.NAME)
 	
-	def readlink(self):
+	def get_target_object(self):
 		commit_sha1 = self.parent.name
 		tree_sha1 = subprocess.check_output(['git', 'rev-parse', commit_sha1 + '^{tree}']).strip()
 		trees_dir = TreesDir.INSTANCE
 		tree_dir = trees_dir.get_gitviewfs_object([tree_sha1])
-		target_path = tree_dir.get_path()
-		symlink_path = os.path.relpath(target_path, self.parent.get_path())
-		return symlink_path
+		return tree_dir
 
 
 class TreesDir(Directory):
@@ -278,8 +283,7 @@ class TreeDirItem(SymLink):
 		assert isinstance(parent, TreeDir)
 		super(TreeDirItem, self).__init__(parent, name)
 	
-	
-	def readlink(self):
+	def get_target_object(self):
 		for item in self.parent._read_tree_items():
 			if item.name == self.name:
 				break
@@ -290,9 +294,7 @@ class TreeDirItem(SymLink):
 			dir_object = TreesDir.INSTANCE
 		
 		target_object = dir_object.get_gitviewfs_object([item.sha1])
-		target_path = target_object.get_path()
-		symlink_path = os.path.relpath(target_path, self.parent.get_path())
-		return symlink_path
+		return target_object
 
 
 class BlobsDir(Directory):
