@@ -3,16 +3,15 @@ import stat
 import os
 import subprocess
 
-from gitviewfs_objects import CommitsDir, CommitTreeSymLink
+from gitviewfs_objects import get_gitviewfs_object
 from tests.test_integration import TestIntegration
+from tests import paths
 
 
 class TestCommitTreeSymLink(unittest.TestCase):
 	
 	def test_getattr_returns_symlink_type(self):
-		commits_dir = CommitsDir.INSTANCE
-		commit_dir = commits_dir.get_gitviewfs_object(['a1b2c3d4'])
-		commit_tree_symlink = commit_dir.get_gitviewfs_object([CommitTreeSymLink.NAME])
+		commit_tree_symlink = get_gitviewfs_object(paths.COMMIT_TREE_SYMLINK)
 		
 		attr = commit_tree_symlink.getattr()
 		

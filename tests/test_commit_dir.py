@@ -3,14 +3,14 @@ import os
 import subprocess
 
 from tests.test_integration import TestIntegration
-from gitviewfs_objects import CommitsDir
+from gitviewfs_objects import get_gitviewfs_object
+from tests import paths
 
 
 class TestCommitDir(unittest.TestCase):
 	
 	def test_list(self):
-		commits_dir = CommitsDir.INSTANCE
-		commit_dir = commits_dir.get_gitviewfs_object(['a1b2c3d4'])
+		commit_dir = get_gitviewfs_object(paths.COMMIT_DIR)
 		
 		items = commit_dir.list()
 		
