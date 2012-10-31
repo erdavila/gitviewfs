@@ -61,6 +61,22 @@ class TestIntegration(unittest.TestCase, PathMaker):
 		subprocess.check_call(['git', 'commit', '-m', 'Add file'])
 		
 		return filename, subdirname
+	
+	def assertSymLink(self, expected_absolute_path, symlink_path):
+		target_path = os.readlink(symlink_path)
+		self.assertRelativePath(target_path)
+		
+		resolved_target_path = self.resolve_relative_path(symlink_path, target_path)
+		self.assertEqual(expected_absolute_path, resolved_target_path)
+	
+	def assertRelativePath(self, path):
+		self.assertFalse(os.path.isabs(path))
+	
+	def resolve_relative_path(self, base_file_path, relative_path):
+		dir_path, _ = os.path.split(base_file_path)
+		resolved_path = os.path.join(dir_path, relative_path)
+		resolved_path = os.path.normpath(resolved_path)
+		return resolved_path
 
 
 if __name__ == "__main__":
