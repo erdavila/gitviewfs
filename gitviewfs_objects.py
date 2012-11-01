@@ -141,7 +141,7 @@ class RefsDir(PredefinedDirectory):
 	def __init__(self, parent):
 		items = {
 			HeadSymLink.NAME : HeadSymLink(parent=self),
-			'branches'       : None,
+			BranchesDir.NAME : BranchesDir(parent=self),
 			'tags'           : None,
 			'remotes'        : None,
 		}
@@ -157,6 +157,18 @@ class HeadSymLink(SymLink):
 	def __init__(self, parent):
 		super(HeadSymLink, self).__init__(parent=parent, name=self.NAME)
 		HeadSymLink.INSTANCE = self
+
+
+class BranchesDir(Directory):
+	
+	NAME = 'branches'
+	
+	def __init__(self, parent):
+		super(BranchesDir, self).__init__(parent=parent, name=self.NAME)
+	
+	def get_gitviewfs_object(self, path_parts):
+		if len(path_parts) == 0:
+			return self
 
 
 class ObjectsDir(PredefinedDirectory):

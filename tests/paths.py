@@ -4,6 +4,7 @@ SAMPLE_FILENAME = 'filename'
 ROOT_DIR            = '/'
 REFS_DIR            = '/refs'
 HEAD_SYMLINK        = '/refs/HEAD'
+BRANCHES_DIR        = '/refs/branches'
 OBJECTS_DIR         = '/objects'
 COMMITS_DIR         = '/objects/commits'
 COMMIT_DIR	        = '/objects/commits/' + SAMPLE_HASH
@@ -22,6 +23,9 @@ class PathMaker(object):
 	
 	def make_head_symlink_path(self):
 		return self.mountpoint + HEAD_SYMLINK
+	
+	def make_branches_dir_path(self):
+		return self.mountpoint + BRANCHES_DIR
 	
 	def make_objects_dir_path(self):
 		return self.mountpoint + OBJECTS_DIR
