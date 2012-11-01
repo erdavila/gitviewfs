@@ -36,9 +36,10 @@ class TestIntegration(unittest.TestCase, PathMaker):
 		shutil.rmtree(self.mountpoint)
 		shutil.rmtree(self.repo)
 	
-	def create_and_commit_file(self):
-		content = '''This is the content
-		in a Git blob file'''
+	def create_and_commit_file(self, content=None):
+		if content is None:
+			content = '''This is the content
+			in a Git blob file'''
 		filename = 'file.txt'
 		
 		with open(filename, 'w') as f:

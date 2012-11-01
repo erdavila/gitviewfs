@@ -169,6 +169,11 @@ class BranchesDir(Directory):
 	def get_gitviewfs_object(self, path_parts):
 		if len(path_parts) == 0:
 			return self
+	
+	def list(self):
+		output = subprocess.check_output(['git', 'rev-parse', '--symbolic', '--branches'])
+		branches = output.splitlines()
+		return branches
 
 
 class ObjectsDir(PredefinedDirectory):
