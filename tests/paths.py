@@ -1,10 +1,12 @@
 SAMPLE_HASH = 'a1b2c3d4'
 SAMPLE_FILENAME = 'filename'
+SAMPLE_BRANCH = 'a-branch'
 
 ROOT_DIR            = '/'
 REFS_DIR            = '/refs'
 HEAD_SYMLINK        = '/refs/HEAD'
 BRANCHES_DIR        = '/refs/branches'
+BRANCH_SYMLINK      = '/refs/branches/' + SAMPLE_BRANCH
 OBJECTS_DIR         = '/objects'
 COMMITS_DIR         = '/objects/commits'
 COMMIT_DIR	        = '/objects/commits/' + SAMPLE_HASH
@@ -26,6 +28,9 @@ class PathMaker(object):
 	
 	def make_branches_dir_path(self):
 		return self.mountpoint + BRANCHES_DIR
+	
+	def make_branch_symlink_path(self, branch):
+		return self.mountpoint + BRANCH_SYMLINK.replace(SAMPLE_BRANCH, branch)
 	
 	def make_objects_dir_path(self):
 		return self.mountpoint + OBJECTS_DIR

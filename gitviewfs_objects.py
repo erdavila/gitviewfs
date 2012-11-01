@@ -169,11 +169,26 @@ class BranchesDir(Directory):
 	def get_gitviewfs_object(self, path_parts):
 		if len(path_parts) == 0:
 			return self
+		
+		if len(path_parts) == 1:
+			first_part = path_parts[0]
+			tree_dir_item = BranchSymLink(parent=self, name=first_part)
+			return tree_dir_item
 	
 	def list(self):
 		output = subprocess.check_output(['git', 'rev-parse', '--symbolic', '--branches'])
 		branches = output.splitlines()
 		return branches
+
+
+class BranchSymLink(SymLink):
+	
+	def get_target_object(self):
+		branch = self.name
+		commit_sha1 = subprocess.check_output(['git', 'rev-parse', branch]).strip()
+		commits_dir = CommitsDir.INSTANCE
+		commit_dir = commits_dir.get_gitviewfs_object([commit_sha1])
+		return commit_dir
 
 
 class ObjectsDir(PredefinedDirectory):
@@ -266,8 +281,8 @@ class TreeDir(Directory):
 		if len(path_parts) == 0:
 			return self
 		
-		first_part = path_parts[0]
 		if len(path_parts) == 1:
+			first_part = path_parts[0]
 			tree_dir_item = TreeDirItem(parent=self, name=first_part)
 			return tree_dir_item
 	
