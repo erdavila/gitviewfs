@@ -157,14 +157,22 @@ class HeadSymLink(SymLink):
 	def __init__(self, parent):
 		super(HeadSymLink, self).__init__(parent=parent, name=self.NAME)
 		HeadSymLink.INSTANCE = self
+	
+	def get_target_object(self):
+		branch = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).strip()
+		branches_dir = BranchesDir.INSTANCE
+		branch_symlink = branches_dir.get_gitviewfs_object([branch])
+		return branch_symlink
 
 
 class BranchesDir(Directory):
 	
 	NAME = 'branches'
+	INSTANCE = None
 	
 	def __init__(self, parent):
 		super(BranchesDir, self).__init__(parent=parent, name=self.NAME)
+		BranchesDir.INSTANCE = self
 	
 	def get_gitviewfs_object(self, path_parts):
 		if len(path_parts) == 0:
