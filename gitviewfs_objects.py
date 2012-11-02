@@ -239,13 +239,30 @@ class CommitDir(PredefinedDirectory):
 	
 	def __init__(self, parent, name):
 		items = {
-			'message'              : None,
+			CommitMessageFile.NAME : CommitMessageFile(parent=self),
 			'author'               : None,
 			'committer'            : None,
 			'parents'              : None,
 			CommitTreeSymLink.NAME : CommitTreeSymLink(parent=self),
 		}
 		super(CommitDir, self).__init__(parent=parent, name=name, items=items)
+
+
+class CommitMessageFile(GitViewFSObject):
+	
+	NAME = 'message'
+	
+	def __init__(self, parent):
+		super(CommitMessageFile, self).__init__(parent=parent, name=self.NAME)
+	
+	def getattr(self):
+		stat_result = super(CommitMessageFile, self).getattr()
+		
+		attrs = list(stat_result)
+		attrs[stat.ST_MODE] = with_regular_file_type(attrs[stat.ST_MODE])
+		attrs[stat.ST_MODE] = without_execution_permissions(attrs[stat.ST_MODE])
+		attrs[stat.ST_SIZE] = self._get_content_size()
+		return posix.stat_result(attrs)
 
 
 class CommitTreeSymLink(SymLink):
