@@ -3,9 +3,12 @@ import unittest
 from gitviewfs_objects import get_gitviewfs_object
 from tests import paths
 import stat
+from tests.test_integration import TestIntegration
+import subprocess
+import os
 
 
-class Test(unittest.TestCase):
+class TestCommitMessagFile(unittest.TestCase):
 
 	def setUp(self):
 		pass
@@ -29,6 +32,31 @@ class Test(unittest.TestCase):
 		self.assertFalse(attrs.st_mode & stat.S_IXOTH)
 		
 		self.assertEqual(CONTENT_SIZE, attrs.st_size)
+
+
+class TestCommitMessageFileIntegration(TestIntegration):
+	
+	def setUp(self):
+		super(TestCommitMessageFileIntegration, self).setUp()
+		self.message = '''
+			This is a
+			multiline
+			commit message
+		'''.strip() + '\n'
+		self.create_and_commit_file(message=self.message)
+		self.commit_sha1 = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip()
+		self.commit_message_path = self.make_commit_message_file_path(self.commit_sha1)
+	
+	def test_content_size(self):
+		st = os.lstat(self.commit_message_path)
+		
+		self.assertEqual(len(self.message), st.st_size)
+	
+	def test_content(self):
+		with open(self.commit_message_path) as f:
+			content = f.read()
+		
+		self.assertEqual(self.message, content)
 
 
 if __name__ == "__main__":

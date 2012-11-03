@@ -42,6 +42,8 @@ class PathMaker(object):
 	def make_commit_dir_path(self, commit_sha1):
 		return self.mountpoint + COMMIT_DIR.replace(SAMPLE_HASH, commit_sha1)
 	
+	def make_commit_message_file_path(self, commit_sha1):
+		return self.mountpoint + COMMIT_MESSAGE_FILE.replace(SAMPLE_HASH, commit_sha1)
 	
 	def make_commit_tree_symlink_path(self, commit_sha1):
 		return self.mountpoint + COMMIT_TREE_SYMLINK.replace(SAMPLE_HASH, commit_sha1)

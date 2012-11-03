@@ -273,6 +273,28 @@ class CommitMessageFile(RegularFile):
 	
 	def __init__(self, parent):
 		super(CommitMessageFile, self).__init__(parent=parent, name=self.NAME)
+	
+	def read(self, length, offset):
+		content = self._get_content()
+		return content[offset : offset+length]
+	
+	def _get_content_size(self):
+		content = self._get_content()
+		return len(content)
+	
+	def _get_content(self):
+		commit_sha1 = self.parent.name
+		commit_content = subprocess.check_output(['git', 'cat-file', 'commit', commit_sha1])
+		
+		commit_message = ''
+		message_found = False
+		for line in commit_content.splitlines(True):
+			if message_found:
+				commit_message += line
+			elif line.strip() == '':
+				message_found = True
+		
+		return commit_message
 
 
 class CommitTreeSymLink(SymLink):

@@ -36,17 +36,19 @@ class TestIntegration(unittest.TestCase, PathMaker):
 		shutil.rmtree(self.mountpoint)
 		shutil.rmtree(self.repo)
 	
-	def create_and_commit_file(self, content=None):
-		if content is None:
-			content = '''This is the content
-			in a Git blob file'''
+	DEFAULT_CONTENT = '''This is the content
+		in a Git blob file'''
+	
+	DEFAULT_MESSAGE = 'Add file'
+	
+	def create_and_commit_file(self, content=DEFAULT_CONTENT, message=DEFAULT_MESSAGE):
 		filename = 'file.txt'
 		
 		with open(filename, 'w') as f:
 			f.write(content)
 		
 		subprocess.check_call(['git', 'add', filename])
-		subprocess.check_call(['git', 'commit', '-m', 'Add file'])
+		subprocess.check_call(['git', 'commit', '-m', message])
 		
 		return filename, content
 	
