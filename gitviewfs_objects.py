@@ -21,6 +21,11 @@ def with_symlink_file_type(stat_mode):
 	stat_mode |= stat.S_IFLNK
 	return stat_mode
 
+def with_directory_type(stat_mode):
+	stat_mode = with_clear_file_type(stat_mode)
+	stat_mode |= stat.S_IFDIR
+	return stat_mode
+
 def with_regular_file_type(stat_mode):
 	stat_mode = with_clear_file_type(stat_mode)
 	stat_mode |= stat.S_IFREG
@@ -52,13 +57,15 @@ class GitViewFSObject(object):
 		self.name = name
 	
 	def getattr(self):
+		attrs = self._get_attrs()
+		return posix.stat_result(attrs)
+	
+	def _get_attrs(self):
 		st_root = os.lstat('.')
-		
 		attrs = list(st_root)
 		attrs[stat.ST_MODE] = without_write_permissions(attrs[stat.ST_MODE])
 		attrs[stat.ST_NLINK] = 1
-		
-		return posix.stat_result(attrs)
+		return attrs
 	
 	def get_path(self):
 		parent_path = self.parent.get_path()
@@ -73,7 +80,11 @@ class GitViewFSObject(object):
 
 
 class Directory(GitViewFSObject):
-	pass
+	
+	def _get_attrs(self):
+		attrs = super(Directory, self)._get_attrs()
+		attrs[stat.ST_MODE] = with_directory_type(attrs[stat.ST_MODE])
+		return attrs
 
 
 class PredefinedDirectory(Directory):
@@ -101,12 +112,10 @@ class PredefinedDirectory(Directory):
 
 class SymLink(GitViewFSObject):
 	
-	def getattr(self):
-		stat_result = super(SymLink, self).getattr()
-		
-		attrs = list(stat_result)
+	def _get_attrs(self):
+		attrs = super(SymLink, self)._get_attrs()
 		attrs[stat.ST_MODE] = with_symlink_file_type(attrs[stat.ST_MODE])
-		return posix.stat_result(attrs)
+		return attrs
 	
 	def readlink(self):
 		target_object = self.get_target_object()
@@ -114,6 +123,16 @@ class SymLink(GitViewFSObject):
 		target_path = target_object.get_path()
 		symlink_path = os.path.relpath(target_path, self.parent.get_path())
 		return symlink_path
+
+
+class RegularFile(GitViewFSObject):
+	
+	def _get_attrs(self):
+		attrs = super(RegularFile, self)._get_attrs()
+		attrs[stat.ST_MODE] = with_regular_file_type(attrs[stat.ST_MODE])
+		attrs[stat.ST_MODE] = without_execution_permissions(attrs[stat.ST_MODE])
+		attrs[stat.ST_SIZE] = self._get_content_size()
+		return attrs
 
 
 class RootDir(PredefinedDirectory):
@@ -248,21 +267,12 @@ class CommitDir(PredefinedDirectory):
 		super(CommitDir, self).__init__(parent=parent, name=name, items=items)
 
 
-class CommitMessageFile(GitViewFSObject):
+class CommitMessageFile(RegularFile):
 	
 	NAME = 'message'
 	
 	def __init__(self, parent):
 		super(CommitMessageFile, self).__init__(parent=parent, name=self.NAME)
-	
-	def getattr(self):
-		stat_result = super(CommitMessageFile, self).getattr()
-		
-		attrs = list(stat_result)
-		attrs[stat.ST_MODE] = with_regular_file_type(attrs[stat.ST_MODE])
-		attrs[stat.ST_MODE] = without_execution_permissions(attrs[stat.ST_MODE])
-		attrs[stat.ST_SIZE] = self._get_content_size()
-		return posix.stat_result(attrs)
 
 
 class CommitTreeSymLink(SymLink):
@@ -373,18 +383,9 @@ class BlobsDir(Directory):
 			return blob_file
 
 
-class BlobFile(GitViewFSObject):
+class BlobFile(RegularFile):
 	
-	def getattr(self):
-		stat_result = super(BlobFile, self).getattr()
-		
-		attrs = list(stat_result)
-		attrs[stat.ST_MODE] = with_regular_file_type(attrs[stat.ST_MODE])
-		attrs[stat.ST_MODE] = without_execution_permissions(attrs[stat.ST_MODE])
-		attrs[stat.ST_SIZE] = self._get_blob_size()
-		return posix.stat_result(attrs)
-	
-	def _get_blob_size(self):
+	def _get_content_size(self):
 		subprocess.call(['git', 'cat-file', '-s', self.name])
 		size_string = subprocess.check_output(['git', 'cat-file', '-s', self.name])
 		size = int(size_string)
