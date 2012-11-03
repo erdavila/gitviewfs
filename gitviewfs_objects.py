@@ -127,6 +127,10 @@ class SymLink(GitViewFSObject):
 
 class RegularFile(GitViewFSObject):
 	
+	def read(self, length, offset):
+		content = self._get_content()
+		return content[offset : offset+length]
+	
 	def _get_attrs(self):
 		attrs = super(RegularFile, self)._get_attrs()
 		attrs[stat.ST_MODE] = with_regular_file_type(attrs[stat.ST_MODE])
@@ -274,10 +278,6 @@ class CommitMessageFile(RegularFile):
 	def __init__(self, parent):
 		super(CommitMessageFile, self).__init__(parent=parent, name=self.NAME)
 	
-	def read(self, length, offset):
-		content = self._get_content()
-		return content[offset : offset+length]
-	
 	def _get_content_size(self):
 		content = self._get_content()
 		return len(content)
@@ -413,9 +413,9 @@ class BlobFile(RegularFile):
 		size = int(size_string)
 		return size
 	
-	def read(self, length, offset):
-		content = subprocess.check_output(['git', 'cat-file', 'blob', self.name])
-		return content[offset : offset+length]
+	def _get_content(self):
+		blob_content = subprocess.check_output(['git', 'cat-file', 'blob', self.name])
+		return blob_content
 
 
 RootDir()
