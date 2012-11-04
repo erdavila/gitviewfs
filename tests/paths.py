@@ -2,27 +2,28 @@ SAMPLE_HASH = 'a1b2c3d4'
 SAMPLE_FILENAME = 'filename'
 SAMPLE_BRANCH = 'a-branch'
 
-ROOT_DIR                   = '/'
-REFS_DIR                   = '/refs'
-HEAD_SYMLINK               = '/refs/HEAD'
-BRANCHES_DIR               = '/refs/branches'
-BRANCH_SYMLINK             = '/refs/branches/' + SAMPLE_BRANCH
-OBJECTS_DIR                = '/objects'
-COMMITS_DIR                = '/objects/commits'
-COMMIT_DIR                 = '/objects/commits/' + SAMPLE_HASH
-COMMIT_MESSAGE_FILE        = '/objects/commits/' + SAMPLE_HASH + '/message'
-COMMIT_AUTHOR_DIR          = '/objects/commits/' + SAMPLE_HASH + '/author'
-COMMIT_AUTHOR_NAME_FILE    = '/objects/commits/' + SAMPLE_HASH + '/author/name'
-COMMIT_AUTHOR_EMAIL_FILE   = '/objects/commits/' + SAMPLE_HASH + '/author/email'
-COMMIT_AUTHOR_DATE_FILE    = '/objects/commits/' + SAMPLE_HASH + '/author/date'
-COMMIT_COMMITTER_DIR       = '/objects/commits/' + SAMPLE_HASH + '/committer'
-COMMIT_COMMITTER_NAME_FILE = '/objects/commits/' + SAMPLE_HASH + '/committer/name'
-COMMIT_TREE_SYMLINK        = '/objects/commits/' + SAMPLE_HASH + '/tree'
-TREES_DIR                  = '/objects/trees'
-TREE_DIR                   = '/objects/trees/' + SAMPLE_HASH
-TREE_DIR_ITEM              = '/objects/trees/' + SAMPLE_HASH + '/' + SAMPLE_FILENAME
-BLOBS_DIR                  = '/objects/blobs'
-BLOB_FILE                  = '/objects/blobs/' + SAMPLE_HASH
+ROOT_DIR                    = '/'
+REFS_DIR                    = '/refs'
+HEAD_SYMLINK                = '/refs/HEAD'
+BRANCHES_DIR                = '/refs/branches'
+BRANCH_SYMLINK              = '/refs/branches/' + SAMPLE_BRANCH
+OBJECTS_DIR                 = '/objects'
+COMMITS_DIR                 = '/objects/commits'
+COMMIT_DIR                  = '/objects/commits/' + SAMPLE_HASH
+COMMIT_MESSAGE_FILE         = '/objects/commits/' + SAMPLE_HASH + '/message'
+COMMIT_AUTHOR_DIR           = '/objects/commits/' + SAMPLE_HASH + '/author'
+COMMIT_AUTHOR_NAME_FILE     = '/objects/commits/' + SAMPLE_HASH + '/author/name'
+COMMIT_AUTHOR_EMAIL_FILE    = '/objects/commits/' + SAMPLE_HASH + '/author/email'
+COMMIT_AUTHOR_DATE_FILE     = '/objects/commits/' + SAMPLE_HASH + '/author/date'
+COMMIT_COMMITTER_DIR        = '/objects/commits/' + SAMPLE_HASH + '/committer'
+COMMIT_COMMITTER_NAME_FILE  = '/objects/commits/' + SAMPLE_HASH + '/committer/name'
+COMMIT_COMMITTER_EMAIL_FILE = '/objects/commits/' + SAMPLE_HASH + '/committer/email'
+COMMIT_TREE_SYMLINK         = '/objects/commits/' + SAMPLE_HASH + '/tree'
+TREES_DIR                   = '/objects/trees'
+TREE_DIR                    = '/objects/trees/' + SAMPLE_HASH
+TREE_DIR_ITEM               = '/objects/trees/' + SAMPLE_HASH + '/' + SAMPLE_FILENAME
+BLOBS_DIR                   = '/objects/blobs'
+BLOB_FILE                   = '/objects/blobs/' + SAMPLE_HASH
 
 	
 class PathMaker(object):
@@ -65,6 +66,9 @@ class PathMaker(object):
 	
 	def make_commit_committer_name_file_path(self, commit_sha1):
 		return self.mountpoint + COMMIT_COMMITTER_NAME_FILE.replace(SAMPLE_HASH, commit_sha1)
+	
+	def make_commit_committer_email_file_path(self, commit_sha1):
+		return self.mountpoint + COMMIT_COMMITTER_EMAIL_FILE.replace(SAMPLE_HASH, commit_sha1)
 	
 	def make_commit_tree_symlink_path(self, commit_sha1):
 		return self.mountpoint + COMMIT_TREE_SYMLINK.replace(SAMPLE_HASH, commit_sha1)

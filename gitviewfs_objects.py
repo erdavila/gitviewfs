@@ -295,7 +295,7 @@ class CommitPersonDir(PredefinedDirectory):
 		assert isinstance(parent, CommitDir)
 		items = {
 			CommitPersonNameFile.NAME  : CommitPersonNameFile(parent=self),
-			CommitAuthorEmailFile.NAME : CommitAuthorEmailFile(parent=self),
+			CommitPersonEmailFile.NAME : CommitPersonEmailFile(parent=self),
 			CommitAuthorDateFile.NAME  : CommitAuthorDateFile(parent=self),
 		}
 		super(CommitPersonDir, self).__init__(parent=parent, name=self.NAME, items=items)
@@ -304,6 +304,11 @@ class CommitPersonDir(PredefinedDirectory):
 class CommitAuthorDir(CommitPersonDir):
 	
 	NAME = 'author'
+
+
+class CommitCommitterDir(CommitPersonDir):
+	
+	NAME = 'committer'
 
 
 class CommitPersonDirFile(RegularFile):
@@ -339,13 +344,13 @@ class CommitPersonNameFile(CommitPersonDirFile):
 		return commit_person_data.name + '\n'
 
 
-class CommitAuthorEmailFile(CommitPersonDirFile):
+class CommitPersonEmailFile(CommitPersonDirFile):
 	
 	NAME = 'email'
 	
 	def _get_content(self):
-		parsed_commit = self._get_parsed_commit()
-		return parsed_commit.author.email + '\n'
+		commit_person_data = self._get_commit_person_data()
+		return commit_person_data.email + '\n'
 
 
 class CommitAuthorDateFile(CommitPersonDirFile):
@@ -355,11 +360,6 @@ class CommitAuthorDateFile(CommitPersonDirFile):
 	def _get_content(self):
 		parsed_commit = self._get_parsed_commit()
 		return parsed_commit.author.date + '\n'
-
-
-class CommitCommitterDir(CommitPersonDir):
-	
-	NAME = 'committer'
 
 
 class CommitTreeSymLink(SymLink):
