@@ -1,5 +1,6 @@
 import unittest
-from git_objects_parser import parse_git_commit
+
+from git_objects_parser import parse_git_commit_content
 
 
 class TestGitObjectsParser(unittest.TestCase):
@@ -13,7 +14,7 @@ class TestGitObjectsParser(unittest.TestCase):
 	)
 	
 	def setUp(self):
-		self.commit = self.join_lines(
+		self.commit_content = self.join_lines(
 			(
 				'tree 0123456789012345678901234567890123456789',
 				'parent abcdefabcdefabcdefabcdefabcdefabcdefabcd',
@@ -25,11 +26,11 @@ class TestGitObjectsParser(unittest.TestCase):
 		)
 
 	def test_parse_commit_author_name(self):
-		commit = parse_git_commit(self.commit)
+		commit = parse_git_commit_content(self.commit_content)
 		self.assertEqual(self.AUTHOR_NAME, commit.author_name)
 
 	def test_parse_commit_message(self):
-		commit = parse_git_commit(self.commit)
+		commit = parse_git_commit_content(self.commit_content)
 		self.assertEqual(self.join_lines(self.MESSAGE_LINES), commit.message)
 	
 	def join_lines(self, lines):

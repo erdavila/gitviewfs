@@ -3,7 +3,7 @@ import posix
 import os
 import subprocess
 from collections import namedtuple
-import re
+from git_objects_parser import parse_git_commit
 
 
 REMOTES_DIR = 'remotes'
@@ -285,17 +285,8 @@ class CommitMessageFile(RegularFile):
 	
 	def _get_content(self):
 		commit_sha1 = self.parent.name
-		commit_content = subprocess.check_output(['git', 'cat-file', 'commit', commit_sha1])
-		
-		commit_message = ''
-		message_found = False
-		for line in commit_content.splitlines(True):
-			if message_found:
-				commit_message += line
-			elif line.strip() == '':
-				message_found = True
-		
-		return commit_message
+		commit = parse_git_commit(commit_sha1)
+		return commit.message
 
 
 class CommitAuthorDir(PredefinedDirectory):
@@ -320,10 +311,8 @@ class CommitAuthorNameFile(RegularFile):
 	
 	def _get_content(self):
 		commit_sha1 = self._get_commit_sha1()
-		commit_author_line = subprocess.check_output("git cat-file commit %s | grep author" % commit_sha1, shell=True)
-		m = re.match(r'^author (.+) <(.+)>', commit_author_line)
-		author_name = m.group(1)
-		return author_name
+		commit = parse_git_commit(commit_sha1)
+		return commit.author_name
 	
 	def _get_commit_sha1(self):
 		commit_author_dir = self.parent
