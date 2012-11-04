@@ -3,6 +3,7 @@ import posix
 import os
 import subprocess
 from collections import namedtuple
+import re
 
 
 REMOTES_DIR = 'remotes'
@@ -137,6 +138,10 @@ class RegularFile(GitViewFSObject):
 		attrs[stat.ST_MODE] = without_execution_permissions(attrs[stat.ST_MODE])
 		attrs[stat.ST_SIZE] = self._get_content_size()
 		return attrs
+	
+	def _get_content_size(self):
+		content = self._get_content()
+		return len(content)
 
 
 class RootDir(PredefinedDirectory):
@@ -278,10 +283,6 @@ class CommitMessageFile(RegularFile):
 	def __init__(self, parent):
 		super(CommitMessageFile, self).__init__(parent=parent, name=self.NAME)
 	
-	def _get_content_size(self):
-		content = self._get_content()
-		return len(content)
-	
 	def _get_content(self):
 		commit_sha1 = self.parent.name
 		commit_content = subprocess.check_output(['git', 'cat-file', 'commit', commit_sha1])
@@ -303,11 +304,32 @@ class CommitAuthorDir(PredefinedDirectory):
 	
 	def __init__(self, parent):
 		items = {
-			'name'  : None,
+			CommitAuthorNameFile.NAME : CommitAuthorNameFile(parent=self),
 			'email' : None,
 			'date'  : None,
 		}
 		super(CommitAuthorDir, self).__init__(parent=parent, name=self.NAME, items=items)
+
+
+class CommitAuthorNameFile(RegularFile):
+	
+	NAME = 'name'
+	
+	def __init__(self, parent):
+		super(CommitAuthorNameFile, self).__init__(parent=parent, name=self.NAME)
+	
+	def _get_content(self):
+		commit_sha1 = self._get_commit_sha1()
+		commit_author_line = subprocess.check_output("git cat-file commit %s | grep author" % commit_sha1, shell=True)
+		m = re.match(r'^author (.+) <(.+)>', commit_author_line)
+		author_name = m.group(1)
+		return author_name
+	
+	def _get_commit_sha1(self):
+		commit_author_dir = self.parent
+		commit_dir = commit_author_dir.parent
+		commit_sha1 = commit_dir.name
+		return commit_sha1
 
 
 class CommitTreeSymLink(SymLink):
