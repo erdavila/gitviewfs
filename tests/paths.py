@@ -15,6 +15,7 @@ COMMIT_AUTHOR_DIR        = '/objects/commits/' + SAMPLE_HASH + '/author'
 COMMIT_AUTHOR_NAME_FILE  = '/objects/commits/' + SAMPLE_HASH + '/author/name'
 COMMIT_AUTHOR_EMAIL_FILE = '/objects/commits/' + SAMPLE_HASH + '/author/email'
 COMMIT_AUTHOR_DATE_FILE  = '/objects/commits/' + SAMPLE_HASH + '/author/date'
+COMMIT_COMMITTER_DIR     = '/objects/commits/' + SAMPLE_HASH + '/committer'
 COMMIT_TREE_SYMLINK      = '/objects/commits/' + SAMPLE_HASH + '/tree'
 TREES_DIR                = '/objects/trees'
 TREE_DIR  	             = '/objects/trees/' + SAMPLE_HASH
@@ -57,6 +58,9 @@ class PathMaker(object):
 	
 	def make_commit_author_email_file_path(self, commit_sha1):
 		return self.mountpoint + COMMIT_AUTHOR_EMAIL_FILE.replace(SAMPLE_HASH, commit_sha1)
+	
+	def make_commit_committer_dir_path(self, commit_sha1):
+		return self.mountpoint + COMMIT_COMMITTER_DIR.replace(SAMPLE_HASH, commit_sha1)
 	
 	def make_commit_tree_symlink_path(self, commit_sha1):
 		return self.mountpoint + COMMIT_TREE_SYMLINK.replace(SAMPLE_HASH, commit_sha1)

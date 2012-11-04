@@ -267,11 +267,11 @@ class CommitDir(PredefinedDirectory):
 	
 	def __init__(self, parent, name):
 		items = {
-			CommitMessageFile.NAME : CommitMessageFile(parent=self),
-			CommitAuthorDir.NAME   : CommitAuthorDir(parent=self),
-			'committer'            : None,
-			'parents'              : None,
-			CommitTreeSymLink.NAME : CommitTreeSymLink(parent=self),
+			CommitMessageFile.NAME  : CommitMessageFile(parent=self),
+			CommitAuthorDir.NAME    : CommitAuthorDir(parent=self),
+			CommitCommitterDir.NAME : CommitCommitterDir(parent=self),
+			'parents'               : None,
+			CommitTreeSymLink.NAME  : CommitTreeSymLink(parent=self),
 		}
 		super(CommitDir, self).__init__(parent=parent, name=name, items=items)
 
@@ -294,6 +294,7 @@ class CommitAuthorDir(PredefinedDirectory):
 	NAME = 'author'
 	
 	def __init__(self, parent):
+		assert isinstance(parent, CommitDir)
 		items = {
 			CommitAuthorNameFile.NAME  : CommitAuthorNameFile(parent=self),
 			CommitAuthorEmailFile.NAME : CommitAuthorEmailFile(parent=self),
@@ -302,61 +303,63 @@ class CommitAuthorDir(PredefinedDirectory):
 		super(CommitAuthorDir, self).__init__(parent=parent, name=self.NAME, items=items)
 
 
-class CommitAuthorNameFile(RegularFile):
+class CommitAuthorDirFile(RegularFile):
+	
+	def __init__(self, parent):
+		assert isinstance(parent, CommitAuthorDir)
+		super(CommitAuthorDirFile, self).__init__(parent=parent, name=self.NAME)
+	
+	def _get_parsed_commit(self):
+		commit_sha1 = self._get_commit_sha1()
+		parsed_commit = parse_git_commit(commit_sha1)
+		return parsed_commit
+	
+	def _get_commit_sha1(self):
+		commit_author_dir = self.parent
+		commit_dir = commit_author_dir.parent
+		commit_sha1 = commit_dir.name
+		return commit_sha1
+
+
+class CommitAuthorNameFile(CommitAuthorDirFile):
 	
 	NAME = 'name'
 	
-	def __init__(self, parent):
-		super(CommitAuthorNameFile, self).__init__(parent=parent, name=self.NAME)
-	
 	def _get_content(self):
-		commit_sha1 = self._get_commit_sha1()
-		commit = parse_git_commit(commit_sha1)
-		return commit.author_name + '\n'
-	
-	def _get_commit_sha1(self):
-		commit_author_dir = self.parent
-		commit_dir = commit_author_dir.parent
-		commit_sha1 = commit_dir.name
-		return commit_sha1
+		parsed_commit = self._get_parsed_commit()
+		return parsed_commit.author_name + '\n'
 
 
-class CommitAuthorEmailFile(RegularFile):
+class CommitAuthorEmailFile(CommitAuthorDirFile):
 	
 	NAME = 'email'
 	
-	def __init__(self, parent):
-		super(CommitAuthorEmailFile, self).__init__(parent=parent, name=self.NAME)
-	
 	def _get_content(self):
-		commit_sha1 = self._get_commit_sha1()
-		commit = parse_git_commit(commit_sha1)
-		return commit.author_email + '\n'
-	
-	def _get_commit_sha1(self):
-		commit_author_dir = self.parent
-		commit_dir = commit_author_dir.parent
-		commit_sha1 = commit_dir.name
-		return commit_sha1
+		parsed_commit = self._get_parsed_commit()
+		return parsed_commit.author_email + '\n'
 
 
-class CommitAuthorDateFile(RegularFile):
+class CommitAuthorDateFile(CommitAuthorDirFile):
 	
 	NAME = 'date'
 	
-	def __init__(self, parent):
-		super(CommitAuthorDateFile, self).__init__(parent=parent, name=self.NAME)
-	
 	def _get_content(self):
-		commit_sha1 = self._get_commit_sha1()
-		commit = parse_git_commit(commit_sha1)
-		return commit.author_date + '\n'
+		parsed_commit = self._get_parsed_commit()
+		return parsed_commit.author_date + '\n'
+
+
+class CommitCommitterDir(PredefinedDirectory):
 	
-	def _get_commit_sha1(self):
-		commit_author_dir = self.parent
-		commit_dir = commit_author_dir.parent
-		commit_sha1 = commit_dir.name
-		return commit_sha1
+	NAME = 'committer'
+	
+	def __init__(self, parent):
+		assert isinstance(parent, CommitDir)
+		items = {
+			'name'  : None,
+			'email' : None,
+			'date'  : None,
+		}
+		super(CommitCommitterDir, self).__init__(parent=parent, name=self.NAME, items=items)
 
 
 class CommitTreeSymLink(SymLink):
