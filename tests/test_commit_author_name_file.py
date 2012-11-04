@@ -24,7 +24,7 @@ class TestCommitAuthorNameFileIntegration(TestIntegration):
 		with open(commit_author_name_file_path) as f:
 			commit_author_name = f.read()
 		
-		self.assertEqual(AUTHOR_NAME, commit_author_name)
+		self.assertEqual(AUTHOR_NAME + '\n', commit_author_name)
 
 
 if __name__ == "__main__":

@@ -312,7 +312,7 @@ class CommitAuthorNameFile(RegularFile):
 	def _get_content(self):
 		commit_sha1 = self._get_commit_sha1()
 		commit = parse_git_commit(commit_sha1)
-		return commit.author_name
+		return commit.author_name + '\n'
 	
 	def _get_commit_sha1(self):
 		commit_author_dir = self.parent
