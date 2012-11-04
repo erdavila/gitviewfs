@@ -289,25 +289,34 @@ class CommitMessageFile(RegularFile):
 		return commit.message
 
 
-class CommitAuthorDir(PredefinedDirectory):
-	
-	NAME = 'author'
+class CommitPersonDir(PredefinedDirectory):
 	
 	def __init__(self, parent):
 		assert isinstance(parent, CommitDir)
 		items = {
-			CommitAuthorNameFile.NAME  : CommitAuthorNameFile(parent=self),
+			CommitPersonNameFile.NAME  : CommitPersonNameFile(parent=self),
 			CommitAuthorEmailFile.NAME : CommitAuthorEmailFile(parent=self),
 			CommitAuthorDateFile.NAME  : CommitAuthorDateFile(parent=self),
 		}
-		super(CommitAuthorDir, self).__init__(parent=parent, name=self.NAME, items=items)
+		super(CommitPersonDir, self).__init__(parent=parent, name=self.NAME, items=items)
 
 
-class CommitAuthorDirFile(RegularFile):
+class CommitAuthorDir(CommitPersonDir):
+	
+	NAME = 'author'
+
+
+class CommitPersonDirFile(RegularFile):
 	
 	def __init__(self, parent):
-		assert isinstance(parent, CommitAuthorDir)
-		super(CommitAuthorDirFile, self).__init__(parent=parent, name=self.NAME)
+		assert isinstance(parent, CommitPersonDir)
+		super(CommitPersonDirFile, self).__init__(parent=parent, name=self.NAME)
+	
+	def _get_commit_person_data(self):
+		parsed_commit = self._get_parsed_commit()
+		person_type = self.parent.name
+		person_data = getattr(parsed_commit, person_type)
+		return person_data
 	
 	def _get_parsed_commit(self):
 		commit_sha1 = self._get_commit_sha1()
@@ -315,22 +324,22 @@ class CommitAuthorDirFile(RegularFile):
 		return parsed_commit
 	
 	def _get_commit_sha1(self):
-		commit_author_dir = self.parent
-		commit_dir = commit_author_dir.parent
+		commit_person_dir = self.parent
+		commit_dir = commit_person_dir.parent
 		commit_sha1 = commit_dir.name
 		return commit_sha1
 
 
-class CommitAuthorNameFile(CommitAuthorDirFile):
+class CommitPersonNameFile(CommitPersonDirFile):
 	
 	NAME = 'name'
 	
 	def _get_content(self):
-		parsed_commit = self._get_parsed_commit()
-		return parsed_commit.author.name + '\n'
+		commit_person_data = self._get_commit_person_data()
+		return commit_person_data.name + '\n'
 
 
-class CommitAuthorEmailFile(CommitAuthorDirFile):
+class CommitAuthorEmailFile(CommitPersonDirFile):
 	
 	NAME = 'email'
 	
@@ -339,7 +348,7 @@ class CommitAuthorEmailFile(CommitAuthorDirFile):
 		return parsed_commit.author.email + '\n'
 
 
-class CommitAuthorDateFile(CommitAuthorDirFile):
+class CommitAuthorDateFile(CommitPersonDirFile):
 	
 	NAME = 'date'
 	
@@ -348,18 +357,9 @@ class CommitAuthorDateFile(CommitAuthorDirFile):
 		return parsed_commit.author.date + '\n'
 
 
-class CommitCommitterDir(PredefinedDirectory):
+class CommitCommitterDir(CommitPersonDir):
 	
 	NAME = 'committer'
-	
-	def __init__(self, parent):
-		assert isinstance(parent, CommitDir)
-		items = {
-			'name'  : None,
-			'email' : None,
-			'date'  : None,
-		}
-		super(CommitCommitterDir, self).__init__(parent=parent, name=self.NAME, items=items)
 
 
 class CommitTreeSymLink(SymLink):

@@ -41,14 +41,19 @@ class TestIntegration(unittest.TestCase, PathMaker):
 	
 	DEFAULT_MESSAGE = 'Add file'
 	
-	def create_and_commit_file(self, content=DEFAULT_CONTENT, message=DEFAULT_MESSAGE):
+	def create_and_commit_file(self, content=DEFAULT_CONTENT, message=DEFAULT_MESSAGE, author=None):
 		filename = 'file.txt'
 		
 		with open(filename, 'w') as f:
 			f.write(content)
 		
 		subprocess.check_call(['git', 'add', filename])
-		subprocess.check_call(['git', 'commit', '-m', message])
+		
+		commit_args = []
+		if author is not None:
+			commit_args.append('--author=' + author)
+		
+		subprocess.check_call(['git', 'commit'] + commit_args + ['-m', message])
 		
 		return filename, content
 	
