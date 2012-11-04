@@ -4,7 +4,8 @@ import subprocess
 import time
 
 
-Commit = namedtuple('Commit', 'author_name, author_email, author_date, message')
+Commit = namedtuple('Commit', 'author, committer, message')
+CommitPerson = namedtuple('CommitPerson', 'name, email, date')
 
 def parse_git_commit(commit):
 	commit_content = subprocess.check_output(['git', 'cat-file', 'commit', commit])
@@ -26,13 +27,15 @@ def parse_git_commit_content(commit_content):
 	return Commit(message=message, **values)
 
 def parse_git_commit_header(line):
-	m = re.match(r'author (.+) <(.+)> (.+)', line)
+	m = re.match(r'(author|committer) (.+) <(.+)> (.+)', line)
 	if m is not None:
-		return {
-			'author_name'  : m.group(1),
-			'author_email' : m.group(2),
-			'author_date'  : parse_git_commit_date(m.group(3))
-		}
+		commit_person_type = m.group(1)
+		name = m.group(2)
+		email = m.group(3)
+		date = parse_git_commit_date(m.group(4))
+		commit_person = CommitPerson(name=name, email=email, date=date)
+		values = { commit_person_type : commit_person, }
+		return values
 	
 	return {}
 

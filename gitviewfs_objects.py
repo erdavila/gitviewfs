@@ -327,7 +327,7 @@ class CommitAuthorNameFile(CommitAuthorDirFile):
 	
 	def _get_content(self):
 		parsed_commit = self._get_parsed_commit()
-		return parsed_commit.author_name + '\n'
+		return parsed_commit.author.name + '\n'
 
 
 class CommitAuthorEmailFile(CommitAuthorDirFile):
@@ -336,7 +336,7 @@ class CommitAuthorEmailFile(CommitAuthorDirFile):
 	
 	def _get_content(self):
 		parsed_commit = self._get_parsed_commit()
-		return parsed_commit.author_email + '\n'
+		return parsed_commit.author.email + '\n'
 
 
 class CommitAuthorDateFile(CommitAuthorDirFile):
@@ -345,7 +345,7 @@ class CommitAuthorDateFile(CommitAuthorDirFile):
 	
 	def _get_content(self):
 		parsed_commit = self._get_parsed_commit()
-		return parsed_commit.author_date + '\n'
+		return parsed_commit.author.date + '\n'
 
 
 class CommitCommitterDir(PredefinedDirectory):
