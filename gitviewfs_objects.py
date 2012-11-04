@@ -263,7 +263,7 @@ class CommitDir(PredefinedDirectory):
 	def __init__(self, parent, name):
 		items = {
 			CommitMessageFile.NAME : CommitMessageFile(parent=self),
-			'author'               : None,
+			CommitAuthorDir.NAME   : CommitAuthorDir(parent=self),
 			'committer'            : None,
 			'parents'              : None,
 			CommitTreeSymLink.NAME : CommitTreeSymLink(parent=self),
@@ -295,6 +295,19 @@ class CommitMessageFile(RegularFile):
 				message_found = True
 		
 		return commit_message
+
+
+class CommitAuthorDir(PredefinedDirectory):
+	
+	NAME = 'author'
+	
+	def __init__(self, parent):
+		items = {
+			'name'  : None,
+			'email' : None,
+			'date'  : None,
+		}
+		super(CommitAuthorDir, self).__init__(parent=parent, name=self.NAME, items=items)
 
 
 class CommitTreeSymLink(SymLink):
