@@ -297,7 +297,7 @@ class CommitAuthorDir(PredefinedDirectory):
 		items = {
 			CommitAuthorNameFile.NAME  : CommitAuthorNameFile(parent=self),
 			CommitAuthorEmailFile.NAME : CommitAuthorEmailFile(parent=self),
-			'date'                     : None,
+			CommitAuthorDateFile.NAME  : CommitAuthorDateFile(parent=self),
 		}
 		super(CommitAuthorDir, self).__init__(parent=parent, name=self.NAME, items=items)
 
@@ -332,6 +332,25 @@ class CommitAuthorEmailFile(RegularFile):
 		commit_sha1 = self._get_commit_sha1()
 		commit = parse_git_commit(commit_sha1)
 		return commit.author_email + '\n'
+	
+	def _get_commit_sha1(self):
+		commit_author_dir = self.parent
+		commit_dir = commit_author_dir.parent
+		commit_sha1 = commit_dir.name
+		return commit_sha1
+
+
+class CommitAuthorDateFile(RegularFile):
+	
+	NAME = 'date'
+	
+	def __init__(self, parent):
+		super(CommitAuthorDateFile, self).__init__(parent=parent, name=self.NAME)
+	
+	def _get_content(self):
+		commit_sha1 = self._get_commit_sha1()
+		commit = parse_git_commit(commit_sha1)
+		return commit.author_date + '\n'
 	
 	def _get_commit_sha1(self):
 		commit_author_dir = self.parent

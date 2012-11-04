@@ -14,6 +14,7 @@ COMMIT_MESSAGE_FILE      = '/objects/commits/' + SAMPLE_HASH + '/message'
 COMMIT_AUTHOR_DIR        = '/objects/commits/' + SAMPLE_HASH + '/author'
 COMMIT_AUTHOR_NAME_FILE  = '/objects/commits/' + SAMPLE_HASH + '/author/name'
 COMMIT_AUTHOR_EMAIL_FILE = '/objects/commits/' + SAMPLE_HASH + '/author/email'
+COMMIT_AUTHOR_DATE_FILE  = '/objects/commits/' + SAMPLE_HASH + '/author/date'
 COMMIT_TREE_SYMLINK      = '/objects/commits/' + SAMPLE_HASH + '/tree'
 TREES_DIR                = '/objects/trees'
 TREE_DIR  	             = '/objects/trees/' + SAMPLE_HASH
