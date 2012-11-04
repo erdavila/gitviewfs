@@ -3,7 +3,7 @@ import re
 import subprocess
 
 
-Commit = namedtuple('Commit', 'author_name, message')
+Commit = namedtuple('Commit', 'author_name, author_email, message')
 
 def parse_git_commit(commit):
 	commit_content = subprocess.check_output(['git', 'cat-file', 'commit', commit])
@@ -19,13 +19,17 @@ def parse_git_commit_content(commit_content):
 		elif line == '\n':
 			found_message = True
 		else:
-			values.update(parse_git_commit_header(line))
+			parsed_header_values = parse_git_commit_header(line)
+			values.update(parsed_header_values)
 	
 	return Commit(message=message, **values)
 
 def parse_git_commit_header(line):
-	m = re.match(r'author (.+) <', line)
+	m = re.match(r'author (.+) <(.+)>', line)
 	if m is not None:
-		return { 'author_name' : m.group(1) }
+		return {
+			'author_name' : m.group(1),
+			'author_email' : m.group(2),
+		}
 	
 	return {}
