@@ -2,9 +2,9 @@ import unittest
 
 from gitviewfs_objects import get_gitviewfs_object, RootDir, RefsDir,\
 	HeadSymLink, BranchesDir, BranchSymLink, ObjectsDir, CommitsDir, CommitDir,\
-	CommitMessageFile, CommitAuthorDir, CommitPersonNameFile, CommitPersonEmailFile,\
-	CommitPersonDateFile, CommitCommitterDir, CommitTreeSymLink, TreesDir, TreeDir,\
-	TreeDirItem, BlobsDir, BlobFile
+	CommitMessageFile, CommitPersonDir, CommitPersonNameFile, CommitPersonEmailFile,\
+	CommitPersonDateFile, CommitTreeSymLink, TreesDir, TreeDir, TreeDirItem,\
+	BlobsDir, BlobFile
 from tests import paths
 
 
@@ -54,7 +54,7 @@ class TestPaths(unittest.TestCase):
 		self.assertPathClassAndName(paths.COMMIT_MESSAGE_FILE, CommitMessageFile)
 	
 	def test_CommitAuthorDir(self):
-		self.assertPathClassAndName(paths.COMMIT_AUTHOR_DIR, CommitAuthorDir)
+		self.assertPathClassAndName(paths.COMMIT_AUTHOR_DIR, CommitPersonDir, 'author')
 	
 	def test_CommitAuthorNameFile(self):
 		self.assertPathClassAndName(paths.COMMIT_AUTHOR_NAME_FILE, CommitPersonNameFile)
@@ -66,7 +66,7 @@ class TestPaths(unittest.TestCase):
 		self.assertPathClassAndName(paths.COMMIT_AUTHOR_DATE_FILE, CommitPersonDateFile)
 	
 	def test_CommitCommitterDir(self):
-		self.assertPathClassAndName(paths.COMMIT_COMMITTER_DIR, CommitCommitterDir)
+		self.assertPathClassAndName(paths.COMMIT_COMMITTER_DIR, CommitPersonDir, 'committer')
 	
 	def test_CommitCommitterNameFile(self):
 		self.assertPathClassAndName(paths.COMMIT_COMMITTER_NAME_FILE, CommitPersonNameFile)

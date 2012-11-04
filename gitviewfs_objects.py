@@ -267,11 +267,11 @@ class CommitDir(PredefinedDirectory):
 	
 	def __init__(self, parent, name):
 		items = {
-			CommitMessageFile.NAME  : CommitMessageFile(parent=self),
-			CommitAuthorDir.NAME    : CommitAuthorDir(parent=self),
-			CommitCommitterDir.NAME : CommitCommitterDir(parent=self),
-			'parents'               : None,
-			CommitTreeSymLink.NAME  : CommitTreeSymLink(parent=self),
+			CommitMessageFile.NAME                : CommitMessageFile(parent=self),
+			CommitPersonDir.PERSON_TYPE_AUTHOR    : CommitPersonDir(parent=self, person_type=CommitPersonDir.PERSON_TYPE_AUTHOR),
+			CommitPersonDir.PERSON_TYPE_COMMITTER : CommitPersonDir(parent=self, person_type=CommitPersonDir.PERSON_TYPE_COMMITTER),
+			'parents'                             : None,
+			CommitTreeSymLink.NAME                : CommitTreeSymLink(parent=self),
 		}
 		super(CommitDir, self).__init__(parent=parent, name=name, items=items)
 
@@ -281,6 +281,7 @@ class CommitMessageFile(RegularFile):
 	NAME = 'message'
 	
 	def __init__(self, parent):
+		assert isinstance(parent, CommitDir)
 		super(CommitMessageFile, self).__init__(parent=parent, name=self.NAME)
 	
 	def _get_content(self):
@@ -291,35 +292,30 @@ class CommitMessageFile(RegularFile):
 
 class CommitPersonDir(PredefinedDirectory):
 	
-	def __init__(self, parent):
+	PERSON_TYPE_AUTHOR = 'author'
+	PERSON_TYPE_COMMITTER = 'committer'
+	
+	def __init__(self, parent, person_type):
 		assert isinstance(parent, CommitDir)
 		items = {
-			CommitPersonNameFile.NAME  : CommitPersonNameFile(parent=self),
-			CommitPersonEmailFile.NAME : CommitPersonEmailFile(parent=self),
-			CommitPersonDateFile.NAME  : CommitPersonDateFile(parent=self),
+			CommitPersonNameFile.NAME  : CommitPersonNameFile(parent=self, person_type=person_type),
+			CommitPersonEmailFile.NAME : CommitPersonEmailFile(parent=self, person_type=person_type),
+			CommitPersonDateFile.NAME  : CommitPersonDateFile(parent=self, person_type=person_type),
 		}
-		super(CommitPersonDir, self).__init__(parent=parent, name=self.NAME, items=items)
-
-
-class CommitAuthorDir(CommitPersonDir):
-	
-	NAME = 'author'
-
-
-class CommitCommitterDir(CommitPersonDir):
-	
-	NAME = 'committer'
+		super(CommitPersonDir, self).__init__(parent=parent, name=person_type, items=items)
+		self.person_type = person_type
 
 
 class CommitPersonDirFile(RegularFile):
 	
-	def __init__(self, parent):
+	def __init__(self, parent, person_type):
 		assert isinstance(parent, CommitPersonDir)
 		super(CommitPersonDirFile, self).__init__(parent=parent, name=self.NAME)
+		self.person_type = person_type
 	
 	def _get_commit_person_data(self):
 		parsed_commit = self._get_parsed_commit()
-		person_type = self.parent.name
+		person_type = self.person_type
 		person_data = getattr(parsed_commit, person_type)
 		return person_data
 	

@@ -11,5 +11,8 @@
 	- ls MOUNT-POINT/objects/objects
 - SymbolicLink.getattr() must report correct size
 - Conflicting names
-	- branch and tag
+	- branch x tag
+	- branch x sha1
+	- tag x sha1
 	- ...
+- Commit without parents

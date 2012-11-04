@@ -2,7 +2,7 @@ import unittest
 import stat
 import os.path
 
-from gitviewfs_objects import CommitsDir, CommitAuthorDir
+from gitviewfs_objects import CommitsDir
 from tests.test_integration import TestIntegration
 from tests import paths
 
@@ -32,7 +32,7 @@ class TestCommitAuthorDir(unittest.TestCase):
 	def make_commit_author_dir_object(self):
 		commits_dir = CommitsDir.INSTANCE
 		commit_dir = commits_dir.get_gitviewfs_object(['a1b2c3d4'])
-		commit_author_dir = commit_dir.get_gitviewfs_object([CommitAuthorDir.NAME])
+		commit_author_dir = commit_dir.get_gitviewfs_object(['author'])
 		return commit_author_dir
 
 
