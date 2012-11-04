@@ -3,7 +3,7 @@ import unittest
 from gitviewfs_objects import get_gitviewfs_object, RootDir, RefsDir,\
 	HeadSymLink, BranchesDir, BranchSymLink, ObjectsDir, CommitsDir, CommitDir,\
 	CommitMessageFile, CommitAuthorDir, CommitPersonNameFile, CommitPersonEmailFile,\
-	CommitAuthorDateFile, CommitCommitterDir, CommitTreeSymLink, TreesDir, TreeDir,\
+	CommitPersonDateFile, CommitCommitterDir, CommitTreeSymLink, TreesDir, TreeDir,\
 	TreeDirItem, BlobsDir, BlobFile
 from tests import paths
 
@@ -63,7 +63,7 @@ class TestPaths(unittest.TestCase):
 		self.assertPathClassAndName(paths.COMMIT_AUTHOR_EMAIL_FILE, CommitPersonEmailFile)
 	
 	def test_CommitAuthorDateFile(self):
-		self.assertPathClassAndName(paths.COMMIT_AUTHOR_DATE_FILE, CommitAuthorDateFile)
+		self.assertPathClassAndName(paths.COMMIT_AUTHOR_DATE_FILE, CommitPersonDateFile)
 	
 	def test_CommitCommitterDir(self):
 		self.assertPathClassAndName(paths.COMMIT_COMMITTER_DIR, CommitCommitterDir)
@@ -73,6 +73,9 @@ class TestPaths(unittest.TestCase):
 	
 	def test_CommitCommitterEmailFile(self):
 		self.assertPathClassAndName(paths.COMMIT_COMMITTER_EMAIL_FILE, CommitPersonEmailFile)
+	
+	def test_CommitCommitterDateFile(self):
+		self.assertPathClassAndName(paths.COMMIT_COMMITTER_DATE_FILE, CommitPersonDateFile)
 	
 	def test_CommitTreeSymLink(self):
 		self.assertPathClassAndName(paths.COMMIT_TREE_SYMLINK, CommitTreeSymLink)

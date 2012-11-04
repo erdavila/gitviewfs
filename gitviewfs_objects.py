@@ -296,7 +296,7 @@ class CommitPersonDir(PredefinedDirectory):
 		items = {
 			CommitPersonNameFile.NAME  : CommitPersonNameFile(parent=self),
 			CommitPersonEmailFile.NAME : CommitPersonEmailFile(parent=self),
-			CommitAuthorDateFile.NAME  : CommitAuthorDateFile(parent=self),
+			CommitPersonDateFile.NAME  : CommitPersonDateFile(parent=self),
 		}
 		super(CommitPersonDir, self).__init__(parent=parent, name=self.NAME, items=items)
 
@@ -353,13 +353,13 @@ class CommitPersonEmailFile(CommitPersonDirFile):
 		return commit_person_data.email + '\n'
 
 
-class CommitAuthorDateFile(CommitPersonDirFile):
+class CommitPersonDateFile(CommitPersonDirFile):
 	
 	NAME = 'date'
 	
 	def _get_content(self):
-		parsed_commit = self._get_parsed_commit()
-		return parsed_commit.author.date + '\n'
+		commit_person_data = self._get_commit_person_data()
+		return commit_person_data.date + '\n'
 
 
 class CommitTreeSymLink(SymLink):
