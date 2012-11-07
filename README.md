@@ -1,10 +1,10 @@
 gitviewfs
 ========
 Gitviewfs provides a filesystem view of a Git repository. It is implemented on
-top of [FUSE](http://fuse.sourceforge.net/) with python-fuse. This can be used
+top of [FUSE](http://fuse.sourceforge.net/) with python-fuse. It can be used
 to help understand [Git internals](http://git-scm.com/book/en/Git-Internals-Git-Objects),
 to debug some problem on your repository or simply as an alternative way of
-browsing the branches, commits, directories and files in your repository.
+browsing branches, tags, commits, directories and files in your repository.
 
 
 How to Use It
@@ -17,7 +17,7 @@ up-to-date Debian-based distros.
 sudo apt-get install python-fuse
 ```
 
-* Choose your `<MOUNTPOINT>` and make sure it is empty.
+* Choose your `<MOUNTPOINT>` directory and make sure it is empty.
 * Then run gitviewfs to mount the filesystem:
 ``` shell
 <PATH-TO-GITVIEWFS>/gitviewfs.py <MOUNTPOINT> -o repo=<GIT-REPOSITORY>
@@ -54,7 +54,7 @@ the current branch in your repository.
   to the commits in `/objects/commits/` which are parents of this commit.
 * `/objects/commits/<COMMIT-SHA1>/tree` - a symlink which points to the root directory
   (in `/objects/trees/`) of this commit.
-* `/objects/trees/<TREE-SHA1>/`- a directory that representes a directory that 
+* `/objects/trees/<TREE-SHA1>/`- a directory that represents a directory that 
   was committed. Each item is a symlink that points to either a blob in
   `/objects/blobs/` (when the item is a committed symlink or regular file) or to
   another tree in `/objects/tree/` (when the item is a committed sub-directory).
@@ -66,9 +66,8 @@ the current branch in your repository.
 * It provides a **read-only view** of a Git repository.
 * It currently does not tell you if a blob referenced by a tree is a regular
   file or a symlink (how can this be implemented?).
-* There is no list of all Git objects; i.e., you can not list **all** commits
-  (in /objects/commits), or **all** trees (in /objects/trees), or **all** blobs
-  (in /objects/blobs), or **all** tags (in /objects/tags) in your repository.
+* The directories `/objects/commits/`, `/objects/tags/`, `/objects/trees/`,
+  `/objects/blobs/`  and `/objects/all/`, **cannot** be used to **list** items.
 
 
 ### Implementation Pending
