@@ -1,7 +1,6 @@
 import unittest
 
-from git_objects_parser import parse_git_commit_content, parse_git_commit_date,\
-	parse_tz_to_seconds
+from git_objects_parser import GitCommitParser
 
 
 class TestGitObjectsParser(unittest.TestCase):
@@ -32,51 +31,53 @@ class TestGitObjectsParser(unittest.TestCase):
 				'',
 			) + self.MESSAGE_LINES
 		)
+		
+		self.parser = GitCommitParser()
 
 	def test_parse_commit_author_name(self):
-		commit = parse_git_commit_content(self.commit_content)
+		commit = self.parser.parse_content(self.commit_content)
 		self.assertEqual(self.AUTHOR_NAME, commit.author.name)
 
 	def test_parse_commit_author_email(self):
-		commit = parse_git_commit_content(self.commit_content)
+		commit = self.parser.parse_content(self.commit_content)
 		self.assertEqual(self.AUTHOR_EMAIL, commit.author.email)
 
 	def test_parse_commit_author_date(self):
-		commit = parse_git_commit_content(self.commit_content)
+		commit = self.parser.parse_content(self.commit_content)
 		self.assertEqual(self.AUTHOR_DATE_FORMATTED, commit.author.date)
 
 	def test_parse_commit_committer_name(self):
-		commit = parse_git_commit_content(self.commit_content)
+		commit = self.parser.parse_content(self.commit_content)
 		self.assertEqual(self.COMMITTER_NAME, commit.committer.name)
 
 	def test_parse_commit_committer_email(self):
-		commit = parse_git_commit_content(self.commit_content)
+		commit = self.parser.parse_content(self.commit_content)
 		self.assertEqual(self.COMMITTER_EMAIL, commit.committer.email)
 
 	def test_parse_commit_committer_date(self):
-		commit = parse_git_commit_content(self.commit_content)
+		commit = self.parser.parse_content(self.commit_content)
 		self.assertEqual(self.COMMITTER_DATE_FORMATTED, commit.committer.date)
 	
 	def test_commit_date_1(self):
 		commit_date = self.AUTHOR_DATE
-		parsed_date = parse_git_commit_date(commit_date)
+		parsed_date = self.parser.parse_date(commit_date)
 		self.assertEqual(self.AUTHOR_DATE_FORMATTED, parsed_date)
 	
 	def test_commit_date_2(self):
 		commit_date = self.COMMITTER_DATE
-		parsed_date = parse_git_commit_date(commit_date)
+		parsed_date = self.parser.parse_date(commit_date)
 		self.assertEqual(self.COMMITTER_DATE_FORMATTED, parsed_date)
 	
 	def test_tz_parsing_1(self):
-		seconds = parse_tz_to_seconds('-0700')
+		seconds = self.parser.parse_tz_to_seconds('-0700')
 		self.assertEqual(-7 * 60 * 60, seconds)
 	
 	def test_tz_parsing_2(self):
-		seconds = parse_tz_to_seconds('+1234')
+		seconds = self.parser.parse_tz_to_seconds('+1234')
 		self.assertEqual(12*60*60 + 34*60, seconds)
 	
 	def test_parse_commit_message(self):
-		commit = parse_git_commit_content(self.commit_content)
+		commit = self.parser.parse_content(self.commit_content)
 		self.assertEqual(self.join_lines(self.MESSAGE_LINES), commit.message)
 	
 	def join_lines(self, lines):

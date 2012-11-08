@@ -3,7 +3,7 @@ import posix
 import os
 import subprocess
 from collections import namedtuple
-from git_objects_parser import parse_git_commit
+from git_objects_parser import GitCommitParser
 
 
 REMOTES_DIR = 'remotes'
@@ -286,7 +286,8 @@ class CommitMessageFile(RegularFile):
 	
 	def _get_content(self):
 		commit_sha1 = self.parent.name
-		commit = parse_git_commit(commit_sha1)
+		parser = GitCommitParser()
+		commit = parser.parse(commit_sha1)
 		return commit.message
 
 
@@ -321,7 +322,8 @@ class CommitPersonDirFile(RegularFile):
 	
 	def _get_parsed_commit(self):
 		commit_sha1 = self._get_commit_sha1()
-		parsed_commit = parse_git_commit(commit_sha1)
+		parser = GitCommitParser()
+		parsed_commit = parser.parse(commit_sha1)
 		return parsed_commit
 	
 	def _get_commit_sha1(self):
