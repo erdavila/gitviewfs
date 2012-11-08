@@ -270,8 +270,8 @@ class CommitDir(PredefinedDirectory):
 			CommitMessageFile.NAME                : CommitMessageFile(parent=self),
 			CommitPersonDir.PERSON_TYPE_AUTHOR    : CommitPersonDir(parent=self, person_type=CommitPersonDir.PERSON_TYPE_AUTHOR),
 			CommitPersonDir.PERSON_TYPE_COMMITTER : CommitPersonDir(parent=self, person_type=CommitPersonDir.PERSON_TYPE_COMMITTER),
-			'parents'                             : None,
 			CommitTreeSymLink.NAME                : CommitTreeSymLink(parent=self),
+			CommitParentsDir.NAME                 : CommitParentsDir(parent=self),
 		}
 		super(CommitDir, self).__init__(parent=parent, name=name, items=items)
 
@@ -372,6 +372,18 @@ class CommitTreeSymLink(SymLink):
 		trees_dir = TreesDir.INSTANCE
 		tree_dir = trees_dir.get_gitviewfs_object([tree_sha1])
 		return tree_dir
+
+
+class CommitParentsDir(Directory):
+	
+	NAME = 'parents'
+	
+	def __init__(self, parent):
+		super(CommitParentsDir, self).__init__(parent=parent, name=self.NAME)
+	
+	def get_gitviewfs_object(self, path_parts):
+		if len(path_parts) == 0:
+			return self
 
 
 class TreesDir(Directory):
