@@ -41,9 +41,7 @@ class TestIntegration(unittest.TestCase, PathMaker):
 	
 	DEFAULT_MESSAGE = 'Add file'
 	
-	def create_and_commit_file(self, content=DEFAULT_CONTENT, message=DEFAULT_MESSAGE, author=None):
-		filename = 'file.txt'
-		
+	def create_and_commit_file(self, filename='file.txt', content=DEFAULT_CONTENT, message=DEFAULT_MESSAGE, author=None):
 		with open(filename, 'w') as f:
 			f.write(content)
 		

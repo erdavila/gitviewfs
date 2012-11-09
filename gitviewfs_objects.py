@@ -381,11 +381,20 @@ class CommitParentsDir(Directory):
 	NAME = 'parents'
 	
 	def __init__(self, parent):
+		assert isinstance(parent, CommitDir)
 		super(CommitParentsDir, self).__init__(parent=parent, name=self.NAME)
 	
 	def get_gitviewfs_object(self, path_parts):
 		if len(path_parts) == 0:
 			return self
+	
+	def list(self):
+		commit_sha1 = self.parent.name
+		parser = GitCommitParser()
+		commit = parser.parse(commit_sha1)
+		num_parents = len(commit.parents)
+		num_digits = len(str(num_parents))
+		return ['%0*d' % (num_digits, i + 1) for i in range(num_parents)]
 
 
 class TreesDir(Directory):

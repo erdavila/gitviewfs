@@ -75,6 +75,9 @@ class PathMaker(object):
 	def make_commit_tree_symlink_path(self, commit_sha1):
 		return self.mountpoint + COMMIT_TREE_SYMLINK.replace(SAMPLE_HASH, commit_sha1)
 	
+	def make_commit_parents_dir_path(self, commit_sha1):
+		return self.mountpoint + COMMIT_PARENTS_DIR.replace(SAMPLE_HASH, commit_sha1)
+	
 	def make_trees_dir_path(self):
 		return self.mountpoint + TREES_DIR
 	
