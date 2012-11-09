@@ -4,7 +4,7 @@ import subprocess
 import time
 
 
-Commit = namedtuple('Commit', 'author, committer, message')
+Commit = namedtuple('Commit', 'parents, author, committer, message')
 CommitPerson = namedtuple('CommitPerson', 'name, email, date')
 
 
@@ -17,7 +17,7 @@ class GitCommitParser(object):
 	def parse_content(self, commit_content):
 		found_message = False
 		message = ''
-		self._values = {}
+		self._values = { 'parents' : [] }
 		for line in commit_content.splitlines(True):
 			if found_message:
 				message += line
@@ -37,6 +37,13 @@ class GitCommitParser(object):
 			date = self.parse_date(m.group(4))
 			commit_person = CommitPerson(name=name, email=email, date=date)
 			self._values[commit_person_type] = commit_person
+			return
+		
+		m = re.match(r'parent (.+)', line)
+		if m is not None:
+			parent_sha1 = m.group(1)
+			self._values['parents'].append(parent_sha1)
+			return
 	
 	def parse_date(self, commit_date):
 		timestamp, tz = commit_date.split(' ')

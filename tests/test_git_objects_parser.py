@@ -5,6 +5,8 @@ from git_objects_parser import GitCommitParser
 
 class TestGitObjectsParser(unittest.TestCase):
 	
+	PARENT_1_SHA1 = 'abcdefabcdefabcdefabcdefabcdefabcdefabcd'
+	PARENT_2_SHA1 = 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2'
 	AUTHOR_NAME = 'Author Name'
 	AUTHOR_EMAIL = 'author@domain1.com'
 	AUTHOR_DATE = '1350852983 -0700'
@@ -24,8 +26,8 @@ class TestGitObjectsParser(unittest.TestCase):
 		self.commit_content = self.join_lines(
 			(
 				'tree 0123456789012345678901234567890123456789',
-				'parent abcdefabcdefabcdefabcdefabcdefabcdefabcd',
-				'parent a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2',
+				'parent ' + self.PARENT_1_SHA1,
+				'parent ' + self.PARENT_2_SHA1,
 				'author '    + self.AUTHOR_NAME    + ' <' + self.AUTHOR_EMAIL    + '> ' + self.AUTHOR_DATE,
 				'committer ' + self.COMMITTER_NAME + ' <' + self.COMMITTER_EMAIL + '> ' + self.COMMITTER_DATE,
 				'',
@@ -33,7 +35,11 @@ class TestGitObjectsParser(unittest.TestCase):
 		)
 		
 		self.parser = GitCommitParser()
-
+	
+	def test_parse_commit_parents(self):
+		commit = self.parser.parse_content(self.commit_content)
+		self.assertSequenceEqual([self.PARENT_1_SHA1, self.PARENT_2_SHA1], commit.parents)
+	
 	def test_parse_commit_author_name(self):
 		commit = self.parser.parse_content(self.commit_content)
 		self.assertEqual(self.AUTHOR_NAME, commit.author.name)
