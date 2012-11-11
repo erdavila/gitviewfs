@@ -387,6 +387,10 @@ class CommitParentsDir(Directory):
 	def get_gitviewfs_object(self, path_parts):
 		if len(path_parts) == 0:
 			return self
+		
+		if len(path_parts) == 1:
+			parent_num = path_parts[0]
+			return CommitParentSymLink(parent=self, name=parent_num)
 	
 	def list(self):
 		commit_sha1 = self.parent.name
@@ -395,6 +399,29 @@ class CommitParentsDir(Directory):
 		num_parents = len(commit.parents)
 		num_digits = len(str(num_parents))
 		return ['%0*d' % (num_digits, i + 1) for i in range(num_parents)]
+
+
+class CommitParentSymLink(SymLink):
+	
+	def __init__(self, parent, name):
+		assert isinstance(parent, CommitParentsDir)
+		super(CommitParentSymLink, self).__init__(parent=parent, name=name)
+	
+	def get_target_object(self):
+		commit_parents_dir = self.parent
+		commit_dir = commit_parents_dir.parent
+		commit_sha1 = commit_dir.name
+		
+		parser = GitCommitParser()
+		commit = parser.parse(commit_sha1)
+		
+		parent_number = int(self.name)
+		parent_index = parent_number - 1
+		parent_sha1 = commit.parents[parent_index]
+		
+		commits_dir = CommitsDir.INSTANCE
+		parent_dir = commits_dir.get_gitviewfs_object([parent_sha1])
+		return parent_dir
 
 
 class TreesDir(Directory):

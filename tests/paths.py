@@ -1,6 +1,8 @@
+import re
 SAMPLE_HASH = 'a1b2c3d4'
 SAMPLE_FILENAME = 'filename'
 SAMPLE_BRANCH = 'a-branch'
+SAMPLE_PARENT = '1'
 
 ROOT_DIR                    = '/'
 REFS_DIR                    = '/refs'
@@ -21,6 +23,7 @@ COMMIT_COMMITTER_EMAIL_FILE = '/objects/commits/' + SAMPLE_HASH + '/committer/em
 COMMIT_COMMITTER_DATE_FILE  = '/objects/commits/' + SAMPLE_HASH + '/committer/date'
 COMMIT_TREE_SYMLINK         = '/objects/commits/' + SAMPLE_HASH + '/tree'
 COMMIT_PARENTS_DIR          = '/objects/commits/' + SAMPLE_HASH + '/parents'
+COMMIT_PARENT_SYMLINK       = '/objects/commits/' + SAMPLE_HASH + '/parents/' + SAMPLE_PARENT
 TREES_DIR                   = '/objects/trees'
 TREE_DIR                    = '/objects/trees/' + SAMPLE_HASH
 TREE_DIR_ITEM               = '/objects/trees/' + SAMPLE_HASH + '/' + SAMPLE_FILENAME
@@ -77,6 +80,12 @@ class PathMaker(object):
 	
 	def make_commit_parents_dir_path(self, commit_sha1):
 		return self.mountpoint + COMMIT_PARENTS_DIR.replace(SAMPLE_HASH, commit_sha1)
+	
+	def make_commit_parent_symlink_path(self, commit_sha1, parent=None):
+		path = self.mountpoint + COMMIT_PARENT_SYMLINK.replace(SAMPLE_HASH, commit_sha1)
+		if parent is not None:
+			path = re.sub(r'/' + SAMPLE_PARENT + '$', '/' + parent, path)
+		return path
 	
 	def make_trees_dir_path(self):
 		return self.mountpoint + TREES_DIR

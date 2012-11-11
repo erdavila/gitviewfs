@@ -10,8 +10,8 @@ CommitPerson = namedtuple('CommitPerson', 'name, email, date')
 
 class GitCommitParser(object):
 	
-	def parse(self, commit):
-		commit_content = subprocess.check_output(['git', 'cat-file', 'commit', commit])
+	def parse(self, commit_ref_or_sha1):
+		commit_content = subprocess.check_output(['git', 'cat-file', 'commit', commit_ref_or_sha1])
 		return self.parse_content(commit_content)
 
 	def parse_content(self, commit_content):

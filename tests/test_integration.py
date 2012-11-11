@@ -6,6 +6,7 @@ import shutil
 
 import gitviewfs
 from tests.paths import PathMaker
+import time
 
 
 class TestIntegration(unittest.TestCase, PathMaker):
@@ -24,13 +25,25 @@ class TestIntegration(unittest.TestCase, PathMaker):
 		self.repo = tempfile.mkdtemp(prefix='gitviewfs-repo-', suffix='.tmp')
 		self.mountpoint = tempfile.mkdtemp(prefix='gitviewfs-mountpoint-', suffix='.tmp')
 		subprocess.check_call(['git', 'init', self.repo])
-		subprocess.check_call([
+		subprocess.Popen([
 				self.__gitviewfs_cmd_path(),
 				self.mountpoint,
+				'-d',
 				'-o', 'repo=' + self.repo,
 		])
+		self._wait_mountpoint_available()
 		os.chdir(self.repo)
-
+	
+	def _wait_mountpoint_available(self):
+		SLEEP_DURATION = 0.001 # in seconds
+		TOTAL_WAIT_DURATION = 1 # in seconds
+		for _ in xrange(int(TOTAL_WAIT_DURATION / SLEEP_DURATION)):
+			time.sleep(SLEEP_DURATION)
+			if os.listdir(self.mountpoint) != []:
+				break
+		else:
+			self.fail()
+	
 	def tearDown(self):
 		subprocess.check_call(['fusermount', '-u', self.mountpoint])
 		shutil.rmtree(self.mountpoint)

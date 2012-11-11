@@ -4,7 +4,7 @@ from gitviewfs_objects import get_gitviewfs_object, RootDir, RefsDir,\
 	HeadSymLink, BranchesDir, BranchSymLink, ObjectsDir, CommitsDir, CommitDir,\
 	CommitMessageFile, CommitPersonDir, CommitPersonNameFile, CommitPersonEmailFile,\
 	CommitPersonDateFile, CommitTreeSymLink, CommitParentsDir, TreesDir, TreeDir,\
-	TreeDirItem, BlobsDir, BlobFile
+	TreeDirItem, BlobsDir, BlobFile, CommitParentSymLink
 from tests import paths
 
 
@@ -82,6 +82,9 @@ class TestPaths(unittest.TestCase):
 	
 	def test_CommitParentsDir(self):
 		self.assertPathClassAndName(paths.COMMIT_PARENTS_DIR, CommitParentsDir)
+	
+	def test_CommitParentSymLink(self):
+		self.assertPathClassAndName(paths.COMMIT_PARENT_SYMLINK, CommitParentSymLink, paths.SAMPLE_PARENT)
 	
 	def test_TreesDir(self):
 		self.assertPathClassAndName(paths.TREES_DIR, TreesDir)

@@ -73,11 +73,12 @@ the current branch in your repository.
 ### Implementation Pending
 * Should check if repo argument is really a Git repository
 * Branches with "/" in name
-* Tags with "/" in name
 * Bare repository (has refs/HEAD?)
 * Detached-head (refs/HEAD?)
 * Repository initialized but without any commit yet (refs/HEAD? refs/commits/?)
-* Signed tags
+* Lightweight tags
+* Annotated tags
+* Tags with "/" in name
 * Directory /objects/all
 * Tags pointing to an object which is not a commit
 * Handle errors:
