@@ -80,15 +80,15 @@ class GitViewFSObject(object):
 		return 4 <= len(sha1_hash) <= 40
 
 
-class Directory(GitViewFSObject):
+class OldDirectory(GitViewFSObject):
 	
 	def _get_attrs(self):
-		attrs = super(Directory, self)._get_attrs()
+		attrs = super(OldDirectory, self)._get_attrs()
 		attrs[stat.ST_MODE] = with_directory_type(attrs[stat.ST_MODE])
 		return attrs
 
 
-class PredefinedDirectory(Directory):
+class PredefinedDirectory(OldDirectory):
 	
 	def __init__(self, parent, name, items):
 		super(PredefinedDirectory, self).__init__(parent=parent, name=name)
@@ -102,7 +102,7 @@ class PredefinedDirectory(Directory):
 		rest = path_parts[1:]
 		
 		item = self.items[first_part]
-		if isinstance(item, Directory):
+		if isinstance(item, OldDirectory):
 			return item.get_gitviewfs_object(rest)
 		else:
 			return item
@@ -193,7 +193,7 @@ class HeadSymLink(SymLink):
 		return branch_symlink
 
 
-class BranchesDir(Directory):
+class BranchesDir(OldDirectory):
 	
 	NAME = 'branches'
 	INSTANCE = None
@@ -243,7 +243,7 @@ class ObjectsDir(PredefinedDirectory):
 		ObjectsDir.INSTANCE = self
 
 
-class CommitsDir(Directory):
+class CommitsDir(OldDirectory):
 	
 	NAME = 'commits'
 	INSTANCE = None
@@ -376,7 +376,7 @@ class CommitTreeSymLink(SymLink):
 		return tree_dir
 
 
-class CommitParentsDir(Directory):
+class CommitParentsDir(OldDirectory):
 	
 	NAME = 'parents'
 	
@@ -424,7 +424,7 @@ class CommitParentSymLink(SymLink):
 		return parent_dir
 
 
-class TreesDir(Directory):
+class TreesDir(OldDirectory):
 	
 	NAME = 'trees'
 	INSTANCE = None
@@ -443,7 +443,7 @@ class TreesDir(Directory):
 			return tree_dir.get_gitviewfs_object(path_parts[1:])
 
 
-class TreeDir(Directory):
+class TreeDir(OldDirectory):
 	
 	def get_gitviewfs_object(self, path_parts):
 		if len(path_parts) == 0:
@@ -497,7 +497,7 @@ class TreeDirItem(SymLink):
 		return target_object
 
 
-class BlobsDir(Directory):
+class BlobsDir(OldDirectory):
 	
 	NAME = 'blobs'
 	INSTANCE = None
