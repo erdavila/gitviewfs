@@ -3,6 +3,8 @@ import posix
 import os
 import subprocess
 from collections import namedtuple
+from abc import abstractmethod, ABCMeta
+
 from git_objects_parser import GitCommitParser
 
 
@@ -78,6 +80,30 @@ class GitViewFSObject(object):
 	
 	def _is_valid_sha1_hash(self, sha1_hash):
 		return 4 <= len(sha1_hash) <= 40
+
+
+class DirItemsProvider(object):
+	__metaclass__ = ABCMeta
+	
+	@abstractmethod
+	def get_items_names(self): pass
+
+
+class Directory(object):
+	
+	def __init__(self, name, items):
+		self.name = name
+		self.items = items
+	
+	def list(self):
+		items_names = []
+		for item in self.items:
+			if isinstance(item, DirItemsProvider):
+				items_names_from_provider = item.get_items_names()
+				items_names.extend(items_names_from_provider)
+			else:
+				items_names.append(item.name)
+		return items_names
 
 
 class OldDirectory(GitViewFSObject):

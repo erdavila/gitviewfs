@@ -68,6 +68,8 @@ the current branch in your repository.
   file or a symlink (how can this be implemented?).
 * The directories `/objects/commits/`, `/objects/tags/`, `/objects/trees/`,
   `/objects/blobs/`  and `/objects/all/`, **cannot** be used to **list** items.
+* Non-"standard" references are not listed. I.e., references which are not HEAD,
+  local branches, remote branches or lightweight tags are not listed.
 
 
 ### Implementation Pending
