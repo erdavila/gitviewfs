@@ -87,6 +87,9 @@ class DirItemsProvider(object):
 	
 	@abstractmethod
 	def get_items_names(self): pass
+	
+	@abstractmethod
+	def get_item(self, name): pass
 
 
 class Directory(object):
@@ -104,6 +107,15 @@ class Directory(object):
 			else:
 				items_names.append(item.name)
 		return items_names
+	
+	def get_item(self, name):
+		for item in self.items:
+			if isinstance(item, DirItemsProvider):
+				item_from_provider = item.get_item(name)
+				if item_from_provider is not None:
+					return item_from_provider
+			elif item.name == name:
+				return item
 
 
 class OldDirectory(GitViewFSObject):
