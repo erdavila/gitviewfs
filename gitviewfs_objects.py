@@ -285,22 +285,6 @@ class BranchSymLink(SymLink):
 		return commit_dir
 
 
-class ObjectsDir(PredefinedDirectory):
-	
-	NAME = 'objects'
-	INSTANCE = None
-	
-	def __init__(self):
-		items = {
-			CommitsDir.NAME : CommitsDir(parent=self),
-			TreesDir.NAME   : TreesDir(parent=self),
-			BlobsDir.NAME   : BlobsDir(parent=self),
-			'all'           : None,
-		}
-		super(ObjectsDir, self).__init__(parent=None, name=self.NAME, items=items)
-		ObjectsDir.INSTANCE = self
-
-
 class CommitsDir(OldDirectory):
 	
 	NAME = 'commits'
@@ -593,5 +577,9 @@ ROOT_DIR = Directory(name=None, items=[
 		HeadSymLink(name='HEAD'),
 		BRANCHES_DIR,
 	]),
-	ObjectsDir(),
+	Directory(name='objects', items=[
+		CommitsDir(parent=None),
+		TreesDir(parent=None),
+		BlobsDir(parent=None),
+	])
 ])
