@@ -53,7 +53,7 @@ def get_gitviewfs_object(path):
 	return obj
 
 
-class GitViewFSObject(object):
+class OldGitViewFSObject(object):
 	
 	def __init__(self, parent, name):
 		self.parent = parent
@@ -124,7 +124,7 @@ class Directory(object):
 		return returned_item
 
 
-class OldDirectory(GitViewFSObject):
+class OldDirectory(OldGitViewFSObject):
 	
 	def _get_attrs(self):
 		attrs = super(OldDirectory, self)._get_attrs()
@@ -155,7 +155,7 @@ class PredefinedDirectory(OldDirectory):
 		return self.items.keys()
 
 
-class SymLink(GitViewFSObject):
+class SymLink(OldGitViewFSObject):
 	
 	def _get_attrs(self):
 		attrs = super(SymLink, self)._get_attrs()
@@ -170,7 +170,7 @@ class SymLink(GitViewFSObject):
 		return symlink_path
 
 
-class RegularFile(GitViewFSObject):
+class RegularFile(OldGitViewFSObject):
 	
 	def read(self, length, offset):
 		content = self._get_content()
