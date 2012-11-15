@@ -8,9 +8,6 @@ from abc import abstractmethod, ABCMeta
 from git_objects_parser import GitCommitParser
 
 
-REMOTES_DIR = 'remotes'
-
-
 def without_write_permissions(stat_mode):
 	stat_mode &= ~(stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH)
 	return stat_mode
@@ -43,14 +40,21 @@ def get_gitviewfs_object(path):
 	assert path.startswith('/')
 	
 	if path == '/':
-		rest = []
-	else:
-		path_parts = path.split('/')
-		rest = path_parts[1:]
+		return ROOT_DIR
 	
-	root_dir = RootDir.INSTANCE
-	obj = root_dir.get_gitviewfs_object(rest)
-	return obj
+	path_parts = path.split('/')
+	assert path_parts[0] == ''
+	path_parts.pop(0)
+	
+	item = ROOT_DIR
+	while len(path_parts) > 0 and not isinstance(item, OldGitViewFSObject):
+		first_part = path_parts.pop(0)
+		item = item.get_item(first_part)
+	
+	if isinstance(item, OldGitViewFSObject):
+		return item.get_gitviewfs_object(path_parts)
+	
+	return item
 
 
 class OldGitViewFSObject(object):
@@ -80,6 +84,9 @@ class OldGitViewFSObject(object):
 	
 	def _is_valid_sha1_hash(self, sha1_hash):
 		return 4 <= len(sha1_hash) <= 40
+	
+	def set_parent(self, parent):
+		self.parent = parent
 
 
 def set_child_parent(child, parent):
@@ -218,36 +225,19 @@ class RegularFile(OldGitViewFSObject):
 		return len(content)
 
 
-class RootDir(PredefinedDirectory):
-	
-	INSTANCE = None
-	
-	def __init__(self):
-		items = {
-			RefsDir.NAME    : RefsDir(parent=self),
-			ObjectsDir.NAME : ObjectsDir(parent=self),
-			REMOTES_DIR     : None,
-		}
-		super(RootDir, self).__init__(parent=None, name='/', items=items)
-		RootDir.INSTANCE = self
-	
-	def get_path(self):
-		return '/'
-	
-
 class RefsDir(PredefinedDirectory):
 	
 	NAME = 'refs'
 	INSTANCE = None
 	
-	def __init__(self, parent):
+	def __init__(self):
 		items = {
 			HeadSymLink.NAME : HeadSymLink(parent=self),
 			BranchesDir.NAME : BranchesDir(parent=self),
 			'tags'           : None,
 			'remotes'        : None,
 		}
-		super(RefsDir, self).__init__(parent=parent, name=self.NAME, items=items)
+		super(RefsDir, self).__init__(parent=None, name=self.NAME, items=items)
 		RefsDir.INSTANCE = self
 
 
@@ -306,14 +296,14 @@ class ObjectsDir(PredefinedDirectory):
 	NAME = 'objects'
 	INSTANCE = None
 	
-	def __init__(self, parent):
+	def __init__(self):
 		items = {
 			CommitsDir.NAME : CommitsDir(parent=self),
 			TreesDir.NAME   : TreesDir(parent=self),
 			BlobsDir.NAME   : BlobsDir(parent=self),
 			'all'           : None,
 		}
-		super(ObjectsDir, self).__init__(parent=parent, name=self.NAME, items=items)
+		super(ObjectsDir, self).__init__(parent=None, name=self.NAME, items=items)
 		ObjectsDir.INSTANCE = self
 
 
@@ -603,4 +593,7 @@ class BlobFile(RegularFile):
 		return blob_content
 
 
-RootDir()
+ROOT_DIR = Directory(name=None, items=[
+	RefsDir(),
+	ObjectsDir(),
+])

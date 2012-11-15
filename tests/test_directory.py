@@ -111,9 +111,9 @@ class TestParentIsSet(TestBase):
 class TestGetPath(TestBase):
 	
 	def test_root(self):
-		root_dir = Directory(name='does not matter', items=[])
+		ROOT_DIR = Directory(name='does not matter', items=[])
 		
-		path = root_dir.get_path()
+		path = ROOT_DIR.get_path()
 		
 		self.assertEqual('/', path)
 	
