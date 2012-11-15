@@ -82,6 +82,22 @@ class OldGitViewFSObject(object):
 		return 4 <= len(sha1_hash) <= 40
 
 
+class GitViewFSObject(object):
+	
+	def __init__(self, name):
+		self.name = name
+	
+	def get_path(self):
+		if hasattr(self, 'parent'):
+			parent_path = self.parent.get_path()
+			if parent_path == '/':
+				return '/' + self.name
+			else:
+				return parent_path + '/' + self.name
+		else:
+			return '/'
+
+
 class DirItemsProvider(object):
 	__metaclass__ = ABCMeta
 	
@@ -92,7 +108,7 @@ class DirItemsProvider(object):
 	def get_item(self, name): pass
 
 
-class Directory(object):
+class Directory(GitViewFSObject):
 	
 	def __init__(self, name, items):
 		self.name = name

@@ -1,6 +1,6 @@
 import unittest
 
-from gitviewfs_objects import DirItemsProvider, Directory
+from gitviewfs_objects import DirItemsProvider, Directory, GitViewFSObject
 
 
 class TestBase(unittest.TestCase):
@@ -108,6 +108,41 @@ class TestParentIsSet(TestBase):
 		INDEX = 1
 		item = self.directory.get_item(self.PROVIDER_ITEMS_NAMES[INDEX])
 		self.assertIs(self.directory, item.parent)
+
+
+class TestGetPath(TestBase):
+	
+	def test_root(self):
+		root_dir = Directory(name='does not matter', items=[])
+		
+		path = root_dir.get_path()
+		
+		self.assertEqual('/', path)
+	
+	def test_child_of_root(self):
+		CHILD_NAME = 'child-name'
+		root_dir = Directory(name='does not matter', items=[GitViewFSObject(name=CHILD_NAME)])
+		child = root_dir.get_item(CHILD_NAME)
+		
+		path = child.get_path()
+		
+		self.assertEqual('/' + CHILD_NAME, path)
+	
+	def test_child_of_non_root(self):
+		CHILD_NAME = 'child-name'
+		NON_ROOT_DIR_PATH = 'non-root-dir-path'
+		
+		child = GitViewFSObject(name=CHILD_NAME)
+		
+		class NonRootDirectory(Directory):
+			def get_path(self):
+				return NON_ROOT_DIR_PATH
+		non_root_dir = NonRootDirectory(name='does not matter', items=[child])
+		
+		child = non_root_dir.get_item(CHILD_NAME)
+		path = child.get_path()
+		
+		self.assertEqual(NON_ROOT_DIR_PATH + '/' + CHILD_NAME, path)
 
 
 if __name__ == "__main__":
