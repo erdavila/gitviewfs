@@ -5,7 +5,7 @@ from gitviewfs_objects import DirItemsProvider, Directory, GitViewFSObject
 
 class TestBase(unittest.TestCase):
 	
-	class MockItem(object):
+	class MockItem(GitViewFSObject):
 		def __init__(self, name):
 			self.name = name
 	
@@ -14,7 +14,7 @@ class TestBase(unittest.TestCase):
 			self.items = items
 		def get_items_names(self):
 			return [item.name for item in self.items]
-		def get_item(self, name):
+		def _get_item(self, name):
 			for item in self.items:
 				if item.name == name:
 					return item
@@ -97,17 +97,15 @@ class TestParentIsSet(TestBase):
 		self.create_directory_with_multiple_items()
 	
 	def test_regular_item(self):
-		item = self.directory.get_item(self.ITEM_NAME)
-		self.assertIs(self.directory, item.parent)
+		self.assertIs(self.directory, self.mock_item.parent)
 	
 	def test_directory_as_item(self):
-		item = self.directory.get_item(self.SUBDIR_NAME)
-		self.assertIs(self.directory, item.parent)
+		self.assertIs(self.directory, self.subdir.parent)
 	
 	def test_item_from_provider(self):
-		INDEX = 1
-		item = self.directory.get_item(self.PROVIDER_ITEMS_NAMES[INDEX])
-		self.assertIs(self.directory, item.parent)
+		for name in self.PROVIDER_ITEMS_NAMES:
+			item = self.directory.get_item(name)
+			self.assertIs(self.directory, item.parent)
 
 
 class TestGetPath(TestBase):
@@ -121,8 +119,8 @@ class TestGetPath(TestBase):
 	
 	def test_child_of_root(self):
 		CHILD_NAME = 'child-name'
-		root_dir = Directory(name='does not matter', items=[GitViewFSObject(name=CHILD_NAME)])
-		child = root_dir.get_item(CHILD_NAME)
+		child = GitViewFSObject(name=CHILD_NAME)
+		_root_dir = Directory(name='does not matter', items=[child])
 		
 		path = child.get_path()
 		
@@ -130,16 +128,14 @@ class TestGetPath(TestBase):
 	
 	def test_child_of_non_root(self):
 		CHILD_NAME = 'child-name'
-		NON_ROOT_DIR_PATH = 'non-root-dir-path'
-		
 		child = GitViewFSObject(name=CHILD_NAME)
 		
+		NON_ROOT_DIR_PATH = 'non-root-dir-path'
 		class NonRootDirectory(Directory):
 			def get_path(self):
 				return NON_ROOT_DIR_PATH
-		non_root_dir = NonRootDirectory(name='does not matter', items=[child])
+		_non_root_dir = NonRootDirectory(name='does not matter', items=[child])
 		
-		child = non_root_dir.get_item(CHILD_NAME)
 		path = child.get_path()
 		
 		self.assertEqual(NON_ROOT_DIR_PATH + '/' + CHILD_NAME, path)

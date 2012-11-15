@@ -82,10 +82,20 @@ class OldGitViewFSObject(object):
 		return 4 <= len(sha1_hash) <= 40
 
 
+def set_child_parent(child, parent):
+	if hasattr(child, 'parent'):
+		assert child.parent is parent
+	else:
+		child.parent = parent
+
+
 class GitViewFSObject(object):
 	
 	def __init__(self, name):
 		self.name = name
+	
+	def set_parent(self, parent):
+		set_child_parent(self, parent)
 	
 	def get_path(self):
 		if hasattr(self, 'parent'):
@@ -104,8 +114,16 @@ class DirItemsProvider(object):
 	@abstractmethod
 	def get_items_names(self): pass
 	
+	def get_item(self, name):
+		item = self._get_item(name)
+		item.set_parent(self.parent)
+		return item
+	
 	@abstractmethod
-	def get_item(self, name): pass
+	def _get_item(self, name): pass
+	
+	def set_parent(self, parent):
+		set_child_parent(self, parent)
 
 
 class Directory(GitViewFSObject):
@@ -113,6 +131,8 @@ class Directory(GitViewFSObject):
 	def __init__(self, name, items):
 		self.name = name
 		self.items = items
+		for item in items:
+			item.set_parent(self)
 	
 	def list(self):
 		items_names = []
@@ -129,15 +149,9 @@ class Directory(GitViewFSObject):
 			if isinstance(item, DirItemsProvider):
 				item_from_provider = item.get_item(name)
 				if item_from_provider is not None:
-					returned_item = item_from_provider
-					break
+					return item_from_provider
 			elif item.name == name:
-				returned_item = item
-				break
-		
-		assert not hasattr(returned_item, 'parent') or returned_item.parent is self
-		returned_item.parent = self
-		return returned_item
+				return item
 
 
 class OldDirectory(OldGitViewFSObject):
