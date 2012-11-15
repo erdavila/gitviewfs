@@ -280,8 +280,7 @@ class BranchSymLink(SymLink):
 	def get_target_object(self):
 		branch = self.name
 		commit_sha1 = subprocess.check_output(['git', 'rev-parse', branch]).strip()
-		commits_dir = CommitsDir.INSTANCE
-		commit_dir = commits_dir.get_gitviewfs_object([commit_sha1])
+		commit_dir = COMMITS_DIR.get_item(commit_sha1)
 		return commit_dir
 
 
@@ -292,26 +291,6 @@ class CommitsProvider(DirItemsProvider):
 	
 	def get_items_names(self):
 		return []
-
-
-class CommitsDir(OldDirectory):
-	
-	NAME = 'commits'
-	INSTANCE = None
-	
-	def __init__(self, parent):
-		super(CommitsDir, self).__init__(parent=parent, name=self.NAME)
-		CommitsDir.INSTANCE = self
-	
-	def get_gitviewfs_object(self, path_parts):
-		if len(path_parts) == 0:
-			return self
-		
-		first_part = path_parts[0]
-		rest = path_parts[1:]
-		if self._is_valid_sha1_hash(first_part):
-			commit_dir = CommitDir(parent=self, name=first_part)
-			return commit_dir.get_gitviewfs_object(rest)
 
 
 class CommitDir(PredefinedDirectory):
@@ -470,8 +449,7 @@ class CommitParentSymLink(OldSymLink):
 		parent_index = parent_number - 1
 		parent_sha1 = commit.parents[parent_index]
 		
-		commits_dir = CommitsDir.INSTANCE
-		parent_dir = commits_dir.get_gitviewfs_object([parent_sha1])
+		parent_dir = COMMITS_DIR.get_item(parent_sha1)
 		return parent_dir
 
 
@@ -581,13 +559,14 @@ class BlobFile(RegularFile):
 
 
 BRANCHES_DIR = Directory(name='branches', items=[BranchesProvider()])
+COMMITS_DIR = Directory(name='commits', items=[CommitsProvider()])
 ROOT_DIR = Directory(name=None, items=[
 	Directory(name='refs', items=[
 		HeadSymLink(name='HEAD'),
 		BRANCHES_DIR,
 	]),
 	Directory(name='objects', items=[
-		CommitsDir(parent=None),
+		COMMITS_DIR,
 		TreesDir(parent=None),
 		BlobsDir(parent=None),
 	])

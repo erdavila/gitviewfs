@@ -2,7 +2,7 @@ import unittest
 import stat
 import os.path
 
-from gitviewfs_objects import CommitsDir
+from gitviewfs_objects import COMMITS_DIR
 from tests.test_integration import TestIntegration
 from tests import paths
 
@@ -30,8 +30,7 @@ class TestCommitAuthorDir(unittest.TestCase):
 		self.assertItemsEqual(['name', 'email', 'date'], items)
 	
 	def make_commit_author_dir_object(self):
-		commits_dir = CommitsDir.INSTANCE
-		commit_dir = commits_dir.get_gitviewfs_object(['a1b2c3d4'])
+		commit_dir = COMMITS_DIR.get_item('a1b2c3d4')
 		commit_author_dir = commit_dir.get_gitviewfs_object(['author'])
 		return commit_author_dir
 
