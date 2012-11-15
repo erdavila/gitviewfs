@@ -1,25 +1,7 @@
 import unittest
-import stat
 import os
 
-from gitviewfs_objects import HeadSymLink
 from tests.test_integration import TestIntegration
-
-
-class TestHeadSymLink(unittest.TestCase):
-
-	def setUp(self):
-		pass
-
-	def tearDown(self):
-		pass
-
-	def test_getattr_returns_symlink_type(self):
-		head_symlink = HeadSymLink.INSTANCE
-		
-		attr = head_symlink.getattr()
-		
-		self.assertTrue(stat.S_ISLNK(attr.st_mode))
 
 
 class TestHeadSymLinkIntegration(TestIntegration):

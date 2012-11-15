@@ -33,7 +33,7 @@ class TestPaths(unittest.TestCase):
 		self.assertPathClassAndName(paths.REFS_DIR, Directory, 'refs')
 	
 	def test_HeadSymLink(self):
-		self.assertPathClassAndName(paths.HEAD_SYMLINK, HeadSymLink)
+		self.assertPathClassAndName(paths.HEAD_SYMLINK, HeadSymLink, 'HEAD')
 	
 	def test_BranchesDir(self):
 		self.assertPathClassAndName(paths.BRANCHES_DIR, BranchesDir)

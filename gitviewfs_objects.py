@@ -256,14 +256,7 @@ class RegularFile(OldGitViewFSObject):
 		return len(content)
 
 
-class HeadSymLink(OldSymLink):
-	
-	NAME = 'HEAD'
-	INSTANCE = None
-	
-	def __init__(self, parent):
-		super(HeadSymLink, self).__init__(parent=parent, name=self.NAME)
-		HeadSymLink.INSTANCE = self
+class HeadSymLink(SymLink):
 	
 	def get_target_object(self):
 		branch = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).strip()
@@ -610,8 +603,8 @@ class BlobFile(RegularFile):
 
 ROOT_DIR = Directory(name=None, items=[
 	Directory(name='refs', items=[
-		HeadSymLink(parent=None), 
-		BranchesDir(parent=None), 
+		HeadSymLink(name='HEAD'),
+		BranchesDir(parent=None),
 	]),
 	ObjectsDir(),
 ])
