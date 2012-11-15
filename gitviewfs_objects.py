@@ -113,9 +113,15 @@ class Directory(object):
 			if isinstance(item, DirItemsProvider):
 				item_from_provider = item.get_item(name)
 				if item_from_provider is not None:
-					return item_from_provider
+					returned_item = item_from_provider
+					break
 			elif item.name == name:
-				return item
+				returned_item = item
+				break
+		
+		assert not hasattr(returned_item, 'parent') or returned_item.parent is self
+		returned_item.parent = self
+		return returned_item
 
 
 class OldDirectory(GitViewFSObject):

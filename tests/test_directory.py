@@ -33,14 +33,7 @@ class TestBase(unittest.TestCase):
 		self.directory = Directory(name='', items=[self.mock_item, self.subdir, mock_provider])
 
 
-
 class TestDirectoryList(TestBase):
-
-	def setUp(self):
-		pass
-
-	def tearDown(self):
-		pass
 	
 	def test_providers_as_items(self):
 		ITEMS_NAMES_1 = ('item1', 'item2', 'item3')
@@ -96,6 +89,25 @@ class TestDirectoryGetItem(TestBase):
 		INDEX = 1
 		item = self.directory.get_item(self.PROVIDER_ITEMS_NAMES[INDEX])
 		self.assertIs(item, self.PROVIDER_ITEMS[INDEX])
+
+
+class TestParentIsSet(TestBase):
+	
+	def setUp(self):
+		self.create_directory_with_multiple_items()
+	
+	def test_regular_item(self):
+		item = self.directory.get_item(self.ITEM_NAME)
+		self.assertIs(self.directory, item.parent)
+	
+	def test_directory_as_item(self):
+		item = self.directory.get_item(self.SUBDIR_NAME)
+		self.assertIs(self.directory, item.parent)
+	
+	def test_item_from_provider(self):
+		INDEX = 1
+		item = self.directory.get_item(self.PROVIDER_ITEMS_NAMES[INDEX])
+		self.assertIs(self.directory, item.parent)
 
 
 if __name__ == "__main__":
