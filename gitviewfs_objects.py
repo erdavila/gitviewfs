@@ -85,15 +85,15 @@ class OldGitViewFSObject(object):
 	def _is_valid_sha1_hash(self, sha1_hash):
 		return 4 <= len(sha1_hash) <= 40
 	
-	def set_parent(self, parent):
+	def set_parent_dir(self, parent):
 		self.parent = parent
 
 
-def set_child_parent(child, parent):
-	if hasattr(child, 'parent'):
-		assert child.parent is parent
+def set_parent_dir(item, parent_dir):
+	if hasattr(item, 'parent_dir'):
+		assert item.parent_dir is parent_dir
 	else:
-		child.parent = parent
+		item.parent_dir = parent_dir
 
 
 class GitViewFSObject(object):
@@ -101,18 +101,14 @@ class GitViewFSObject(object):
 	def __init__(self, name):
 		self.name = name
 	
-	def set_parent(self, parent):
-		set_child_parent(self, parent)
+	def set_parent_dir(self, parent_dir):
+		set_parent_dir(self, parent_dir)
 	
 	def get_path(self):
-		if hasattr(self, 'parent'):
-			parent_path = self.parent.get_path()
-			if parent_path == '/':
-				return '/' + self.name
-			else:
-				return parent_path + '/' + self.name
+		if self.parent_dir.is_root():
+			return '/' + self.name
 		else:
-			return '/'
+			return self.parent_dir.get_path() + '/' + self.name
 
 
 class DirItemsProvider(object):
@@ -123,14 +119,14 @@ class DirItemsProvider(object):
 	
 	def get_item(self, name):
 		item = self._get_item(name)
-		item.set_parent(self.parent)
+		item.set_parent_dir(self.parent_dir)
 		return item
 	
 	@abstractmethod
 	def _get_item(self, name): pass
 	
-	def set_parent(self, parent):
-		set_child_parent(self, parent)
+	def set_parent_dir(self, parent_dir):
+		set_parent_dir(self, parent_dir)
 
 
 class Directory(GitViewFSObject):
@@ -139,7 +135,7 @@ class Directory(GitViewFSObject):
 		self.name = name
 		self.items = items
 		for item in items:
-			item.set_parent(self)
+			item.set_parent_dir(self)
 	
 	def list(self):
 		items_names = []
@@ -159,6 +155,15 @@ class Directory(GitViewFSObject):
 					return item_from_provider
 			elif item.name == name:
 				return item
+	
+	def get_path(self):
+		if self.is_root():
+			return '/'
+		else:
+			return super(Directory, self).get_path()
+	
+	def is_root(self):
+		return not hasattr(self, 'parent_dir')
 
 
 class OldDirectory(OldGitViewFSObject):

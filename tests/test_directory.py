@@ -91,21 +91,21 @@ class TestDirectoryGetItem(TestBase):
 		self.assertIs(item, self.PROVIDER_ITEMS[INDEX])
 
 
-class TestParentIsSet(TestBase):
+class TestParentDirIsSet(TestBase):
 	
 	def setUp(self):
 		self.create_directory_with_multiple_items()
 	
 	def test_regular_item(self):
-		self.assertIs(self.directory, self.mock_item.parent)
+		self.assertIs(self.directory, self.mock_item.parent_dir)
 	
 	def test_directory_as_item(self):
-		self.assertIs(self.directory, self.subdir.parent)
+		self.assertIs(self.directory, self.subdir.parent_dir)
 	
 	def test_item_from_provider(self):
 		for name in self.PROVIDER_ITEMS_NAMES:
 			item = self.directory.get_item(name)
-			self.assertIs(self.directory, item.parent)
+			self.assertIs(self.directory, item.parent_dir)
 
 
 class TestGetPath(TestBase):
@@ -134,6 +134,8 @@ class TestGetPath(TestBase):
 		class NonRootDirectory(Directory):
 			def get_path(self):
 				return NON_ROOT_DIR_PATH
+			def is_root(self):
+				return False
 		_non_root_dir = NonRootDirectory(name='does not matter', items=[child])
 		
 		path = child.get_path()
