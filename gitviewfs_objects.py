@@ -51,7 +51,7 @@ def get_gitviewfs_object(path):
 		first_part = path_parts.pop(0)
 		item = item.get_item(first_part)
 	
-	if isinstance(item, OldGitViewFSObject):
+	if isinstance(item, OldDirectory):
 		return item.get_gitviewfs_object(path_parts)
 	
 	return item
@@ -109,6 +109,17 @@ class GitViewFSObject(object):
 			return '/' + self.name
 		else:
 			return self.parent_dir.get_path() + '/' + self.name
+	
+	def getattr(self):
+		attrs = self._get_attrs()
+		return posix.stat_result(attrs)
+	
+	def _get_attrs(self):
+		st_root = os.lstat('.')
+		attrs = list(st_root)
+		attrs[stat.ST_MODE] = without_write_permissions(attrs[stat.ST_MODE])
+		attrs[stat.ST_NLINK] = 1
+		return attrs
 
 
 class DirItemsProvider(object):
@@ -228,22 +239,6 @@ class RegularFile(OldGitViewFSObject):
 	def _get_content_size(self):
 		content = self._get_content()
 		return len(content)
-
-
-class RefsDir(PredefinedDirectory):
-	
-	NAME = 'refs'
-	INSTANCE = None
-	
-	def __init__(self):
-		items = {
-			HeadSymLink.NAME : HeadSymLink(parent=self),
-			BranchesDir.NAME : BranchesDir(parent=self),
-			'tags'           : None,
-			'remotes'        : None,
-		}
-		super(RefsDir, self).__init__(parent=None, name=self.NAME, items=items)
-		RefsDir.INSTANCE = self
 
 
 class HeadSymLink(SymLink):
@@ -599,6 +594,9 @@ class BlobFile(RegularFile):
 
 
 ROOT_DIR = Directory(name=None, items=[
-	RefsDir(),
+	Directory(name='refs', items=[
+		HeadSymLink(parent=None), 
+		BranchesDir(parent=None), 
+	]),
 	ObjectsDir(),
 ])
