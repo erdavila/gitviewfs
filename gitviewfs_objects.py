@@ -208,6 +208,23 @@ class PredefinedDirectory(OldDirectory):
 		return self.items.keys()
 
 
+class SymLink(GitViewFSObject):
+	__metaclass__ = ABCMeta
+	
+	def _get_attrs(self):
+		attrs = super(SymLink, self)._get_attrs()
+		attrs[stat.ST_MODE] = with_symlink_file_type(attrs[stat.ST_MODE])
+		return attrs
+	
+	def readlink(self):
+		target_object = self.get_target_object()
+		target_path = target_object.get_path()
+		return target_path
+	
+	@abstractmethod
+	def get_target_object(self): pass
+
+
 class OldSymLink(OldGitViewFSObject):
 	
 	def _get_attrs(self):
