@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import os, sys
-import fcntl
 import fuse
 from fuse import Fuse
 from gitviewfs_objects import get_gitviewfs_object
@@ -44,8 +43,11 @@ class GitViewFS(Fuse):
 		return obj.getattr()
 	
 	def readlink(self, path):
-		obj = get_gitviewfs_object(path)
-		return obj.readlink()
+		symlink = get_gitviewfs_object(path)
+		target_path = symlink.get_target_path()
+		parent_path, _ = os.path.split(path)
+		relative_target_path = os.path.relpath(target_path, parent_path)
+		return relative_target_path
 
 	def readdir(self, path, offset):
 		obj = get_gitviewfs_object(path)

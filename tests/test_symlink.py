@@ -16,7 +16,7 @@ class TestSymlink(unittest.TestCase):
 		mode = attrs[stat.ST_MODE]
 		self.assertTrue(stat.S_ISLNK(mode))
 	
-	def test_readlink_returns_path_of_target_object(self):
+	def test_get_target_path_returns_path_of_target_object(self):
 		PATH = '/xyz/abc'
 		class TargetObject(object):
 			def get_path(self):
@@ -26,7 +26,7 @@ class TestSymlink(unittest.TestCase):
 				return TargetObject()
 		symlink = MockSymLink(name='ignored')
 		
-		path = symlink.readlink()
+		path = symlink.get_target_path()
 		
 		self.assertEqual(PATH, path)
 

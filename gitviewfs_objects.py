@@ -216,7 +216,7 @@ class SymLink(GitViewFSObject):
 		attrs[stat.ST_MODE] = with_symlink_file_type(attrs[stat.ST_MODE])
 		return attrs
 	
-	def readlink(self):
+	def get_target_path(self):
 		target_object = self.get_target_object()
 		target_path = target_object.get_path()
 		return target_path
@@ -232,12 +232,10 @@ class OldSymLink(OldGitViewFSObject):
 		attrs[stat.ST_MODE] = with_symlink_file_type(attrs[stat.ST_MODE])
 		return attrs
 	
-	def readlink(self):
+	def get_target_path(self):
 		target_object = self.get_target_object()
-		
 		target_path = target_object.get_path()
-		symlink_path = os.path.relpath(target_path, self.parent.get_path())
-		return symlink_path
+		return target_path
 
 
 class RegularFile(OldGitViewFSObject):
