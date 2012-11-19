@@ -83,6 +83,8 @@ the current branch in your repository.
 * Tags with "/" in name
 * Directory /objects/all
 * Tags pointing to an object which is not a commit
+* notes
+* objects replacement
 * Handle errors:
 	* ls MOUNT-POINT/objects/trees
 	* ls MOUNT-POINT/objects/commits

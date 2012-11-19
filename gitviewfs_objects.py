@@ -208,10 +208,10 @@ class PredefinedDirectory(OldDirectory):
 		return self.items.keys()
 
 
-class SymLink(OldGitViewFSObject):
+class OldSymLink(OldGitViewFSObject):
 	
 	def _get_attrs(self):
-		attrs = super(SymLink, self)._get_attrs()
+		attrs = super(OldSymLink, self)._get_attrs()
 		attrs[stat.ST_MODE] = with_symlink_file_type(attrs[stat.ST_MODE])
 		return attrs
 	
@@ -241,7 +241,7 @@ class RegularFile(OldGitViewFSObject):
 		return len(content)
 
 
-class HeadSymLink(SymLink):
+class HeadSymLink(OldSymLink):
 	
 	NAME = 'HEAD'
 	INSTANCE = None
@@ -281,7 +281,7 @@ class BranchesDir(OldDirectory):
 		return branches
 
 
-class BranchSymLink(SymLink):
+class BranchSymLink(OldSymLink):
 	
 	def get_target_object(self):
 		branch = self.name
@@ -424,7 +424,7 @@ class CommitPersonDateFile(CommitPersonDirFile):
 		return commit_person_data.date + '\n'
 
 
-class CommitTreeSymLink(SymLink):
+class CommitTreeSymLink(OldSymLink):
 	
 	NAME = 'tree'
 	
@@ -465,7 +465,7 @@ class CommitParentsDir(OldDirectory):
 		return ['%0*d' % (num_digits, i + 1) for i in range(num_parents)]
 
 
-class CommitParentSymLink(SymLink):
+class CommitParentSymLink(OldSymLink):
 	
 	def __init__(self, parent, name):
 		assert isinstance(parent, CommitParentsDir)
@@ -541,7 +541,7 @@ class TreeDir(OldDirectory):
 			proc.wait()
 
 
-class TreeDirItem(SymLink):
+class TreeDirItem(OldSymLink):
 	
 	def __init__(self, parent, name):
 		assert isinstance(parent, TreeDir)
