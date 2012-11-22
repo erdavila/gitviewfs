@@ -3,50 +3,20 @@ import os
 import subprocess
 import tempfile
 import shutil
+import time
 
 import gitviewfs
 from tests.paths import PathMaker
-import time
 
 
-class TestIntegration(unittest.TestCase, PathMaker):
-
-	def __gitviewfs_cmd_path(self):
-		main_file_path = gitviewfs.__file__
-		cmd_path = self.__replace_extension(main_file_path, '.py')
-		return cmd_path
+class TestWithRepository(unittest.TestCase):
 	
-	def __replace_extension(self, path, new_extension):
-		path, _ = os.path.splitext(gitviewfs.__file__)
-		path += new_extension
-		return path
-
 	def setUp(self):
 		self.repo = tempfile.mkdtemp(prefix='gitviewfs-repo-', suffix='.tmp')
-		self.mountpoint = tempfile.mkdtemp(prefix='gitviewfs-mountpoint-', suffix='.tmp')
 		subprocess.check_call(['git', 'init', self.repo])
-		subprocess.Popen([
-				self.__gitviewfs_cmd_path(),
-				self.mountpoint,
-				'-d',
-				'-o', 'repo=' + self.repo,
-		])
-		self._wait_mountpoint_available()
 		os.chdir(self.repo)
 	
-	def _wait_mountpoint_available(self):
-		SLEEP_DURATION = 0.001 # in seconds
-		TOTAL_WAIT_DURATION = 1 # in seconds
-		for _ in xrange(int(TOTAL_WAIT_DURATION / SLEEP_DURATION)):
-			time.sleep(SLEEP_DURATION)
-			if os.listdir(self.mountpoint) != []:
-				break
-		else:
-			self.fail()
-	
 	def tearDown(self):
-		subprocess.check_call(['fusermount', '-u', self.mountpoint])
-		shutil.rmtree(self.mountpoint)
 		shutil.rmtree(self.repo)
 	
 	DEFAULT_CONTENT = '''This is the content
@@ -80,6 +50,47 @@ class TestIntegration(unittest.TestCase, PathMaker):
 		subprocess.check_call(['git', 'commit', '-m', 'Add file'])
 		
 		return filename, subdirname
+
+
+class TestIntegration(TestWithRepository, PathMaker):
+
+	def __gitviewfs_cmd_path(self):
+		main_file_path = gitviewfs.__file__
+		cmd_path = self.__replace_extension(main_file_path, '.py')
+		return cmd_path
+	
+	def __replace_extension(self, path, new_extension):
+		path, _ = os.path.splitext(gitviewfs.__file__)
+		path += new_extension
+		return path
+
+	def setUp(self):
+		TestWithRepository.setUp(self)
+		
+		self.mountpoint = tempfile.mkdtemp(prefix='gitviewfs-mountpoint-', suffix='.tmp')
+		subprocess.Popen([
+				self.__gitviewfs_cmd_path(),
+				self.mountpoint,
+				'-d',
+				'-o', 'repo=' + self.repo,
+		])
+		self._wait_mountpoint_available()
+	
+	def _wait_mountpoint_available(self):
+		SLEEP_DURATION = 0.001 # in seconds
+		TOTAL_WAIT_DURATION = 1 # in seconds
+		for _ in xrange(int(TOTAL_WAIT_DURATION / SLEEP_DURATION)):
+			time.sleep(SLEEP_DURATION)
+			if os.listdir(self.mountpoint) != []:
+				break
+		else:
+			self.fail()
+	
+	def tearDown(self):
+		subprocess.check_call(['fusermount', '-u', self.mountpoint])
+		shutil.rmtree(self.mountpoint)
+		
+		TestWithRepository.tearDown(self)
 	
 	def assertSymLink(self, expected_absolute_path, symlink_path):
 		target_path = os.readlink(symlink_path)
