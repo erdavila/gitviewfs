@@ -260,8 +260,7 @@ class HeadSymLink(SymLink):
 	
 	def get_target_object(self):
 		branch = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).strip()
-		branches_dir = BranchesDir.INSTANCE
-		branch_symlink = branches_dir.get_gitviewfs_object([branch])
+		branch_symlink = BRANCHES_DIR.get_item(branch)
 		return branch_symlink
 
 
@@ -271,30 +270,6 @@ class BranchesProvider(DirItemsProvider):
 		return BranchSymLink(parent=None, name=name)
 	
 	def get_items_names(self):
-		output = subprocess.check_output(['git', 'rev-parse', '--symbolic', '--branches'])
-		branches = output.splitlines()
-		return branches
-
-
-class BranchesDir(OldDirectory):
-	
-	NAME = 'branches'
-	INSTANCE = None
-	
-	def __init__(self, parent):
-		super(BranchesDir, self).__init__(parent=parent, name=self.NAME)
-		BranchesDir.INSTANCE = self
-	
-	def get_gitviewfs_object(self, path_parts):
-		if len(path_parts) == 0:
-			return self
-		
-		if len(path_parts) == 1:
-			first_part = path_parts[0]
-			tree_dir_item = BranchSymLink(parent=self, name=first_part)
-			return tree_dir_item
-	
-	def list(self):
 		output = subprocess.check_output(['git', 'rev-parse', '--symbolic', '--branches'])
 		branches = output.splitlines()
 		return branches
@@ -612,10 +587,11 @@ class BlobFile(RegularFile):
 		return blob_content
 
 
+BRANCHES_DIR = Directory(name='branches', items=[BranchesProvider()])
 ROOT_DIR = Directory(name=None, items=[
 	Directory(name='refs', items=[
 		HeadSymLink(name='HEAD'),
-		BranchesDir(parent=None),
+		BRANCHES_DIR,
 	]),
 	ObjectsDir(),
 ])
