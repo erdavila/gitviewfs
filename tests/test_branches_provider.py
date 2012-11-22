@@ -2,7 +2,7 @@ import unittest
 import subprocess
 
 from tests.test_integration import TestWithRepository
-from gitviewfs_objects import BranchesProvider, OldSymLink
+from gitviewfs_objects import BranchesProvider, SymLink
 
 
 class TestBranchesProvider(unittest.TestCase):
@@ -13,7 +13,7 @@ class TestBranchesProvider(unittest.TestCase):
 		NAME = 'name'
 		item = provider._get_item(NAME)
 		
-		self.assertIsInstance(item, OldSymLink)
+		self.assertIsInstance(item, SymLink)
 		self.assertEqual(NAME, item.name)
 
 

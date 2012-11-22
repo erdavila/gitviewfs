@@ -267,7 +267,7 @@ class HeadSymLink(SymLink):
 class BranchesProvider(DirItemsProvider):
 	
 	def _get_item(self, name):
-		return BranchSymLink(parent=None, name=name)
+		return BranchSymLink(name=name)
 	
 	def get_items_names(self):
 		output = subprocess.check_output(['git', 'rev-parse', '--symbolic', '--branches'])
@@ -275,7 +275,7 @@ class BranchesProvider(DirItemsProvider):
 		return branches
 
 
-class BranchSymLink(OldSymLink):
+class BranchSymLink(SymLink):
 	
 	def get_target_object(self):
 		branch = self.name
