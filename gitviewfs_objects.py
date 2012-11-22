@@ -285,6 +285,15 @@ class BranchSymLink(SymLink):
 		return commit_dir
 
 
+class CommitsProvider(DirItemsProvider):
+	
+	def _get_item(self, name):
+		return CommitDir(parent=None, name=name)
+	
+	def get_items_names(self):
+		return []
+
+
 class CommitsDir(OldDirectory):
 	
 	NAME = 'commits'
