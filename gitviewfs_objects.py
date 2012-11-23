@@ -256,6 +256,42 @@ class RegularFile(OldGitViewFSObject):
 		return len(content)
 
 
+class template(object):
+	
+	def __init__(self, Class, **kwargs):
+		self.Class = Class
+		self.kwargs = kwargs
+	
+	def create_instance(self, **additional_kwargs):
+		kwargs = self.process_kwargs(self.kwargs)
+		kwargs.update(self.process_kwargs(additional_kwargs))
+		return self.Class(**kwargs)
+	
+	def process_kwargs(self, kwargs):
+		new_kwargs = {}
+		for name, value in kwargs.iteritems():
+			new_value = self.process_kwarg_value(value)
+			new_kwargs[name] = new_value
+		return new_kwargs
+	
+	def process_kwarg_value(self, value):
+		if isinstance(value, list):
+			return self.process_kwarg_list_value(value)
+		else:
+			return value
+	
+	def process_kwarg_list_value(self, list_value):
+		new_list_value = []
+		for item in list_value:
+			if isinstance(item, template):
+				new_item = item.create_instance()
+			else:
+				new_item = item
+			new_list_value.append(new_item)
+
+		return new_list_value
+
+
 class HeadSymLink(SymLink):
 	
 	def get_target_object(self):
