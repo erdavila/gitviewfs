@@ -323,7 +323,7 @@ class BranchSymLink(SymLink):
 class CommitsProvider(DirItemsProvider):
 	
 	def _get_item(self, name):
-		return CommitDir(parent=None, name=name)
+		return COMMIT_DIR_TEMPLATE.create_instance(name=name)
 	
 	def get_items_names(self):
 		return []
@@ -607,3 +607,5 @@ ROOT_DIR = Directory(name=None, items=[
 		BlobsDir(parent=None),
 	])
 ])
+
+COMMIT_DIR_TEMPLATE = template(CommitDir, parent=None)
