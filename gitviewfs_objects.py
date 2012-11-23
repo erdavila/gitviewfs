@@ -329,25 +329,11 @@ class CommitsProvider(DirItemsProvider):
 		return []
 
 
-class CommitDir(PredefinedDirectory):
-	
-	def __init__(self, parent, name):
-		items = {
-			CommitMessageFile.NAME                : CommitMessageFile(parent=self),
-			CommitPersonDir.PERSON_TYPE_AUTHOR    : CommitPersonDir(parent=self, person_type=CommitPersonDir.PERSON_TYPE_AUTHOR),
-			CommitPersonDir.PERSON_TYPE_COMMITTER : CommitPersonDir(parent=self, person_type=CommitPersonDir.PERSON_TYPE_COMMITTER),
-			CommitTreeSymLink.NAME                : CommitTreeSymLink(parent=self),
-			CommitParentsDir.NAME                 : CommitParentsDir(parent=self),
-		}
-		super(CommitDir, self).__init__(parent=parent, name=name, items=items)
-
-
 class CommitMessageFile(RegularFile):
 	
 	NAME = 'message'
 	
 	def __init__(self, parent):
-		assert isinstance(parent, CommitDir)
 		super(CommitMessageFile, self).__init__(parent=parent, name=self.NAME)
 	
 	def _get_content(self):
@@ -363,7 +349,6 @@ class CommitPersonDir(PredefinedDirectory):
 	PERSON_TYPE_COMMITTER = 'committer'
 	
 	def __init__(self, parent, person_type):
-		assert isinstance(parent, CommitDir)
 		items = {
 			CommitPersonNameFile.NAME  : CommitPersonNameFile(parent=self, person_type=person_type),
 			CommitPersonEmailFile.NAME : CommitPersonEmailFile(parent=self, person_type=person_type),
@@ -431,7 +416,6 @@ class CommitTreeSymLink(OldSymLink):
 	NAME = 'tree'
 	
 	def __init__(self, parent):
-		assert isinstance(parent, CommitDir)
 		super(CommitTreeSymLink, self).__init__(parent=parent, name=CommitTreeSymLink.NAME)
 	
 	def get_target_object(self):
@@ -447,7 +431,6 @@ class CommitParentsDir(OldDirectory):
 	NAME = 'parents'
 	
 	def __init__(self, parent):
-		assert isinstance(parent, CommitDir)
 		super(CommitParentsDir, self).__init__(parent=parent, name=self.NAME)
 	
 	def get_gitviewfs_object(self, path_parts):
@@ -608,4 +591,10 @@ ROOT_DIR = Directory(name=None, items=[
 	])
 ])
 
-COMMIT_DIR_TEMPLATE = template(CommitDir, parent=None)
+COMMIT_DIR_TEMPLATE = template(Directory, items=[
+	template(CommitMessageFile, parent=None),
+	template(CommitPersonDir, parent=None, person_type=CommitPersonDir.PERSON_TYPE_AUTHOR),
+	template(CommitPersonDir, parent=None, person_type=CommitPersonDir.PERSON_TYPE_COMMITTER),
+	template(CommitTreeSymLink, parent=None),
+	template(CommitParentsDir, parent=None),
+])

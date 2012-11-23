@@ -1,6 +1,6 @@
 import unittest
 
-from gitviewfs_objects import CommitsProvider, OldDirectory
+from gitviewfs_objects import CommitsProvider, Directory
 
 
 class TestCommitsProvider(unittest.TestCase):
@@ -11,7 +11,7 @@ class TestCommitsProvider(unittest.TestCase):
 		NAME = 'name'
 		item = provider._get_item(NAME)
 		
-		self.assertIsInstance(item, OldDirectory)
+		self.assertIsInstance(item, Directory)
 		self.assertEqual(NAME, item.name)
 	
 	def test_get_items_names(self):

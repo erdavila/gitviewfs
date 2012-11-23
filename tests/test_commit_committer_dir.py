@@ -31,7 +31,7 @@ class TestCommitCommitterDir(unittest.TestCase):
 	
 	def make_commit_committer_dir_object(self):
 		commit_dir = COMMITS_DIR.get_item('a1b2c3d4')
-		commit_comitter_dir = commit_dir.get_gitviewfs_object(['committer'])
+		commit_comitter_dir = commit_dir.get_item('committer')
 		return commit_comitter_dir
 
 

@@ -31,7 +31,7 @@ class TestCommitAuthorDir(unittest.TestCase):
 	
 	def make_commit_author_dir_object(self):
 		commit_dir = COMMITS_DIR.get_item('a1b2c3d4')
-		commit_author_dir = commit_dir.get_gitviewfs_object(['author'])
+		commit_author_dir = commit_dir.get_item('author')
 		return commit_author_dir
 
 
