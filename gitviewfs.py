@@ -52,52 +52,12 @@ class GitViewFS(Fuse):
 		obj = get_gitviewfs_object(path)
 		for item_name in obj.get_items_names():
 			yield fuse.Direntry(item_name)
-	
-	def unlink(self, path):
-		os.unlink("." + path)
 
-	def rmdir(self, path):
-		os.rmdir("." + path)
-
-	def symlink(self, path, path1):
-		os.symlink(path, "." + path1)
-
-	def rename(self, path, path1):
-		os.rename("." + path, "." + path1)
-
-	def link(self, path, path1):
-		os.link("." + path, "." + path1)
-
-	def chmod(self, path, mode):
-		os.chmod("." + path, mode)
-
-	def chown(self, path, user, group):
-		os.chown("." + path, user, group)
-
-	def truncate(self, path, length):
-		f = open("." + path, "a")
-		f.truncate(length)
-		f.close()
-
-	def mknod(self, path, mode, dev):
-		os.mknod("." + path, mode, dev)
-
-	def mkdir(self, path, mode):
-		os.mkdir("." + path, mode)
-
-	def utime(self, path, times):
-		os.utime("." + path, times)
-
-#	The following utimens method would do the same as the above utime method.
-#	We can't make it better though as the Python stdlib doesn't know of
-#	subsecond preciseness in acces/modify times.
-#  
-#	def utimens(self, path, ts_acc, ts_mod):
-#	  os.utime("." + path, (ts_acc.tv_sec, ts_mod.tv_sec))
-
+	'''
 	def access(self, path, mode):
 		if not os.access("." + path, mode):
 			return -errno.EACCES
+	'''
 
 #	This is how we could add stub extended attribute handlers...
 #	(We can't have ones which aptly delegate requests to the underlying fs
@@ -150,61 +110,9 @@ class GitViewFS(Fuse):
 		def read(self, length, offset):
 			content = self.file.get_content()
 			return content[offset : offset+length]
-		
-		def write(self, buf, offset):
-			self.file.seek(offset)
-			self.file.write(buf)
-			return len(buf)
-
-		def release(self, flags):
-			pass
-
-		def _fflush(self):
-			pass
-
-		def fsync(self, isfsyncfile):
-			self._fflush()
-			if isfsyncfile and hasattr(os, 'fdatasync'):
-				os.fdatasync(self.fd)
-			else:
-				os.fsync(self.fd)
-
-		def flush(self):
-			pass
 
 		def fgetattr(self):
 			return self.file.get_stat()
-
-		def ftruncate(self, length):
-			self.file.truncate(length)
-
-		def lock(self, cmd, owner, **kw):
-			# The code here is much rather just a demonstration of the locking
-			# API than something which actually was seen to be useful.
-
-			# Advisory file locking is pretty messy in Unix, and the Python
-			# interface to this doesn't make it better.
-			# We can't do fcntl(2)/F_GETLK from Python in a platfrom independent
-			# way. The following implementation *might* work under Linux. 
-			#
-			# if cmd == fcntl.F_GETLK:
-			#	 import struct
-			# 
-			#	 lockdata = struct.pack('hhQQi', kw['l_type'], os.SEEK_SET,
-			#							kw['l_start'], kw['l_len'], kw['l_pid'])
-			#	 ld2 = fcntl.fcntl(self.fd, fcntl.F_GETLK, lockdata)
-			#	 flockfields = ('l_type', 'l_whence', 'l_start', 'l_len', 'l_pid')
-			#	 uld2 = struct.unpack('hhQQi', ld2)
-			#	 res = {}
-			#	 for i in xrange(len(uld2)):
-			#		  res[flockfields[i]] = uld2[i]
-			#  
-			#	 return fuse.Flock(**res)
-
-			# Convert fcntl-ish lock parameters to Python's weird
-			# lockf(3)/flock(2) medley locking API...
-			pass
-
 
 	def main(self, *a, **kw):
 		self.file_class = self.GitViewFSFile
