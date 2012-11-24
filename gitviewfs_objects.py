@@ -390,15 +390,10 @@ class CommitPersonDateFile(CommitPersonItemFile):
 		return commit_person_data.date + '\n'
 	
 
-class CommitTreeSymLink(OldSymLink):
-	
-	NAME = 'tree'
-	
-	def __init__(self, parent):
-		super(CommitTreeSymLink, self).__init__(parent=parent, name=CommitTreeSymLink.NAME)
+class CommitTreeSymLink(SymLink):
 	
 	def get_target_object(self):
-		commit_sha1 = self.parent.name
+		commit_sha1 = self.get_context_value(CommitContextNames.SHA1)
 		tree_sha1 = subprocess.check_output(['git', 'rev-parse', commit_sha1 + '^{tree}']).strip()
 		trees_dir = TreesDir.INSTANCE
 		tree_dir = trees_dir.get_gitviewfs_object([tree_sha1])
@@ -582,6 +577,6 @@ COMMIT_DIR_TEMPLATE = template(Directory, items=[
 		template(CommitPersonEmailFile, name='email'),
 		template(CommitPersonDateFile , name='date' ),
 	]),
-	template(CommitTreeSymLink, parent=None),
+	template(CommitTreeSymLink, name='tree'),
 	template(CommitParentsDir , parent=None),
 ])

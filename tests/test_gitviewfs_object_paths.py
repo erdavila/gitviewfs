@@ -77,7 +77,7 @@ class TestPaths(unittest.TestCase):
 		self.assertPathClassAndName(paths.COMMIT_COMMITTER_DATE_FILE, CommitPersonDateFile, 'date')
 	
 	def test_CommitTreeSymLink(self):
-		self.assertPathClassAndName(paths.COMMIT_TREE_SYMLINK, CommitTreeSymLink)
+		self.assertPathClassAndName(paths.COMMIT_TREE_SYMLINK, CommitTreeSymLink, 'tree')
 	
 	def test_CommitParentsDir(self):
 		self.assertPathClassAndName(paths.COMMIT_PARENTS_DIR, CommitParentsDir)
