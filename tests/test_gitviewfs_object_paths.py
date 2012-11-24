@@ -2,9 +2,10 @@ import unittest
 
 from gitviewfs_objects import get_gitviewfs_object, Directory, HeadSymLink,\
 	BranchSymLink, CommitMessageFile, CommitPersonNameFile, CommitPersonEmailFile,\
-	OldCommitPersonDateFile, CommitPersonDir, OldCommitPersonNameFile,\
-	OldCommitPersonEmailFile, CommitTreeSymLink, CommitParentsDir,\
-	CommitParentSymLink, TreesDir, TreeDir, TreeDirItem, BlobsDir, BlobFile
+	CommitPersonDateFile, CommitPersonDir, OldCommitPersonNameFile,\
+	OldCommitPersonEmailFile, OldCommitPersonDateFile, CommitTreeSymLink,\
+	CommitParentsDir, CommitParentSymLink, TreesDir, TreeDir, TreeDirItem, BlobsDir,\
+	BlobFile
 from tests import paths
 
 
@@ -63,7 +64,7 @@ class TestPaths(unittest.TestCase):
 		self.assertPathClassAndName(paths.COMMIT_AUTHOR_EMAIL_FILE, CommitPersonEmailFile, 'email')
 	
 	def test_CommitAuthorDateFile(self):
-		self.assertPathClassAndName(paths.COMMIT_AUTHOR_DATE_FILE, OldCommitPersonDateFile)
+		self.assertPathClassAndName(paths.COMMIT_AUTHOR_DATE_FILE, CommitPersonDateFile, 'date')
 	
 	def test_CommitCommitterDir(self):
 		self.assertPathClassAndName(paths.COMMIT_COMMITTER_DIR, CommitPersonDir, 'committer')

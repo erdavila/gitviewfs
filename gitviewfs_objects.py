@@ -467,6 +467,13 @@ class OldCommitPersonEmailFile(OldCommitPersonDirFile):
 		return commit_person_data.email + '\n'
 
 
+class CommitPersonDateFile(CommitPersonItemFile):
+	
+	def get_content(self):
+		commit_person_data = self._get_commit_person_data()
+		return commit_person_data.date + '\n'
+	
+
 class OldCommitPersonDateFile(OldCommitPersonDirFile):
 	
 	NAME = 'date'
@@ -658,10 +665,10 @@ ROOT_DIR = Directory(name=None, items=[
 
 COMMIT_DIR_TEMPLATE = template(Directory, items=[
 	template(CommitMessageFile, name='message'),
-	template(Directory, name='author', items=[
-		template(CommitPersonNameFile, name='name', context_values={CommitContextNames.PERSON_TYPE:CommitPersonTypes.AUTHOR}),
-		template(CommitPersonEmailFile, name='email', context_values={CommitContextNames.PERSON_TYPE:CommitPersonTypes.AUTHOR}),
-		template(OldCommitPersonDateFile , parent=None, person_type=CommitPersonDir.PERSON_TYPE_AUTHOR),
+	template(Directory, name='author', context_values={CommitContextNames.PERSON_TYPE:CommitPersonTypes.AUTHOR}, items=[
+		template(CommitPersonNameFile , name='name' ),
+		template(CommitPersonEmailFile, name='email'),
+		template(CommitPersonDateFile , name='date' ),
 	]),
 	template(CommitPersonDir  , parent=None, person_type=CommitPersonDir.PERSON_TYPE_COMMITTER),
 	template(CommitTreeSymLink, parent=None),
