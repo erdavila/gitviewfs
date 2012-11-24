@@ -424,7 +424,8 @@ class CommitPersonItemFile(RegularFile):
 	def _get_commit_person_data(self):
 		parsed_commit = self._get_parsed_commit()
 		person_type = self.get_context_value(CommitContextNames.PERSON_TYPE)
-		person_data = getattr(parsed_commit, person_type)
+		parsed_commit_attribute = person_type
+		person_data = getattr(parsed_commit, parsed_commit_attribute)
 		return person_data
 	
 	def _get_parsed_commit(self):
@@ -448,6 +449,13 @@ class OldCommitPersonNameFile(OldCommitPersonDirFile):
 	def get_content(self):
 		commit_person_data = self._get_commit_person_data()
 		return commit_person_data.name + '\n'
+
+
+class CommitPersonEmailFile(CommitPersonItemFile):
+	
+	def get_content(self):
+		commit_person_data = self._get_commit_person_data()
+		return commit_person_data.email + '\n'
 
 
 class OldCommitPersonEmailFile(OldCommitPersonDirFile):
