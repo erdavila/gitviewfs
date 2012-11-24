@@ -379,10 +379,10 @@ class CommitPersonDir(PredefinedDirectory):
 		self.person_type = person_type
 
 
-class CommitPersonDirFile(OldRegularFile):
+class OldCommitPersonDirFile(OldRegularFile):
 	
 	def __init__(self, parent, person_type):
-		super(CommitPersonDirFile, self).__init__(parent=parent, name=self.NAME)
+		super(OldCommitPersonDirFile, self).__init__(parent=parent, name=self.NAME)
 		self.person_type = person_type
 	
 	def _get_commit_person_data(self):
@@ -407,7 +407,7 @@ class CommitPersonDirFile(OldRegularFile):
 		return commit_sha1
 
 
-class OldCommitPersonNameFile(CommitPersonDirFile):
+class OldCommitPersonNameFile(OldCommitPersonDirFile):
 	
 	NAME = 'name'
 	
@@ -416,7 +416,7 @@ class OldCommitPersonNameFile(CommitPersonDirFile):
 		return commit_person_data.name + '\n'
 
 
-class CommitPersonEmailFile(CommitPersonDirFile):
+class CommitPersonEmailFile(OldCommitPersonDirFile):
 	
 	NAME = 'email'
 	
@@ -425,7 +425,7 @@ class CommitPersonEmailFile(CommitPersonDirFile):
 		return commit_person_data.email + '\n'
 
 
-class CommitPersonDateFile(CommitPersonDirFile):
+class CommitPersonDateFile(OldCommitPersonDirFile):
 	
 	NAME = 'date'
 	
