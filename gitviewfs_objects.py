@@ -382,7 +382,6 @@ class CommitPersonDir(PredefinedDirectory):
 class CommitPersonDirFile(OldRegularFile):
 	
 	def __init__(self, parent, person_type):
-		assert isinstance(parent, CommitPersonDir)
 		super(CommitPersonDirFile, self).__init__(parent=parent, name=self.NAME)
 		self.person_type = person_type
 	
@@ -400,7 +399,10 @@ class CommitPersonDirFile(OldRegularFile):
 	
 	def _get_commit_sha1(self):
 		commit_person_dir = self.parent
-		commit_dir = commit_person_dir.parent
+		if isinstance(commit_person_dir, CommitPersonDir):
+			commit_dir = commit_person_dir.parent
+		else:
+			commit_dir = commit_person_dir.parent_dir
 		commit_sha1 = commit_dir.name
 		return commit_sha1
 
@@ -614,7 +616,11 @@ ROOT_DIR = Directory(name=None, items=[
 
 COMMIT_DIR_TEMPLATE = template(Directory, items=[
 	template(CommitMessageFile, name='message'),
-	template(CommitPersonDir, parent=None, person_type=CommitPersonDir.PERSON_TYPE_AUTHOR),
+	template(Directory, name='author', items=[
+		template(CommitPersonNameFile, parent=None, person_type=CommitPersonDir.PERSON_TYPE_AUTHOR),
+		template(CommitPersonEmailFile, parent=None, person_type=CommitPersonDir.PERSON_TYPE_AUTHOR),
+		template(CommitPersonDateFile, parent=None, person_type=CommitPersonDir.PERSON_TYPE_AUTHOR),
+	]),
 	template(CommitPersonDir, parent=None, person_type=CommitPersonDir.PERSON_TYPE_COMMITTER),
 	template(CommitTreeSymLink, parent=None),
 	template(CommitParentsDir, parent=None),
