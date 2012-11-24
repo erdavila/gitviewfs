@@ -651,7 +651,7 @@ ROOT_DIR = Directory(name=None, items=[
 COMMIT_DIR_TEMPLATE = template(Directory, items=[
 	template(CommitMessageFile, name='message'),
 	template(Directory, name='author', items=[
-		template(OldCommitPersonNameFile , parent=None, person_type=CommitPersonDir.PERSON_TYPE_AUTHOR),
+		template(CommitPersonNameFile, name='name', context_values={CommitContextNames.PERSON_TYPE:CommitPersonTypes.AUTHOR}),
 		template(CommitPersonEmailFile, parent=None, person_type=CommitPersonDir.PERSON_TYPE_AUTHOR),
 		template(CommitPersonDateFile , parent=None, person_type=CommitPersonDir.PERSON_TYPE_AUTHOR),
 	]),
