@@ -660,7 +660,7 @@ COMMIT_DIR_TEMPLATE = template(Directory, items=[
 	template(CommitMessageFile, name='message'),
 	template(Directory, name='author', items=[
 		template(CommitPersonNameFile, name='name', context_values={CommitContextNames.PERSON_TYPE:CommitPersonTypes.AUTHOR}),
-		template(OldCommitPersonEmailFile, parent=None, person_type=CommitPersonDir.PERSON_TYPE_AUTHOR),
+		template(CommitPersonEmailFile, name='email', context_values={CommitContextNames.PERSON_TYPE:CommitPersonTypes.AUTHOR}),
 		template(CommitPersonDateFile , parent=None, person_type=CommitPersonDir.PERSON_TYPE_AUTHOR),
 	]),
 	template(CommitPersonDir  , parent=None, person_type=CommitPersonDir.PERSON_TYPE_COMMITTER),
