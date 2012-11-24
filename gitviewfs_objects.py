@@ -192,29 +192,6 @@ class OldDirectory(OldGitViewFSObject):
 		return st
 
 
-class PredefinedDirectory(OldDirectory):
-	
-	def __init__(self, parent, name, items):
-		super(PredefinedDirectory, self).__init__(parent=parent, name=name)
-		self.items = items
-	
-	def get_gitviewfs_object(self, path_parts):
-		if len(path_parts) == 0:
-			return self
-		
-		first_part = path_parts[0]
-		rest = path_parts[1:]
-		
-		item = self.items[first_part]
-		if isinstance(item, OldDirectory):
-			return item.get_gitviewfs_object(rest)
-		else:
-			return item
-	
-	def get_items_names(self):
-		return self.items.keys()
-
-
 class SymLink(GitViewFSObject):
 	__metaclass__ = ABCMeta
 	
@@ -376,49 +353,6 @@ class CommitMessageFile(RegularFile):
 		return commit.message
 
 
-class CommitPersonDir(PredefinedDirectory):
-	
-	PERSON_TYPE_AUTHOR = 'author'
-	PERSON_TYPE_COMMITTER = 'committer'
-	
-	def __init__(self, parent, person_type):
-		items = {
-			OldCommitPersonNameFile.NAME  : OldCommitPersonNameFile(parent=self, person_type=person_type),
-			OldCommitPersonEmailFile.NAME : OldCommitPersonEmailFile(parent=self, person_type=person_type),
-			OldCommitPersonDateFile.NAME  : OldCommitPersonDateFile(parent=self, person_type=person_type),
-		}
-		super(CommitPersonDir, self).__init__(parent=parent, name=person_type, items=items)
-		self.person_type = person_type
-
-
-class OldCommitPersonDirFile(OldRegularFile):
-	
-	def __init__(self, parent, person_type):
-		super(OldCommitPersonDirFile, self).__init__(parent=parent, name=self.NAME)
-		self.person_type = person_type
-	
-	def _get_commit_person_data(self):
-		parsed_commit = self._get_parsed_commit()
-		person_type = self.person_type
-		person_data = getattr(parsed_commit, person_type)
-		return person_data
-	
-	def _get_parsed_commit(self):
-		commit_sha1 = self._get_commit_sha1()
-		parser = GitCommitParser()
-		parsed_commit = parser.parse(commit_sha1)
-		return parsed_commit
-	
-	def _get_commit_sha1(self):
-		commit_person_dir = self.parent
-		if isinstance(commit_person_dir, CommitPersonDir):
-			commit_dir = commit_person_dir.parent
-		else:
-			commit_dir = commit_person_dir.parent_dir
-		commit_sha1 = commit_dir.name
-		return commit_sha1
-
-
 class CommitPersonItemFile(RegularFile):
 	
 	def _get_commit_person_data(self):
@@ -442,25 +376,7 @@ class CommitPersonNameFile(CommitPersonItemFile):
 		return commit_person_data.name + '\n'
 
 
-class OldCommitPersonNameFile(OldCommitPersonDirFile):
-	
-	NAME = 'name'
-	
-	def get_content(self):
-		commit_person_data = self._get_commit_person_data()
-		return commit_person_data.name + '\n'
-
-
 class CommitPersonEmailFile(CommitPersonItemFile):
-	
-	def get_content(self):
-		commit_person_data = self._get_commit_person_data()
-		return commit_person_data.email + '\n'
-
-
-class OldCommitPersonEmailFile(OldCommitPersonDirFile):
-	
-	NAME = 'email'
 	
 	def get_content(self):
 		commit_person_data = self._get_commit_person_data()
@@ -473,15 +389,6 @@ class CommitPersonDateFile(CommitPersonItemFile):
 		commit_person_data = self._get_commit_person_data()
 		return commit_person_data.date + '\n'
 	
-
-class OldCommitPersonDateFile(OldCommitPersonDirFile):
-	
-	NAME = 'date'
-	
-	def get_content(self):
-		commit_person_data = self._get_commit_person_data()
-		return commit_person_data.date + '\n'
-
 
 class CommitTreeSymLink(OldSymLink):
 	
@@ -670,7 +577,11 @@ COMMIT_DIR_TEMPLATE = template(Directory, items=[
 		template(CommitPersonEmailFile, name='email'),
 		template(CommitPersonDateFile , name='date' ),
 	]),
-	template(CommitPersonDir  , parent=None, person_type=CommitPersonDir.PERSON_TYPE_COMMITTER),
+	template(Directory, name='committer', context_values={CommitContextNames.PERSON_TYPE:CommitPersonTypes.COMMITTER}, items=[
+		template(CommitPersonNameFile , name='name' ),
+		template(CommitPersonEmailFile, name='email'),
+		template(CommitPersonDateFile , name='date' ),
+	]),
 	template(CommitTreeSymLink, parent=None),
 	template(CommitParentsDir , parent=None),
 ])
