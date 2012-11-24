@@ -1,15 +1,26 @@
 import unittest
-from tests.test_integration import TestIntegration
 import subprocess
 
+from gitviewfs_objects import CommitPersonNameFile, CommitContextNames,\
+	CommitPersonTypes
+from tests.test_integration import TestIntegration, TestWithRepository
 
-class TestCommitAuthorNameFile(unittest.TestCase):
 
-	def setUp(self):
-		pass
+class TestCommitAuthorNameFileWithRepository(TestWithRepository):
 
-	def tearDown(self):
-		pass
+	def test_get_content(self):
+		AUTHOR_NAME = 'Author Name'
+		AUTHOR_EMAIL = 'author@email.com'
+		self.create_and_commit_file(author='%s <%s>' % (AUTHOR_NAME, AUTHOR_EMAIL))
+		context_values = {
+			CommitContextNames.PERSON_TYPE : CommitPersonTypes.AUTHOR,
+			CommitContextNames.SHA1        : 'HEAD',
+		}
+		name_file = CommitPersonNameFile(name='author', context_values=context_values)
+		
+		content = name_file.get_content()
+		
+		self.assertEqual(content, AUTHOR_NAME + '\n')
 
 
 class TestCommitAuthorNameFileIntegration(TestIntegration):

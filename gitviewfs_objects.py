@@ -147,10 +147,6 @@ class DirItemsProvider(object):
 		set_parent_dir(self, parent_dir)
 
 
-class CONTEXT_NAMES(object):
-	COMMIT_SHA1 = 'commit-sha1'
-
-
 class Directory(GitViewFSObject):
 	
 	def __init__(self, name, items, context_values={}):
@@ -345,10 +341,26 @@ class BranchSymLink(SymLink):
 		return commit_dir
 
 
+class CommitContextNames(object):
+	
+	SHA1 = 'commit-sha1'
+	PERSON_TYPE = 'commit-person-type'
+	
+	def __init__(self): raise NotImplementedError('should not instantiate this class!')
+
+	
+class CommitPersonTypes(object):
+	
+	AUTHOR = 'author'
+	COMMITTER = 'committer'
+	
+	def __init__(self): raise NotImplementedError('should not instantiate this class!')
+
+	
 class CommitsProvider(DirItemsProvider):
 	
 	def _get_item(self, name):
-		context_values = { CONTEXT_NAMES.COMMIT_SHA1 : name }
+		context_values = { CommitContextNames.SHA1 : name }
 		return COMMIT_DIR_TEMPLATE.create_instance(name=name, context_values=context_values)
 	
 	def get_items_names(self):
@@ -358,7 +370,7 @@ class CommitsProvider(DirItemsProvider):
 class CommitMessageFile(RegularFile):
 	
 	def get_content(self):
-		commit_sha1 = self.get_context_value(CONTEXT_NAMES.COMMIT_SHA1)
+		commit_sha1 = self.get_context_value(CommitContextNames.SHA1)
 		parser = GitCommitParser()
 		commit = parser.parse(commit_sha1)
 		return commit.message
@@ -405,6 +417,28 @@ class OldCommitPersonDirFile(OldRegularFile):
 			commit_dir = commit_person_dir.parent_dir
 		commit_sha1 = commit_dir.name
 		return commit_sha1
+
+
+class CommitPersonItemFile(RegularFile):
+	
+	def _get_commit_person_data(self):
+		parsed_commit = self._get_parsed_commit()
+		person_type = self.get_context_value(CommitContextNames.PERSON_TYPE)
+		person_data = getattr(parsed_commit, person_type)
+		return person_data
+	
+	def _get_parsed_commit(self):
+		commit_sha1 = self.get_context_value(CommitContextNames.SHA1)
+		parser = GitCommitParser()
+		parsed_commit = parser.parse(commit_sha1)
+		return parsed_commit
+
+
+class CommitPersonNameFile(CommitPersonItemFile):
+	
+	def get_content(self):
+		commit_person_data = self._get_commit_person_data()
+		return commit_person_data.name + '\n'
 
 
 class OldCommitPersonNameFile(OldCommitPersonDirFile):
