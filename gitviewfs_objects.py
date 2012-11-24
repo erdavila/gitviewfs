@@ -140,6 +140,10 @@ class DirItemsProvider(object):
 		set_parent_dir(self, parent_dir)
 
 
+class CONTEXT_NAMES(object):
+	COMMIT_SHA1 = 'commit-sha1'
+
+
 class Directory(GitViewFSObject):
 	
 	def __init__(self, name, items, context_values={}):
@@ -344,21 +348,17 @@ class BranchSymLink(SymLink):
 class CommitsProvider(DirItemsProvider):
 	
 	def _get_item(self, name):
-		return COMMIT_DIR_TEMPLATE.create_instance(name=name)
+		context_values = {CONTEXT_NAMES.COMMIT_SHA1:name}
+		return COMMIT_DIR_TEMPLATE.create_instance(name=name, context_values=context_values)
 	
 	def get_items_names(self):
 		return []
 
 
-class CommitMessageFile(OldRegularFile):
-	
-	NAME = 'message'
-	
-	def __init__(self, parent):
-		super(CommitMessageFile, self).__init__(parent=parent, name=self.NAME)
+class CommitMessageFile(RegularFile):
 	
 	def get_content(self):
-		commit_sha1 = self.parent.name
+		commit_sha1 = self.parent_dir.get_context_value(CONTEXT_NAMES.COMMIT_SHA1)
 		parser = GitCommitParser()
 		commit = parser.parse(commit_sha1)
 		return commit.message
@@ -613,7 +613,7 @@ ROOT_DIR = Directory(name=None, items=[
 ])
 
 COMMIT_DIR_TEMPLATE = template(Directory, items=[
-	template(CommitMessageFile, parent=None),
+	template(CommitMessageFile, name='message'),
 	template(CommitPersonDir, parent=None, person_type=CommitPersonDir.PERSON_TYPE_AUTHOR),
 	template(CommitPersonDir, parent=None, person_type=CommitPersonDir.PERSON_TYPE_COMMITTER),
 	template(CommitTreeSymLink, parent=None),

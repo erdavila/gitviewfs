@@ -51,7 +51,7 @@ class TestPaths(unittest.TestCase):
 		self.assertPathClassAndName(paths.COMMIT_DIR, Directory, paths.SAMPLE_HASH)
 	
 	def test_CommitMessageFile(self):
-		self.assertPathClassAndName(paths.COMMIT_MESSAGE_FILE, CommitMessageFile)
+		self.assertPathClassAndName(paths.COMMIT_MESSAGE_FILE, CommitMessageFile, 'message')
 	
 	def test_CommitAuthorDir(self):
 		self.assertPathClassAndName(paths.COMMIT_AUTHOR_DIR, CommitPersonDir, 'author')
