@@ -371,9 +371,9 @@ class CommitPersonDir(PredefinedDirectory):
 	
 	def __init__(self, parent, person_type):
 		items = {
-			CommitPersonNameFile.NAME  : CommitPersonNameFile(parent=self, person_type=person_type),
-			CommitPersonEmailFile.NAME : CommitPersonEmailFile(parent=self, person_type=person_type),
-			CommitPersonDateFile.NAME  : CommitPersonDateFile(parent=self, person_type=person_type),
+			OldCommitPersonNameFile.NAME : OldCommitPersonNameFile(parent=self, person_type=person_type),
+			CommitPersonEmailFile.NAME   : CommitPersonEmailFile(parent=self, person_type=person_type),
+			CommitPersonDateFile.NAME    : CommitPersonDateFile(parent=self, person_type=person_type),
 		}
 		super(CommitPersonDir, self).__init__(parent=parent, name=person_type, items=items)
 		self.person_type = person_type
@@ -407,7 +407,7 @@ class CommitPersonDirFile(OldRegularFile):
 		return commit_sha1
 
 
-class CommitPersonNameFile(CommitPersonDirFile):
+class OldCommitPersonNameFile(CommitPersonDirFile):
 	
 	NAME = 'name'
 	
@@ -617,7 +617,7 @@ ROOT_DIR = Directory(name=None, items=[
 COMMIT_DIR_TEMPLATE = template(Directory, items=[
 	template(CommitMessageFile, name='message'),
 	template(Directory, name='author', items=[
-		template(CommitPersonNameFile , parent=None, person_type=CommitPersonDir.PERSON_TYPE_AUTHOR),
+		template(OldCommitPersonNameFile , parent=None, person_type=CommitPersonDir.PERSON_TYPE_AUTHOR),
 		template(CommitPersonEmailFile, parent=None, person_type=CommitPersonDir.PERSON_TYPE_AUTHOR),
 		template(CommitPersonDateFile , parent=None, person_type=CommitPersonDir.PERSON_TYPE_AUTHOR),
 	]),
