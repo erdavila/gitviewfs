@@ -406,8 +406,7 @@ class CommitTreeSymLink(SymLink):
 class CommitParentsProvider(DirItemsProvider):
 	
 	def _get_item(self, name):
-		parent_num = name
-		return CommitParentSymLink(parent=self, name=parent_num)
+		return CommitParentSymLink(name=name, parent_number=int(name))
 	
 	def get_items_names(self):
 		parser = GitCommitParser()
@@ -418,22 +417,23 @@ class CommitParentsProvider(DirItemsProvider):
 		return ['%0*d' % (num_digits, i + 1) for i in xrange(num_parents)]
 
 
-class CommitParentSymLink(OldSymLink):
+class CommitParentSymLink(SymLink):
+	
+	def __init__(self, name, parent_number):
+		super(CommitParentSymLink, self).__init__(name=name)
+		self.parent_number = parent_number
 	
 	def get_target_object(self):
-		commit_parents_dir = self.parent
-		commit_dir = commit_parents_dir.parent_dir
-		commit_sha1 = commit_dir.name
+		commit_sha1 = self.get_context_value(CommitContextNames.SHA1)
 		
 		parser = GitCommitParser()
 		commit = parser.parse(commit_sha1)
 		
-		parent_number = int(self.name)
-		parent_index = parent_number - 1
+		parent_index = self.parent_number - 1
 		parent_sha1 = commit.parents[parent_index]
 		
-		parent_dir = COMMITS_DIR.get_item(parent_sha1)
-		return parent_dir
+		parent_commit_dir = COMMITS_DIR.get_item(parent_sha1)
+		return parent_commit_dir
 
 
 class TreesDir(OldDirectory):
