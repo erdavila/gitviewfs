@@ -259,6 +259,24 @@ class OldRegularFile(OldGitViewFSObject):
 		return len(content)
 
 
+class RegularFile(GitViewFSObject):
+	__metaclass__ = ABCMeta
+	
+	def _get_stat(self):
+		st = super(RegularFile, self)._get_stat()
+		st[stat.ST_MODE] = with_regular_file_type(st[stat.ST_MODE])
+		st[stat.ST_MODE] = without_execution_permissions(st[stat.ST_MODE])
+		st[stat.ST_SIZE] = self._get_content_size()
+		return st
+	
+	def _get_content_size(self):
+		content = self.get_content()
+		return len(content)
+	
+	@abstractmethod
+	def get_content(self): pass
+
+
 class template(object):
 	
 	def __init__(self, Class, **kwargs):
