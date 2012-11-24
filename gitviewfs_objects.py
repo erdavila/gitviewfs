@@ -385,7 +385,7 @@ class CommitPersonDir(PredefinedDirectory):
 		items = {
 			OldCommitPersonNameFile.NAME  : OldCommitPersonNameFile(parent=self, person_type=person_type),
 			OldCommitPersonEmailFile.NAME : OldCommitPersonEmailFile(parent=self, person_type=person_type),
-			CommitPersonDateFile.NAME     : CommitPersonDateFile(parent=self, person_type=person_type),
+			OldCommitPersonDateFile.NAME  : OldCommitPersonDateFile(parent=self, person_type=person_type),
 		}
 		super(CommitPersonDir, self).__init__(parent=parent, name=person_type, items=items)
 		self.person_type = person_type
@@ -467,7 +467,7 @@ class OldCommitPersonEmailFile(OldCommitPersonDirFile):
 		return commit_person_data.email + '\n'
 
 
-class CommitPersonDateFile(OldCommitPersonDirFile):
+class OldCommitPersonDateFile(OldCommitPersonDirFile):
 	
 	NAME = 'date'
 	
@@ -661,7 +661,7 @@ COMMIT_DIR_TEMPLATE = template(Directory, items=[
 	template(Directory, name='author', items=[
 		template(CommitPersonNameFile, name='name', context_values={CommitContextNames.PERSON_TYPE:CommitPersonTypes.AUTHOR}),
 		template(CommitPersonEmailFile, name='email', context_values={CommitContextNames.PERSON_TYPE:CommitPersonTypes.AUTHOR}),
-		template(CommitPersonDateFile , parent=None, person_type=CommitPersonDir.PERSON_TYPE_AUTHOR),
+		template(OldCommitPersonDateFile , parent=None, person_type=CommitPersonDir.PERSON_TYPE_AUTHOR),
 	]),
 	template(CommitPersonDir  , parent=None, person_type=CommitPersonDir.PERSON_TYPE_COMMITTER),
 	template(CommitTreeSymLink, parent=None),
