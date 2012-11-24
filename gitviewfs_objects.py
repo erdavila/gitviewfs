@@ -245,14 +245,14 @@ class OldSymLink(OldGitViewFSObject):
 		return target_path
 
 
-class RegularFile(OldGitViewFSObject):
+class OldRegularFile(OldGitViewFSObject):
 	
 	def read(self, length, offset):
 		content = self._get_content()
 		return content[offset : offset+length]
 	
 	def _get_attrs(self):
-		attrs = super(RegularFile, self)._get_attrs()
+		attrs = super(OldRegularFile, self)._get_attrs()
 		attrs[stat.ST_MODE] = with_regular_file_type(attrs[stat.ST_MODE])
 		attrs[stat.ST_MODE] = without_execution_permissions(attrs[stat.ST_MODE])
 		attrs[stat.ST_SIZE] = self._get_content_size()
@@ -336,7 +336,7 @@ class CommitsProvider(DirItemsProvider):
 		return []
 
 
-class CommitMessageFile(RegularFile):
+class CommitMessageFile(OldRegularFile):
 	
 	NAME = 'message'
 	
@@ -365,7 +365,7 @@ class CommitPersonDir(PredefinedDirectory):
 		self.person_type = person_type
 
 
-class CommitPersonDirFile(RegularFile):
+class CommitPersonDirFile(OldRegularFile):
 	
 	def __init__(self, parent, person_type):
 		assert isinstance(parent, CommitPersonDir)
@@ -571,7 +571,7 @@ class BlobsDir(OldDirectory):
 			return blob_file
 
 
-class BlobFile(RegularFile):
+class BlobFile(OldRegularFile):
 	
 	def _get_content_size(self):
 		subprocess.call(['git', 'cat-file', '-s', self.name])
