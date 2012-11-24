@@ -142,9 +142,10 @@ class DirItemsProvider(object):
 
 class Directory(GitViewFSObject):
 	
-	def __init__(self, name, items):
+	def __init__(self, name, items, context_values={}):
 		self.name = name
 		self.items = items
+		self.context_values = context_values.copy()
 		for item in items:
 			item.set_parent_dir(self)
 	
@@ -175,6 +176,12 @@ class Directory(GitViewFSObject):
 	
 	def is_root(self):
 		return not hasattr(self, 'parent_dir')
+	
+	def get_context_value(self, name):
+		try:
+			return self.context_values[name]
+		except KeyError:
+			return self.parent_dir.get_context_value(name)
 
 
 class OldDirectory(OldGitViewFSObject):

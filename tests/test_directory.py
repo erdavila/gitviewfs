@@ -33,7 +33,7 @@ class TestBase(unittest.TestCase):
 		self.directory = Directory(name='', items=[self.mock_item, self.subdir, mock_provider])
 
 
-class TestDirectoryList(TestBase):
+class TestDirectoryListMethod(TestBase):
 	
 	def test_providers_as_items(self):
 		ITEMS_NAMES_1 = ('item1', 'item2', 'item3')
@@ -72,7 +72,7 @@ class TestDirectoryList(TestBase):
 		self.assertItemsEqual([self.SUBDIR_NAME, self.ITEM_NAME] + self.PROVIDER_ITEMS_NAMES, items)
 
 
-class TestDirectoryGetItem(TestBase):
+class TestDirectoryGetItemMethod(TestBase):
 	
 	def setUp(self):
 		self.create_directory_with_multiple_items()
@@ -108,7 +108,7 @@ class TestParentDirIsSet(TestBase):
 			self.assertIs(self.directory, item.parent_dir)
 
 
-class TestGetPath(TestBase):
+class TestGetPathMethod(TestBase):
 	
 	def test_root(self):
 		ROOT_DIR = Directory(name='does not matter', items=[])
@@ -141,6 +141,34 @@ class TestGetPath(TestBase):
 		path = child.get_path()
 		
 		self.assertEqual(NON_ROOT_DIR_PATH + '/' + CHILD_NAME, path)
+
+
+class TextContextValues(unittest.TestCase):
+	
+	def test_constructor(self):
+		NAME1 = 'name1'
+		NAME2 = 'name2'
+		VALUE1 = 'value1'
+		VALUE2 = 'value2'
+		context_values = {
+			NAME1 : VALUE1,
+			NAME2 : VALUE2,
+		}
+		directory = Directory(context_values=context_values, name=None, items=[])
+		
+		self.assertEqual(directory.get_context_value(NAME1), VALUE1)
+		self.assertEqual(directory.get_context_value(NAME2), VALUE2)
+	
+	def test_forward_to_parent(self):
+		NAME = 'name'
+		VALUE = 'value'
+		directory = Directory(name=None, items=[])
+		parent_directory = Directory(context_values={NAME:VALUE}, name=None, items=[])
+		directory.set_parent_dir(parent_directory)
+		
+		value = directory.get_context_value(NAME)
+		
+		self.assertEqual(value, VALUE)
 
 
 if __name__ == "__main__":
