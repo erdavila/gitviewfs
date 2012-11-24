@@ -98,8 +98,9 @@ def set_parent_dir(item, parent_dir):
 
 class GitViewFSObject(object):
 	
-	def __init__(self, name):
+	def __init__(self, name, context_values={}):
 		self.name = name
+		self.context_values = context_values.copy()
 	
 	def set_parent_dir(self, parent_dir):
 		set_parent_dir(self, parent_dir)
@@ -120,6 +121,12 @@ class GitViewFSObject(object):
 		attrs[stat.ST_MODE] = without_write_permissions(attrs[stat.ST_MODE])
 		attrs[stat.ST_NLINK] = 1
 		return attrs
+	
+	def get_context_value(self, name):
+		try:
+			return self.context_values[name]
+		except KeyError:
+			return self.parent_dir.get_context_value(name)
 
 
 class DirItemsProvider(object):
@@ -147,9 +154,8 @@ class CONTEXT_NAMES(object):
 class Directory(GitViewFSObject):
 	
 	def __init__(self, name, items, context_values={}):
-		self.name = name
+		super(Directory, self).__init__(name=name, context_values=context_values)
 		self.items = items
-		self.context_values = context_values.copy()
 		for item in items:
 			item.set_parent_dir(self)
 	
@@ -180,12 +186,6 @@ class Directory(GitViewFSObject):
 	
 	def is_root(self):
 		return not hasattr(self, 'parent_dir')
-	
-	def get_context_value(self, name):
-		try:
-			return self.context_values[name]
-		except KeyError:
-			return self.parent_dir.get_context_value(name)
 
 
 class OldDirectory(OldGitViewFSObject):
@@ -348,7 +348,7 @@ class BranchSymLink(SymLink):
 class CommitsProvider(DirItemsProvider):
 	
 	def _get_item(self, name):
-		context_values = {CONTEXT_NAMES.COMMIT_SHA1:name}
+		context_values = { CONTEXT_NAMES.COMMIT_SHA1 : name }
 		return COMMIT_DIR_TEMPLATE.create_instance(name=name, context_values=context_values)
 	
 	def get_items_names(self):
@@ -358,7 +358,7 @@ class CommitsProvider(DirItemsProvider):
 class CommitMessageFile(RegularFile):
 	
 	def get_content(self):
-		commit_sha1 = self.parent_dir.get_context_value(CONTEXT_NAMES.COMMIT_SHA1)
+		commit_sha1 = self.get_context_value(CONTEXT_NAMES.COMMIT_SHA1)
 		parser = GitCommitParser()
 		commit = parser.parse(commit_sha1)
 		return commit.message
@@ -617,11 +617,11 @@ ROOT_DIR = Directory(name=None, items=[
 COMMIT_DIR_TEMPLATE = template(Directory, items=[
 	template(CommitMessageFile, name='message'),
 	template(Directory, name='author', items=[
-		template(CommitPersonNameFile, parent=None, person_type=CommitPersonDir.PERSON_TYPE_AUTHOR),
+		template(CommitPersonNameFile , parent=None, person_type=CommitPersonDir.PERSON_TYPE_AUTHOR),
 		template(CommitPersonEmailFile, parent=None, person_type=CommitPersonDir.PERSON_TYPE_AUTHOR),
-		template(CommitPersonDateFile, parent=None, person_type=CommitPersonDir.PERSON_TYPE_AUTHOR),
+		template(CommitPersonDateFile , parent=None, person_type=CommitPersonDir.PERSON_TYPE_AUTHOR),
 	]),
-	template(CommitPersonDir, parent=None, person_type=CommitPersonDir.PERSON_TYPE_COMMITTER),
+	template(CommitPersonDir  , parent=None, person_type=CommitPersonDir.PERSON_TYPE_COMMITTER),
 	template(CommitTreeSymLink, parent=None),
-	template(CommitParentsDir, parent=None),
+	template(CommitParentsDir , parent=None),
 ])

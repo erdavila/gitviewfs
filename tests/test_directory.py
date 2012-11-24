@@ -143,34 +143,6 @@ class TestGetPathMethod(TestBase):
 		self.assertEqual(NON_ROOT_DIR_PATH + '/' + CHILD_NAME, path)
 
 
-class TextContextValues(unittest.TestCase):
-	
-	def test_constructor(self):
-		NAME1 = 'name1'
-		NAME2 = 'name2'
-		VALUE1 = 'value1'
-		VALUE2 = 'value2'
-		context_values = {
-			NAME1 : VALUE1,
-			NAME2 : VALUE2,
-		}
-		directory = Directory(context_values=context_values, name=None, items=[])
-		
-		self.assertEqual(directory.get_context_value(NAME1), VALUE1)
-		self.assertEqual(directory.get_context_value(NAME2), VALUE2)
-	
-	def test_forward_to_parent(self):
-		NAME = 'name'
-		VALUE = 'value'
-		directory = Directory(name=None, items=[])
-		parent_directory = Directory(context_values={NAME:VALUE}, name=None, items=[])
-		directory.set_parent_dir(parent_directory)
-		
-		value = directory.get_context_value(NAME)
-		
-		self.assertEqual(value, VALUE)
-
-
 if __name__ == "__main__":
 	#import sys;sys.argv = ['', 'Test.testName']
 	unittest.main()
