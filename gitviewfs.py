@@ -19,7 +19,6 @@ fuse.feature_assert('stateful_files', 'has_init')
 class GitViewFS(Fuse):
 
 	def __init__(self, *args, **kw):
-
 		Fuse.__init__(self, *args, **kw)
 
 		# do stuff to set up your filesystem here, if you want
@@ -40,7 +39,7 @@ class GitViewFS(Fuse):
 
 	def getattr(self, path):
 		obj = get_gitviewfs_object(path)
-		return obj.getattr()
+		return obj.get_stat()
 	
 	def readlink(self, path):
 		symlink = get_gitviewfs_object(path)
@@ -51,8 +50,8 @@ class GitViewFS(Fuse):
 
 	def readdir(self, path, offset):
 		obj = get_gitviewfs_object(path)
-		for item in obj.list():
-			yield fuse.Direntry(item)
+		for item_name in obj.get_items_names():
+			yield fuse.Direntry(item_name)
 	
 	def unlink(self, path):
 		os.unlink("." + path)
@@ -149,8 +148,9 @@ class GitViewFS(Fuse):
 			self.file = get_gitviewfs_object(path)
 
 		def read(self, length, offset):
-			return self.file.read(length, offset)
-
+			content = self.file.get_content()
+			return content[offset : offset+length]
+		
 		def write(self, buf, offset):
 			self.file.seek(offset)
 			self.file.write(buf)
@@ -173,7 +173,7 @@ class GitViewFS(Fuse):
 			pass
 
 		def fgetattr(self):
-			return self.file.getattr()
+			return self.file.get_stat()
 
 		def ftruncate(self, length):
 			self.file.truncate(length)

@@ -42,7 +42,7 @@ class TestDirectoryListMethod(TestBase):
 		mock_provider_2 = self.MockDirItemsProvider(self.MockItem(name) for name in ITEMS_NAMES_2)
 		
 		directory = Directory(name='', items=[mock_provider_1, mock_provider_2])
-		items = directory.list()
+		items = directory.get_items_names()
 		
 		self.assertItemsEqual(ITEMS_NAMES_2 + ITEMS_NAMES_1, items)
 	
@@ -51,7 +51,7 @@ class TestDirectoryListMethod(TestBase):
 		subdir = Directory(name=DIR_NAME, items=[])
 		
 		directory = Directory(name='', items=[subdir])
-		items = directory.list()
+		items = directory.get_items_names()
 		
 		self.assertItemsEqual([DIR_NAME], items)
 	
@@ -60,14 +60,14 @@ class TestDirectoryListMethod(TestBase):
 		mock_item = self.MockItem(ITEM_NAME)
 		
 		directory = Directory(name='', items=[mock_item])
-		items = directory.list()
+		items = directory.get_items_names()
 		
 		self.assertItemsEqual([ITEM_NAME], items)
 	
 	def test_multiple_content_types(self):
 		self.create_directory_with_multiple_items()
 		
-		items = self.directory.list()
+		items = self.directory.get_items_names()
 		
 		self.assertItemsEqual([self.SUBDIR_NAME, self.ITEM_NAME] + self.PROVIDER_ITEMS_NAMES, items)
 

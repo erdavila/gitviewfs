@@ -7,8 +7,8 @@ from gitviewfs_objects import ROOT_DIR
 
 class TestRootDir(unittest.TestCase):
 
-	def test_list(self):
-		items = ROOT_DIR.list()
+	def test_get_items_names(self):
+		items = ROOT_DIR.get_items_names()
 		self.assertItemsEqual(['refs', 'objects'], items)
 
 

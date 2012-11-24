@@ -18,14 +18,14 @@ class TestCommitCommitterDir(unittest.TestCase):
 	def test_is_directory(self):
 		commit_committer_dir = self.make_commit_committer_dir_object()
 		
-		attr = commit_committer_dir.getattr()
+		st = commit_committer_dir.get_stat()
 		
-		self.assertTrue(stat.S_ISDIR(attr.st_mode))
+		self.assertTrue(stat.S_ISDIR(st.st_mode))
 	
-	def test_list(self):
+	def test_get_items_names(self):
 		commit_committer_dir = self.make_commit_committer_dir_object()
 		
-		items = commit_committer_dir.list()
+		items = commit_committer_dir.get_items_names()
 		
 		self.assertItemsEqual(['name', 'email', 'date'], items)
 	

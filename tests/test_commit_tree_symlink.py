@@ -10,12 +10,12 @@ from tests import paths
 
 class TestCommitTreeSymLink(unittest.TestCase):
 	
-	def test_getattr_returns_symlink_type(self):
+	def test_get_stat_returns_symlink_type(self):
 		commit_tree_symlink = get_gitviewfs_object(paths.COMMIT_TREE_SYMLINK)
 		
-		attr = commit_tree_symlink.getattr()
+		st = commit_tree_symlink.get_stat()
 		
-		self.assertTrue(stat.S_ISLNK(attr.st_mode))
+		self.assertTrue(stat.S_ISLNK(st.st_mode))
 
 
 class TestCommitTreeSymLinkIntegration(TestIntegration):

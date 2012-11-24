@@ -14,12 +14,12 @@ class TestBlobsDir(unittest.TestCase):
 	def tearDown(self):
 		pass
 
-	def test_getattr_returns_directory_type(self):
+	def test_get_stat_returns_directory_type(self):
 		blobs_dir = BlobsDir.INSTANCE
 		
-		attr = blobs_dir.getattr()
+		st = blobs_dir.get_stat()
 		
-		self.assertTrue(stat.S_ISDIR(attr.st_mode))
+		self.assertTrue(stat.S_ISDIR(st.st_mode))
 
 
 class TestBlobsDirIntegration(TestIntegration):

@@ -63,11 +63,11 @@ class OldGitViewFSObject(object):
 		self.parent = parent
 		self.name = name
 	
-	def getattr(self):
-		attrs = self._get_attrs()
-		return posix.stat_result(attrs)
+	def get_stat(self):
+		st = self._get_stat()
+		return posix.stat_result(st)
 	
-	def _get_attrs(self):
+	def _get_stat(self):
 		st_root = os.lstat('.')
 		attrs = list(st_root)
 		attrs[stat.ST_MODE] = without_write_permissions(attrs[stat.ST_MODE])
@@ -110,11 +110,11 @@ class GitViewFSObject(object):
 		else:
 			return self.parent_dir.get_path() + '/' + self.name
 	
-	def getattr(self):
-		attrs = self._get_attrs()
-		return posix.stat_result(attrs)
+	def get_stat(self):
+		st = self._get_stat()
+		return posix.stat_result(st)
 	
-	def _get_attrs(self):
+	def _get_stat(self):
 		st_root = os.lstat('.')
 		attrs = list(st_root)
 		attrs[stat.ST_MODE] = without_write_permissions(attrs[stat.ST_MODE])
@@ -149,7 +149,7 @@ class Directory(GitViewFSObject):
 		for item in items:
 			item.set_parent_dir(self)
 	
-	def list(self):
+	def get_items_names(self):
 		items_names = []
 		for item in self.items:
 			if isinstance(item, DirItemsProvider):
@@ -186,10 +186,10 @@ class Directory(GitViewFSObject):
 
 class OldDirectory(OldGitViewFSObject):
 	
-	def _get_attrs(self):
-		attrs = super(OldDirectory, self)._get_attrs()
-		attrs[stat.ST_MODE] = with_directory_type(attrs[stat.ST_MODE])
-		return attrs
+	def _get_stat(self):
+		st = super(OldDirectory, self)._get_stat()
+		st[stat.ST_MODE] = with_directory_type(st[stat.ST_MODE])
+		return st
 
 
 class PredefinedDirectory(OldDirectory):
@@ -211,17 +211,17 @@ class PredefinedDirectory(OldDirectory):
 		else:
 			return item
 	
-	def list(self):
+	def get_items_names(self):
 		return self.items.keys()
 
 
 class SymLink(GitViewFSObject):
 	__metaclass__ = ABCMeta
 	
-	def _get_attrs(self):
-		attrs = super(SymLink, self)._get_attrs()
-		attrs[stat.ST_MODE] = with_symlink_file_type(attrs[stat.ST_MODE])
-		return attrs
+	def _get_stat(self):
+		st = super(SymLink, self)._get_stat()
+		st[stat.ST_MODE] = with_symlink_file_type(st[stat.ST_MODE])
+		return st
 	
 	def get_target_path(self):
 		target_object = self.get_target_object()
@@ -234,10 +234,10 @@ class SymLink(GitViewFSObject):
 
 class OldSymLink(OldGitViewFSObject):
 	
-	def _get_attrs(self):
-		attrs = super(OldSymLink, self)._get_attrs()
-		attrs[stat.ST_MODE] = with_symlink_file_type(attrs[stat.ST_MODE])
-		return attrs
+	def _get_stat(self):
+		st = super(OldSymLink, self)._get_stat()
+		st[stat.ST_MODE] = with_symlink_file_type(st[stat.ST_MODE])
+		return st
 	
 	def get_target_path(self):
 		target_object = self.get_target_object()
@@ -247,19 +247,15 @@ class OldSymLink(OldGitViewFSObject):
 
 class OldRegularFile(OldGitViewFSObject):
 	
-	def read(self, length, offset):
-		content = self._get_content()
-		return content[offset : offset+length]
-	
-	def _get_attrs(self):
-		attrs = super(OldRegularFile, self)._get_attrs()
-		attrs[stat.ST_MODE] = with_regular_file_type(attrs[stat.ST_MODE])
-		attrs[stat.ST_MODE] = without_execution_permissions(attrs[stat.ST_MODE])
-		attrs[stat.ST_SIZE] = self._get_content_size()
-		return attrs
+	def _get_stat(self):
+		st = super(OldRegularFile, self)._get_stat()
+		st[stat.ST_MODE] = with_regular_file_type(st[stat.ST_MODE])
+		st[stat.ST_MODE] = without_execution_permissions(st[stat.ST_MODE])
+		st[stat.ST_SIZE] = self._get_content_size()
+		return st
 	
 	def _get_content_size(self):
-		content = self._get_content()
+		content = self.get_content()
 		return len(content)
 
 
@@ -343,7 +339,7 @@ class CommitMessageFile(OldRegularFile):
 	def __init__(self, parent):
 		super(CommitMessageFile, self).__init__(parent=parent, name=self.NAME)
 	
-	def _get_content(self):
+	def get_content(self):
 		commit_sha1 = self.parent.name
 		parser = GitCommitParser()
 		commit = parser.parse(commit_sha1)
@@ -395,7 +391,7 @@ class CommitPersonNameFile(CommitPersonDirFile):
 	
 	NAME = 'name'
 	
-	def _get_content(self):
+	def get_content(self):
 		commit_person_data = self._get_commit_person_data()
 		return commit_person_data.name + '\n'
 
@@ -404,7 +400,7 @@ class CommitPersonEmailFile(CommitPersonDirFile):
 	
 	NAME = 'email'
 	
-	def _get_content(self):
+	def get_content(self):
 		commit_person_data = self._get_commit_person_data()
 		return commit_person_data.email + '\n'
 
@@ -413,7 +409,7 @@ class CommitPersonDateFile(CommitPersonDirFile):
 	
 	NAME = 'date'
 	
-	def _get_content(self):
+	def get_content(self):
 		commit_person_data = self._get_commit_person_data()
 		return commit_person_data.date + '\n'
 
@@ -448,7 +444,7 @@ class CommitParentsDir(OldDirectory):
 			parent_num = path_parts[0]
 			return CommitParentSymLink(parent=self, name=parent_num)
 	
-	def list(self):
+	def get_items_names(self):
 		commit_sha1 = self.parent.name
 		parser = GitCommitParser()
 		commit = parser.parse(commit_sha1)
@@ -509,7 +505,7 @@ class TreeDir(OldDirectory):
 			tree_dir_item = TreeDirItem(parent=self, name=first_part)
 			return tree_dir_item
 	
-	def list(self):
+	def get_items_names(self):
 		items = []
 		
 		for item in self._read_tree_items():
@@ -579,7 +575,7 @@ class BlobFile(OldRegularFile):
 		size = int(size_string)
 		return size
 	
-	def _get_content(self):
+	def get_content(self):
 		blob_content = subprocess.check_output(['git', 'cat-file', 'blob', self.name])
 		return blob_content
 

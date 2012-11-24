@@ -16,22 +16,22 @@ class TestCommitMessagFile(unittest.TestCase):
 	def tearDown(self):
 		pass
 
-	def test_getattr(self):
+	def test_get_stat(self):
 		commit_message_file = get_gitviewfs_object(paths.COMMIT_MESSAGE_FILE)
 		CONTENT_SIZE = 142857
 		def _get_content_size():
 			return CONTENT_SIZE
 		commit_message_file._get_content_size = _get_content_size
 		
-		attrs = commit_message_file.getattr()
+		st = commit_message_file.get_stat()
 		
-		self.assertTrue(stat.S_ISREG(attrs.st_mode))
+		self.assertTrue(stat.S_ISREG(st.st_mode))
 		
-		self.assertFalse(attrs.st_mode & stat.S_IXUSR)
-		self.assertFalse(attrs.st_mode & stat.S_IXGRP)
-		self.assertFalse(attrs.st_mode & stat.S_IXOTH)
+		self.assertFalse(st.st_mode & stat.S_IXUSR)
+		self.assertFalse(st.st_mode & stat.S_IXGRP)
+		self.assertFalse(st.st_mode & stat.S_IXOTH)
 		
-		self.assertEqual(CONTENT_SIZE, attrs.st_size)
+		self.assertEqual(CONTENT_SIZE, st.st_size)
 
 
 class TestCommitMessageFileIntegration(TestIntegration):

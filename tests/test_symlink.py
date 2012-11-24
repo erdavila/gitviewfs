@@ -11,9 +11,9 @@ class TestSymlink(unittest.TestCase):
 			def get_target_object(self): pass
 		symlink = MockSymLink(name='ignored')
 		
-		attrs = symlink._get_attrs()
+		st = symlink._get_stat()
 		
-		mode = attrs[stat.ST_MODE]
+		mode = st[stat.ST_MODE]
 		self.assertTrue(stat.S_ISLNK(mode))
 	
 	def test_get_target_path_returns_path_of_target_object(self):

@@ -9,10 +9,10 @@ from tests import paths
 
 class TestCommitDir(unittest.TestCase):
 	
-	def test_list(self):
+	def test_get_items_names(self):
 		commit_dir = get_gitviewfs_object(paths.COMMIT_DIR)
 		
-		items = commit_dir.list()
+		items = commit_dir.get_items_names()
 		
 		self.assertItemsEqual(['message', 'author', 'committer', 'parents', 'tree'], items)
 
