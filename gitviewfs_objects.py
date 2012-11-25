@@ -405,8 +405,13 @@ class CommitTreeSymLink(SymLink):
 
 class CommitParentsProvider(DirItemsProvider):
 	
+	def __init__(self, prefix=''):
+		self.prefix = prefix
+	
 	def _get_item(self, name):
-		return CommitParentSymLink(name=name, parent_number=int(name))
+		assert name.startswith(self.prefix)
+		parent_number = int(name[len(self.prefix):])
+		return CommitParentSymLink(name=name, parent_number=parent_number)
 	
 	def get_items_names(self):
 		parser = GitCommitParser()
@@ -414,7 +419,7 @@ class CommitParentsProvider(DirItemsProvider):
 		commit = parser.parse(commit_sha1)
 		num_parents = len(commit.parents)
 		num_digits = len(str(num_parents))
-		return ['%0*d' % (num_digits, i + 1) for i in xrange(num_parents)]
+		return ['%s%0*d' % (self.prefix, num_digits, i + 1) for i in xrange(num_parents)]
 
 
 class CommitParentSymLink(SymLink):

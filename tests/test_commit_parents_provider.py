@@ -18,6 +18,19 @@ class TestCommitParentsProvider(unittest.TestCase):
 		
 		self.assertIsInstance(item, CommitParentSymLink)
 		self.assertEqual(item.name, parent_name)
+	
+	def test_get_item_with_prefix(self):
+		PREFIX = 'prfx'
+		provider = CommitParentsProvider(prefix=PREFIX)
+		Directory(name=None, items=[provider])
+		
+		PARENT_NUMBER = 2
+		parent_name = PREFIX + str(PARENT_NUMBER)
+		item = provider.get_item(parent_name)
+		
+		self.assertIsInstance(item, CommitParentSymLink)
+		self.assertEqual(item.name, parent_name)
+		self.assertEqual(item.parent_number, PARENT_NUMBER)
 
 
 class TestCommitParentsProviderWithRepository(TestWithRepository):
@@ -46,6 +59,17 @@ class TestCommitParentsProviderWithRepository(TestWithRepository):
 		
 		num_digits = len(str(num_parents))
 		self.assertItemsEqual(['%0*d' % (num_digits, i + 1) for i in range(num_parents)], parents_items)
+	
+	def test_get_items_names_with_prefix(self):
+		self.create_merge_commit(num_parents=12)
+		merge_commit_sha1 = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip()
+		
+		provider = CommitParentsProvider(prefix='prfx')
+		Directory(name=None, items=[provider], context_values={CommitContextNames.SHA1:merge_commit_sha1})
+		
+		items_names = provider.get_items_names()
+		
+		self.assertEqual(items_names, ['prfx01', 'prfx02', 'prfx03', 'prfx04', 'prfx05', 'prfx06', 'prfx07', 'prfx08', 'prfx09', 'prfx10', 'prfx11', 'prfx12'])
 	
 	def create_merge_commit(self, num_parents):
 		self.create_and_commit_file(message='Initial commit')
