@@ -418,35 +418,11 @@ class CommitParentsProvider(DirItemsProvider):
 		return ['%0*d' % (num_digits, i + 1) for i in xrange(num_parents)]
 
 
-class CommitParentsDir(OldDirectory):
-	
-	NAME = 'parents'
-	
-	def __init__(self, parent):
-		super(CommitParentsDir, self).__init__(parent=parent, name=self.NAME)
-	
-	def get_gitviewfs_object(self, path_parts):
-		if len(path_parts) == 0:
-			return self
-		
-		if len(path_parts) == 1:
-			parent_num = path_parts[0]
-			return CommitParentSymLink(parent=self, name=parent_num)
-	
-	def get_items_names(self):
-		commit_sha1 = self.parent.name
-		parser = GitCommitParser()
-		commit = parser.parse(commit_sha1)
-		num_parents = len(commit.parents)
-		num_digits = len(str(num_parents))
-		return ['%0*d' % (num_digits, i + 1) for i in range(num_parents)]
-
-
 class CommitParentSymLink(OldSymLink):
 	
 	def get_target_object(self):
 		commit_parents_dir = self.parent
-		commit_dir = commit_parents_dir.parent
+		commit_dir = commit_parents_dir.parent_dir
 		commit_sha1 = commit_dir.name
 		
 		parser = GitCommitParser()
@@ -592,5 +568,5 @@ COMMIT_DIR_TEMPLATE = template(Directory, items=[
 		template(CommitPersonDateFile , name='date' ),
 	]),
 	template(CommitTreeSymLink, name='tree'),
-	template(CommitParentsDir , parent=None),
+	template(Directory, name='parents', items=[template(CommitParentsProvider)])
 ])
