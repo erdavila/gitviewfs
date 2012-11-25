@@ -145,6 +145,9 @@ class DirItemsProvider(object):
 	
 	def set_parent_dir(self, parent_dir):
 		set_parent_dir(self, parent_dir)
+	
+	def get_context_value(self, name):
+		return self.parent_dir.get_context_value(name)
 
 
 class Directory(GitViewFSObject):
@@ -400,6 +403,21 @@ class CommitTreeSymLink(SymLink):
 		return tree_dir
 
 
+class CommitParentsProvider(DirItemsProvider):
+	
+	def _get_item(self, name):
+		parent_num = name
+		return CommitParentSymLink(parent=self, name=parent_num)
+	
+	def get_items_names(self):
+		parser = GitCommitParser()
+		commit_sha1 = self.get_context_value(CommitContextNames.SHA1)
+		commit = parser.parse(commit_sha1)
+		num_parents = len(commit.parents)
+		num_digits = len(str(num_parents))
+		return ['%0*d' % (num_digits, i + 1) for i in xrange(num_parents)]
+
+
 class CommitParentsDir(OldDirectory):
 	
 	NAME = 'parents'
@@ -425,10 +443,6 @@ class CommitParentsDir(OldDirectory):
 
 
 class CommitParentSymLink(OldSymLink):
-	
-	def __init__(self, parent, name):
-		assert isinstance(parent, CommitParentsDir)
-		super(CommitParentSymLink, self).__init__(parent=parent, name=name)
 	
 	def get_target_object(self):
 		commit_parents_dir = self.parent
