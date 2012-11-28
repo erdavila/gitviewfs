@@ -62,3 +62,22 @@ class GitCommitParser(object):
 		if signal == '-':
 			value_in_seconds = -value_in_seconds
 		return value_in_seconds
+
+
+TreeItem = namedtuple('TreeItem', 'mode, type, sha1, name')
+
+
+class GitTreeParser(object):
+	
+	def parse(self, tree_ref_or_sha1):
+		tree_content = subprocess.check_output(['git', 'cat-file', '-p', tree_ref_or_sha1])
+		return self.parse_content(tree_content)
+	
+	def parse_content(self, tree_content):
+		items = {}
+		for line in tree_content.splitlines(True):
+			line = line.strip()
+			attributes, name = line.split('\t')
+			mode, type, sha1 = attributes.split(' ')
+			items[name] = TreeItem(mode=mode, type=type, sha1=sha1, name=name)
+		return items

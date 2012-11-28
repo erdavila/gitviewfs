@@ -1,9 +1,12 @@
 import unittest
+import os.path
+import re
 
-from git_objects_parser import GitCommitParser
+from git_objects_parser import GitCommitParser, GitTreeParser
+from tests.test_integration import TestWithRepository
 
 
-class TestGitObjectsParser(unittest.TestCase):
+class TestGitCommitParser(unittest.TestCase):
 	
 	PARENT_1_SHA1 = 'abcdefabcdefabcdefabcdefabcdefabcdefabcd'
 	PARENT_2_SHA1 = 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2'
@@ -88,6 +91,38 @@ class TestGitObjectsParser(unittest.TestCase):
 	
 	def join_lines(self, lines):
 		return ''.join(line + '\n' for line in lines)
+
+
+class TestGitTreeParser(TestWithRepository):
+	
+	def test_parse(self):
+		FILENAME = 'file.txt'
+		SUBDIR = 'subdir'
+		if not os.path.isdir(SUBDIR):
+			os.makedirs(SUBDIR)
+		self.create_and_commit_file(FILENAME)
+		self.create_and_commit_file(os.path.join(SUBDIR, 'another-file.txt'))
+		
+		parser = GitTreeParser()
+		tree_items = parser.parse('HEAD^{tree}')
+		
+		self.assertIn(FILENAME, tree_items)
+		self.assertIn(SUBDIR, tree_items)
+		
+		file_item = tree_items[FILENAME]
+		self.assertEqual('100644', file_item.mode)
+		self.assertEqual('blob', file_item.type)
+		self.assertIsSha1(file_item.sha1)
+		self.assertEqual(FILENAME, file_item.name)
+		
+		dir_item = tree_items[SUBDIR]
+		self.assertEqual('040000', dir_item.mode)
+		self.assertEqual('tree', dir_item.type)
+		self.assertIsSha1(dir_item.sha1)
+		self.assertEqual(SUBDIR, dir_item.name)
+	
+	def assertIsSha1(self, value):
+		self.assertTrue(re.match(r'^[0-9a-f]{40}$', value), '%r is not SHA-1' % value)
 
 
 if __name__ == "__main__":
