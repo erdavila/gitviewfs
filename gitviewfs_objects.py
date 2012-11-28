@@ -441,6 +441,15 @@ class CommitParentSymLink(SymLink):
 		return parent_commit_dir
 
 
+class TreesProvider(DirItemsProvider):
+	
+	def get_items_names(self):
+		return []
+	
+	def _get_item(self, name):
+		return TreeDir(parent=None, name=name)
+
+
 class TreesDir(OldDirectory):
 	
 	NAME = 'trees'
