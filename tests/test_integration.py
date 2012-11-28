@@ -25,6 +25,10 @@ class TestWithRepository(unittest.TestCase):
 	DEFAULT_MESSAGE = 'Add file'
 	
 	def create_and_commit_file(self, filename='file.txt', content=DEFAULT_CONTENT, message=DEFAULT_MESSAGE, author=None):
+		if '/' in filename:
+			directory, _ = os.path.split(filename)
+			if not os.path.isdir(directory):
+				os.makedirs(directory)
 		with open(filename, 'w') as f:
 			f.write(content)
 		

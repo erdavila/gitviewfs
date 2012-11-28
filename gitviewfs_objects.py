@@ -5,7 +5,7 @@ import subprocess
 from collections import namedtuple
 from abc import abstractmethod, ABCMeta
 
-from git_objects_parser import GitCommitParser
+from git_objects_parser import GitCommitParser, GitTreeParser
 
 
 def without_write_permissions(stat_mode):
@@ -449,6 +449,25 @@ class TreesProvider(DirItemsProvider):
 		return TreeDir(parent=None, name=name)
 
 
+class TreeContextNames(object):
+	
+	SHA1 = 'tree-sha1'
+	
+	def __init__(self): raise NotImplementedError('should not instantiate this class!')
+
+
+class TreeDirItemsProvider(DirItemsProvider):
+	
+	def get_items_names(self):
+		tree_sha1 = self.parent_dir.get_context_value(TreeContextNames.SHA1)
+		parser = GitTreeParser()
+		items = parser.parse(tree_sha1)
+		return items.keys()
+	
+	def _get_item(self, name):
+		return TreeDirItem(parent=None, name=name)
+
+
 class TreeDir(OldDirectory):
 	
 	def get_gitviewfs_object(self, path_parts):
@@ -486,7 +505,6 @@ class TreeDir(OldDirectory):
 class TreeDirItem(OldSymLink):
 	
 	def __init__(self, parent, name):
-		assert isinstance(parent, TreeDir)
 		super(TreeDirItem, self).__init__(parent, name)
 	
 	def get_target_object(self):
