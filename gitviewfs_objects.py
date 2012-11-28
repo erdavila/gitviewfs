@@ -398,8 +398,7 @@ class CommitTreeSymLink(SymLink):
 	def get_target_object(self):
 		commit_sha1 = self.get_context_value(CommitContextNames.SHA1)
 		tree_sha1 = subprocess.check_output(['git', 'rev-parse', commit_sha1 + '^{tree}']).strip()
-		trees_dir = TreesDir.INSTANCE
-		tree_dir = trees_dir.get_gitviewfs_object([tree_sha1])
+		tree_dir = TREES_DIR.get_item(tree_sha1)
 		return tree_dir
 
 
@@ -450,25 +449,6 @@ class TreesProvider(DirItemsProvider):
 		return TreeDir(parent=None, name=name)
 
 
-class TreesDir(OldDirectory):
-	
-	NAME = 'trees'
-	INSTANCE = None
-	
-	def __init__(self, parent):
-		super(TreesDir, self).__init__(parent=parent, name=self.NAME)
-		TreesDir.INSTANCE = self
-	
-	def get_gitviewfs_object(self, path_parts):
-		if len(path_parts) == 0:
-			return self
-		
-		first_part = path_parts[0]
-		if self._is_valid_sha1_hash(first_part):
-			tree_dir = TreeDir(parent=self, name=first_part)
-			return tree_dir.get_gitviewfs_object(path_parts[1:])
-
-
 class TreeDir(OldDirectory):
 	
 	def get_gitviewfs_object(self, path_parts):
@@ -515,11 +495,10 @@ class TreeDirItem(OldSymLink):
 				break
 		
 		if item.type == 'blob':
-			dir_object = BlobsDir.INSTANCE
+			target_object = BlobsDir.INSTANCE.get_gitviewfs_object([item.sha1])
 		elif item.type == 'tree':
-			dir_object = TreesDir.INSTANCE
+			target_object = TREES_DIR.get_item(item.sha1)
 		
-		target_object = dir_object.get_gitviewfs_object([item.sha1])
 		return target_object
 
 
@@ -557,6 +536,7 @@ class BlobFile(OldRegularFile):
 
 BRANCHES_DIR = Directory(name='branches', items=[BranchesProvider()])
 COMMITS_DIR = Directory(name='commits', items=[CommitsProvider()])
+TREES_DIR = Directory(name='trees', items=[TreesProvider()])
 ROOT_DIR = Directory(name=None, items=[
 	Directory(name='refs', items=[
 		HeadSymLink(name='HEAD'),
@@ -564,7 +544,7 @@ ROOT_DIR = Directory(name=None, items=[
 	]),
 	Directory(name='objects', items=[
 		COMMITS_DIR,
-		TreesDir(parent=None),
+		TREES_DIR,
 		BlobsDir(parent=None),
 	])
 ])
