@@ -1,6 +1,6 @@
 import unittest
 
-from gitviewfs_objects import TreesProvider, TreeDir
+from gitviewfs_objects import TreesProvider, Directory
 
 
 class TestTreesProvider(unittest.TestCase):
@@ -18,7 +18,7 @@ class TestTreesProvider(unittest.TestCase):
 		ITEM_NAME = 'a1b2c3d4'
 		item = provider._get_item(ITEM_NAME)
 		
-		self.assertIsInstance(item, TreeDir)
+		self.assertIsInstance(item, Directory)
 		self.assertEqual(ITEM_NAME, item.name)
 
 

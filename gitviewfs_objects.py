@@ -2,7 +2,6 @@ import stat
 import posix
 import os
 import subprocess
-from collections import namedtuple
 from abc import abstractmethod, ABCMeta
 
 from git_objects_parser import GitCommitParser, GitTreeParser
@@ -446,7 +445,8 @@ class TreesProvider(DirItemsProvider):
 		return []
 	
 	def _get_item(self, name):
-		return TreeDir(parent=None, name=name)
+		context_values = {TreeContextNames.SHA1:name}
+		return TREE_DIR_TEMPLATE.create_instance(name=name, context_values=context_values)
 
 
 class TreeContextNames(object):
@@ -468,49 +468,16 @@ class TreeDirItemsProvider(DirItemsProvider):
 		return TreeDirItem(parent=None, name=name)
 
 
-class TreeDir(OldDirectory):
-	
-	def get_gitviewfs_object(self, path_parts):
-		if len(path_parts) == 0:
-			return self
-		
-		if len(path_parts) == 1:
-			first_part = path_parts[0]
-			tree_dir_item = TreeDirItem(parent=self, name=first_part)
-			return tree_dir_item
-	
-	def get_items_names(self):
-		items = []
-		
-		for item in self._read_tree_items():
-			items.append(item.name)
-		
-		return items
-	
-	Item = namedtuple('Item', 'name, sha1, type, perms')
-	
-	def _read_tree_items(self):
-		tree_sha1 = self.name
-		proc = subprocess.Popen(['git', 'cat-file', '-p', tree_sha1], stdout=subprocess.PIPE)
-		try:
-			for line in proc.stdout:
-				line = line.strip()
-				perms_and_type_and_sha1, item_name = line.split('\t')
-				item_perms, item_type, item_sha1 = perms_and_type_and_sha1.split(' ')
-				yield self.Item(item_name, item_sha1, item_type, item_perms)
-		finally:
-			proc.wait()
-
-
 class TreeDirItem(OldSymLink):
 	
 	def __init__(self, parent, name):
 		super(TreeDirItem, self).__init__(parent, name)
 	
 	def get_target_object(self):
-		for item in self.parent._read_tree_items():
-			if item.name == self.name:
-				break
+		tree_sha1 = self.parent.get_context_value(TreeContextNames.SHA1)
+		parser = GitTreeParser()
+		items = parser.parse(tree_sha1)
+		item = items[self.name]
 		
 		if item.type == 'blob':
 			target_object = BlobsDir.INSTANCE.get_gitviewfs_object([item.sha1])
@@ -582,3 +549,5 @@ COMMIT_DIR_TEMPLATE = template(Directory, items=[
 	template(CommitTreeSymLink, name='tree'),
 	template(Directory, name='parents', items=[template(CommitParentsProvider)])
 ])
+
+TREE_DIR_TEMPLATE = template(Directory, items=[template(TreeDirItemsProvider)])
