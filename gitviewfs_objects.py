@@ -46,43 +46,11 @@ def get_gitviewfs_object(path):
 	path_parts.pop(0)
 	
 	item = ROOT_DIR
-	while len(path_parts) > 0 and not isinstance(item, OldGitViewFSObject):
+	while len(path_parts) > 0:
 		first_part = path_parts.pop(0)
 		item = item.get_item(first_part)
 	
 	return item
-
-
-class OldGitViewFSObject(object):
-	
-	def __init__(self, parent, name):
-		self.parent = parent
-		self.name = name
-	
-	def get_stat(self):
-		st = self._get_stat()
-		return posix.stat_result(st)
-	
-	def _get_stat(self):
-		st_root = os.lstat('.')
-		attrs = list(st_root)
-		attrs[stat.ST_MODE] = without_write_permissions(attrs[stat.ST_MODE])
-		attrs[stat.ST_NLINK] = 1
-		return attrs
-	
-	def get_path(self):
-		parent_path = self.parent.get_path()
-		if parent_path == '/':
-			path = '/' + self.name
-		else:
-			path = parent_path + '/' + self.name
-		return path
-	
-	def _is_valid_sha1_hash(self, sha1_hash):
-		return 4 <= len(sha1_hash) <= 40
-	
-	def set_parent_dir(self, parent):
-		self.parent = parent
 
 
 def set_parent_dir(item, parent_dir):
@@ -198,20 +166,6 @@ class SymLink(GitViewFSObject):
 	
 	@abstractmethod
 	def get_target_object(self): pass
-
-
-class OldRegularFile(OldGitViewFSObject):
-	
-	def _get_stat(self):
-		st = super(OldRegularFile, self)._get_stat()
-		st[stat.ST_MODE] = with_regular_file_type(st[stat.ST_MODE])
-		st[stat.ST_MODE] = without_execution_permissions(st[stat.ST_MODE])
-		st[stat.ST_SIZE] = self._get_content_size()
-		return st
-	
-	def _get_content_size(self):
-		content = self.get_content()
-		return len(content)
 
 
 class RegularFile(GitViewFSObject):
@@ -466,20 +420,20 @@ class BlobsProvider(DirItemsProvider):
 		return []
 	
 	def _get_item(self, name):
-		return BlobFile(parent=None, name=name)
+		return BlobFile(name=name)
 
 
-class BlobFile(OldRegularFile):
+class BlobFile(RegularFile):
+	
+	def get_content(self):
+		blob_sha1 = self.name
+		blob_content = subprocess.check_output(['git', 'cat-file', 'blob', blob_sha1])
+		return blob_content
 	
 	def _get_content_size(self):
-		subprocess.call(['git', 'cat-file', '-s', self.name])
 		size_string = subprocess.check_output(['git', 'cat-file', '-s', self.name])
 		size = int(size_string)
 		return size
-	
-	def get_content(self):
-		blob_content = subprocess.check_output(['git', 'cat-file', 'blob', self.name])
-		return blob_content
 
 
 BRANCHES_DIR = Directory(name='branches', items=[BranchesProvider()])
