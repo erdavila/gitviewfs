@@ -211,19 +211,6 @@ class SymLink(GitViewFSObject):
 	def get_target_object(self): pass
 
 
-class OldSymLink(OldGitViewFSObject):
-	
-	def _get_stat(self):
-		st = super(OldSymLink, self)._get_stat()
-		st[stat.ST_MODE] = with_symlink_file_type(st[stat.ST_MODE])
-		return st
-	
-	def get_target_path(self):
-		target_object = self.get_target_object()
-		target_path = target_object.get_path()
-		return target_path
-
-
 class OldRegularFile(OldGitViewFSObject):
 	
 	def _get_stat(self):
@@ -465,16 +452,13 @@ class TreeDirItemsProvider(DirItemsProvider):
 		return items.keys()
 	
 	def _get_item(self, name):
-		return TreeDirItem(parent=None, name=name)
+		return TreeDirItem(name=name)
 
 
-class TreeDirItem(OldSymLink):
-	
-	def __init__(self, parent, name):
-		super(TreeDirItem, self).__init__(parent, name)
+class TreeDirItem(SymLink):
 	
 	def get_target_object(self):
-		tree_sha1 = self.parent.get_context_value(TreeContextNames.SHA1)
+		tree_sha1 = self.get_context_value(TreeContextNames.SHA1)
 		parser = GitTreeParser()
 		items = parser.parse(tree_sha1)
 		item = items[self.name]
