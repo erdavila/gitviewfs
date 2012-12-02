@@ -471,6 +471,15 @@ class TreeDirItem(SymLink):
 		return target_object
 
 
+class BlobsProvider(DirItemsProvider):
+	
+	def get_items_names(self):
+		return []
+	
+	def _get_item(self, name):
+		return BlobFile(parent=None, name=name)
+
+
 class BlobsDir(OldDirectory):
 	
 	NAME = 'blobs'
