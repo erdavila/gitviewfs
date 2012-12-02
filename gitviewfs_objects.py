@@ -50,9 +50,6 @@ def get_gitviewfs_object(path):
 		first_part = path_parts.pop(0)
 		item = item.get_item(first_part)
 	
-	if isinstance(item, OldDirectory):
-		return item.get_gitviewfs_object(path_parts)
-	
 	return item
 
 
@@ -184,14 +181,6 @@ class Directory(GitViewFSObject):
 	
 	def is_root(self):
 		return not hasattr(self, 'parent_dir')
-
-
-class OldDirectory(OldGitViewFSObject):
-	
-	def _get_stat(self):
-		st = super(OldDirectory, self)._get_stat()
-		st[stat.ST_MODE] = with_directory_type(st[stat.ST_MODE])
-		return st
 
 
 class SymLink(GitViewFSObject):
@@ -464,7 +453,7 @@ class TreeDirItem(SymLink):
 		item = items[self.name]
 		
 		if item.type == 'blob':
-			target_object = BlobsDir.INSTANCE.get_gitviewfs_object([item.sha1])
+			target_object = BLOBS_DIR.get_item(item.sha1)
 		elif item.type == 'tree':
 			target_object = TREES_DIR.get_item(item.sha1)
 		
@@ -478,25 +467,6 @@ class BlobsProvider(DirItemsProvider):
 	
 	def _get_item(self, name):
 		return BlobFile(parent=None, name=name)
-
-
-class BlobsDir(OldDirectory):
-	
-	NAME = 'blobs'
-	INSTANCE = None
-	
-	def __init__(self, parent):
-		super(BlobsDir, self).__init__(parent=parent, name=self.NAME)
-		BlobsDir.INSTANCE = self
-	
-	def get_gitviewfs_object(self, path_parts):
-		if len(path_parts) == 0:
-			return self
-		
-		first_part = path_parts[0]
-		if len(path_parts) == 1  and  self._is_valid_sha1_hash(first_part):
-			blob_file = BlobFile(parent=self, name=first_part)
-			return blob_file
 
 
 class BlobFile(OldRegularFile):
@@ -515,6 +485,7 @@ class BlobFile(OldRegularFile):
 BRANCHES_DIR = Directory(name='branches', items=[BranchesProvider()])
 COMMITS_DIR = Directory(name='commits', items=[CommitsProvider()])
 TREES_DIR = Directory(name='trees', items=[TreesProvider()])
+BLOBS_DIR = Directory(name='blobs', items=[BlobsProvider()])
 ROOT_DIR = Directory(name=None, items=[
 	Directory(name='refs', items=[
 		HeadSymLink(name='HEAD'),
@@ -523,7 +494,7 @@ ROOT_DIR = Directory(name=None, items=[
 	Directory(name='objects', items=[
 		COMMITS_DIR,
 		TREES_DIR,
-		BlobsDir(parent=None),
+		BLOBS_DIR,
 	])
 ])
 

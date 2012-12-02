@@ -3,7 +3,7 @@ import unittest
 from gitviewfs_objects import get_gitviewfs_object, Directory, HeadSymLink,\
 	BranchSymLink, CommitMessageFile, CommitPersonNameFile, CommitPersonEmailFile,\
 	CommitPersonDateFile, CommitTreeSymLink, CommitParentSymLink, TreeDirItem,\
-	BlobsDir, BlobFile
+	BlobFile
 from tests import paths
 
 
@@ -95,7 +95,7 @@ class TestPaths(unittest.TestCase):
 		self.assertPathClassAndName(paths.TREE_DIR_ITEM, TreeDirItem, paths.SAMPLE_FILENAME)
 	
 	def test_BlobsDir(self):
-		self.assertPathClassAndName(paths.BLOBS_DIR, BlobsDir)
+		self.assertPathClassAndName(paths.BLOBS_DIR, Directory, 'blobs')
 	
 	def test_BlobFile(self):
 		self.assertPathClassAndName(paths.BLOB_FILE, BlobFile, paths.SAMPLE_HASH)
