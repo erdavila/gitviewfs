@@ -1,29 +1,18 @@
-import unittest
 import subprocess
 
-from tests.test_integration import TestIntegration
+from gitviewfs_objects import BranchSymLink, Directory
+from tests.test_with_repository import TestWithRepository
 
 
-class TestBranchSymLink(unittest.TestCase):
+class TestBranchSymLink(TestWithRepository):
 
-	def setUp(self):
-		pass
-
-	def tearDown(self):
-		pass
-
-
-class TestBranchSymLinkIntegration(TestIntegration):
-
-	def test_symlink(self):
+	def test_target(self):
 		BRANCH = 'master'
 		self.create_and_commit_file()
 		commit_sha1 = subprocess.check_output(['git', 'rev-parse', BRANCH]).strip()
-		branch_symlink_path = self.make_branch_symlink_path(BRANCH)
+		branch_symlink = BranchSymLink(name=BRANCH)
 		
-		self.assertSymLink(self.make_commit_dir_path(commit_sha1), branch_symlink_path)
-
-
-if __name__ == "__main__":
-	#import sys;sys.argv = ['', 'Test.testName']
-	unittest.main()
+		target = branch_symlink.get_target_object()
+		
+		self.assertIsInstance(target, Directory)
+		self.assertEqual(commit_sha1, target.name)

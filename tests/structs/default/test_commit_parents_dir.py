@@ -1,17 +1,19 @@
-import subprocess
-import unittest
-
-from tests.test_integration import TestIntegration
 import os
+import subprocess
+
+from tests.structs.default.test_integration import TestIntegration
+from gitviewfs_objects import get_gitviewfs_object, CommitParentsProvider
+from tests.structs.default import paths
+from tests.test_with_repository import TestBase
 
 
-class TestCommitParentsDir(unittest.TestCase):
+class TestCommitParentsDir(TestBase):
 
-	def setUp(self):
-		pass
-
-	def tearDown(self):
-		pass
+	def test_path(self):
+		commit_parents_dir = get_gitviewfs_object(paths.COMMIT_PARENTS_DIR)
+		
+		self.assertIsDirectoryWithProvider(commit_parents_dir, CommitParentsProvider)
+		self.assertEqual(paths.COMMIT_PARENTS_DIR, commit_parents_dir.get_path())
 
 
 class TestCommitParentsDirIntegration(TestIntegration):
@@ -49,8 +51,3 @@ class TestCommitParentsDirIntegration(TestIntegration):
 		
 		num_digits = len(str(num_parents))
 		self.assertItemsEqual(['%0*d' % (num_digits, i + 1) for i in range(num_parents)], parents_items)
-
-
-if __name__ == "__main__":
-	#import sys;sys.argv = ['', 'Test.test_']
-	unittest.main()

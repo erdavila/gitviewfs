@@ -5,14 +5,7 @@ import stat
 
 
 class TestRegularFile(unittest.TestCase):
-
-	def setUp(self):
-		pass
-
-	def tearDown(self):
-		pass
 	
-
 	def test_get_stat(self):
 		CONTENT_SIZE = 1234
 		class MockRegularFile(RegularFile):
@@ -40,8 +33,3 @@ class TestRegularFile(unittest.TestCase):
 		content_size = reg_file._get_content_size()
 		
 		self.assertEqual(content_size, len(CONTENT))
-
-
-if __name__ == "__main__":
-	#import sys;sys.argv = ['', 'Test.testName']
-	unittest.main()

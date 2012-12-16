@@ -3,7 +3,7 @@ import os.path
 import re
 
 from git_objects_parser import GitCommitParser, GitTreeParser
-from tests.test_integration import TestWithRepository
+from tests.test_with_repository import TestWithRepository
 
 
 class TestGitCommitParser(unittest.TestCase):
@@ -123,8 +123,3 @@ class TestGitTreeParser(TestWithRepository):
 	
 	def assertIsSha1(self, value):
 		self.assertTrue(re.match(r'^[0-9a-f]{40}$', value), '%r is not SHA-1' % value)
-
-
-if __name__ == "__main__":
-	#import sys;sys.argv = ['', 'Test.testName']
-	unittest.main()

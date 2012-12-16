@@ -29,8 +29,3 @@ class TestGitViewFSObject(unittest.TestCase):
 		value = obj.get_context_value(NAME)
 		
 		self.assertEqual(value, VALUE)
-
-
-if __name__ == "__main__":
-	#import sys;sys.argv = ['', 'Test.testName']
-	unittest.main()

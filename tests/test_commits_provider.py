@@ -20,8 +20,3 @@ class TestCommitsProvider(unittest.TestCase):
 		items = provider.get_items_names()
 		
 		self.assertItemsEqual([], items)
-
-
-if __name__ == "__main__":
-	#import sys;sys.argv = ['', 'Test.testName']
-	unittest.main()

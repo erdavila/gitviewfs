@@ -2,13 +2,7 @@ import unittest
 from gitviewfs_objects import template
 
 
-class Test(unittest.TestCase):
-	
-	def setUp(self):
-		pass
-	
-	def tearDown(self):
-		pass
+class TestTemplate(unittest.TestCase):
 	
 	def test_create_instance(self):
 		class Class(object): pass
@@ -72,8 +66,3 @@ class Test(unittest.TestCase):
 			'status' : STATUS,
 		}
 		self.assertDictEqual(instance.kwargs, expected_kwargs)
-
-
-if __name__ == "__main__":
-	#import sys;sys.argv = ['', 'Test.testName']
-	unittest.main()

@@ -1,9 +1,20 @@
-import unittest
 import subprocess
+import unittest
 
-from tests.test_integration import TestWithRepository
 from gitviewfs_objects import TreeDirItemsProvider, Directory, TreeContextNames,\
 	TreeDirItem
+from tests.test_with_repository import TestWithRepository
+	
+
+class TestTreeDirItemsProvider(unittest.TestCase):
+	
+	def test_get_item(self):
+		SHA1 = 'a1b2c3d4'
+		provider = TreeDirItemsProvider()
+		
+		item = provider._get_item(SHA1)
+		
+		self.assertIsInstance(item, TreeDirItem)
 
 
 class TestTreeDirItemsProviderWithRepository(TestWithRepository):
@@ -21,20 +32,3 @@ class TestTreeDirItemsProviderWithRepository(TestWithRepository):
 		items_names = provider.get_items_names()
 		
 		self.assertItemsEqual([FILE_NAME, SUBDIR_NAME], items_names)
-	
-
-class TestTreeDirItemsProvider(unittest.TestCase):
-	
-	def test_get_item(self):
-		SHA1 = 'a1b2c3d4'
-		provider = TreeDirItemsProvider()
-		
-		item = provider._get_item(SHA1)
-		
-		self.assertIsInstance(item, TreeDirItem)
-		
-
-
-if __name__ == "__main__":
-	#import sys;sys.argv = ['', 'Test.testName']
-	unittest.main()

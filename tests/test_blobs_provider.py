@@ -19,8 +19,3 @@ class TestBlobsProvider(unittest.TestCase):
 		
 		self.assertIsInstance(item, BlobFile)
 		self.assertEqual(NAME, item.name)
-
-
-if __name__ == "__main__":
-	#import sys;sys.argv = ['', 'Test.testName']
-	unittest.main()

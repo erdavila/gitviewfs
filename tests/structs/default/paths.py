@@ -1,8 +1,8 @@
 import re
-SAMPLE_HASH = 'a1b2c3d4'
-SAMPLE_FILENAME = 'filename'
-SAMPLE_BRANCH = 'a-branch'
-SAMPLE_PARENT = '1'
+
+from tests.structs.sample_values import SAMPLE_BRANCH, SAMPLE_HASH,\
+	SAMPLE_PARENT, SAMPLE_FILENAME
+
 
 ROOT_DIR                    = '/'
 REFS_DIR                    = '/refs'

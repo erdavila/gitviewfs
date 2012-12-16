@@ -1,7 +1,7 @@
 import unittest
 import subprocess
 
-from tests.test_integration import TestWithRepository
+from tests.test_with_repository import TestWithRepository
 from gitviewfs_objects import BranchesProvider, SymLink
 
 
@@ -32,8 +32,3 @@ class TestBranchesProviderWithRepository(TestWithRepository):
 		items = provider.get_items_names()
 		
 		self.assertItemsEqual(['master', CREATED_BRANCH], items)
-
-
-if __name__ == "__main__":
-	#import sys;sys.argv = ['', 'Test.testName']
-	unittest.main()

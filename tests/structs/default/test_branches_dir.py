@@ -1,25 +1,22 @@
-import unittest
-import os.path
+import os
 import subprocess
 
-from tests.test_integration import TestIntegration
+from gitviewfs_objects import get_gitviewfs_object, BranchesProvider
+from tests.structs.default import paths
+from tests.structs.default.test_integration import TestIntegration
+from tests.test_with_repository import TestBase
 
 
-class TestBranchesDir(unittest.TestCase):
-
-	def setUp(self):
-		pass
-
-	def tearDown(self):
-		pass
-
+class TestBranchesDir(TestBase):
+	
+	def test_path(self):
+		branches_dir = get_gitviewfs_object(paths.BRANCHES_DIR)
+		
+		self.assertIsDirectoryWithProvider(branches_dir, BranchesProvider)
+		self.assertEqual(paths.BRANCHES_DIR, branches_dir.get_path())
+	
 
 class TestBranchesDirIntegration(TestIntegration):
-
-	def test_is_directory(self):
-		branches_dir_path = self.make_branches_dir_path()
-		
-		self.assertTrue(os.path.isdir(branches_dir_path))
 	
 	def test_list(self):
 		self.create_and_commit_file('some content')
@@ -33,8 +30,3 @@ class TestBranchesDirIntegration(TestIntegration):
 		branches = os.listdir(branches_dir_path)
 		
 		self.assertItemsEqual(['master', CREATED_BRANCH], branches)
-
-
-if __name__ == "__main__":
-	#import sys;sys.argv = ['', 'Test.testName']
-	unittest.main()

@@ -1,7 +1,7 @@
 import subprocess
 import unittest
 
-from tests.test_integration import TestWithRepository
+from tests.test_with_repository import TestWithRepository
 from gitviewfs_objects import Directory, CommitContextNames,\
 	CommitParentsProvider, CommitParentSymLink
 
@@ -86,8 +86,3 @@ class TestCommitParentsProviderWithRepository(TestWithRepository):
 		subprocess.check_call(['git', 'merge'] + branches)
 		
 		return branches
-
-
-if __name__ == "__main__":
-	#import sys;sys.argv = ['', 'Test.test_']
-	unittest.main()

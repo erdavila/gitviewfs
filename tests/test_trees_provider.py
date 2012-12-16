@@ -20,8 +20,3 @@ class TestTreesProvider(unittest.TestCase):
 		
 		self.assertIsInstance(item, Directory)
 		self.assertEqual(ITEM_NAME, item.name)
-
-
-if __name__ == "__main__":
-	#import sys;sys.argv = ['', 'Test.testName']
-	unittest.main()

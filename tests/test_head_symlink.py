@@ -1,23 +1,11 @@
-import unittest
-import os
-
-from tests.test_integration import TestIntegration
+from gitviewfs_objects import HeadSymLink, BranchSymLink
+from tests.test_with_repository import TestWithRepository
 
 
-class TestHeadSymLinkIntegration(TestIntegration):
-	
-	def test_is_symlink(self):
-		head_symlink_path = self.make_head_symlink_path()
-		self.assertTrue(os.path.islink(head_symlink_path))
-	
-	def test_link(self):
+class TestHeadSymLink(TestWithRepository):
+
+	def test_target(self):
 		self.create_and_commit_file()
-		expected_absolute_path = self.make_branch_symlink_path('master')
-		symlink_path = self.make_head_symlink_path()
-		
-		self.assertSymLink(expected_absolute_path, symlink_path)
-
-
-if __name__ == "__main__":
-	#import sys;sys.argv = ['', 'Test.testName']
-	unittest.main()
+		head_sym_link = HeadSymLink(name=None)
+		target_object = head_sym_link.get_target_object()
+		self.assertIsInstance(target_object, BranchSymLink)

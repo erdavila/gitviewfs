@@ -29,8 +29,3 @@ class TestSymlink(unittest.TestCase):
 		path = symlink.get_target_path()
 		
 		self.assertEqual(PATH, path)
-
-
-if __name__ == "__main__":
-	#import sys;sys.argv = ['', 'Test.testName']
-	unittest.main()

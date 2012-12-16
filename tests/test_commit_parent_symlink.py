@@ -1,34 +1,13 @@
-import unittest
-
-from tests.test_integration import TestIntegration
 import subprocess
 
-
-class TestCommitParentSymlink(unittest.TestCase):
-
-	def setUp(self):
-		pass
-
-	def tearDown(self):
-		pass
+from gitviewfs_objects import CommitParentSymLink, CommitContextNames, Directory
+from tests.test_with_repository import TestWithRepository
 
 
-class TestCommitParentSymlinkIntegration(TestIntegration):
-
-	def test_symlink(self):
-		self.create_and_commit_file(content='Version 1')
-		parent_commit_sha1 = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip()
-		
-		self.create_and_commit_file(content='Version 2')
-		commit_sha1 = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip()
-		
-		parent_commit_dir_path = self.make_commit_dir_path(parent_commit_sha1)
-		parent_commit_symlink_path = self.make_commit_parent_symlink_path(commit_sha1)
-		
-		self.assertSymLink(parent_commit_dir_path, parent_commit_symlink_path)
+class TestCommitParentSymLinkWithRepository(TestWithRepository):
 
 
-	def test_not_first_parent(self):
+	def test_get_target_object(self):
 		self.create_and_commit_file(content='Initial version')
 		initial_commit_sha1 = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip()
 		
@@ -45,19 +24,12 @@ class TestCommitParentSymlinkIntegration(TestIntegration):
 		
 		TESTED_PARENT_NUMBER = 7
 		TESTED_PARENT_INDEX = TESTED_PARENT_NUMBER - 1
-		
-		commit_sha1 = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip()
 		tested_parent_sha1 = subprocess.check_output(['git', 'rev-parse', branches[TESTED_PARENT_INDEX]]).strip()
 		
-		num_digits = len(str(NUM_PARENTS))
-		parent = '%0*d' % (num_digits, TESTED_PARENT_NUMBER)
+		commit_parent_symlink = CommitParentSymLink(name=None, parent_number=TESTED_PARENT_NUMBER)
+		Directory(name=None, items=[commit_parent_symlink], context_values={CommitContextNames.SHA1:'HEAD'})
 		
-		parent_commit_symlink_path = self.make_commit_parent_symlink_path(commit_sha1, parent)
-		parent_commit_dir_path = self.make_commit_dir_path(tested_parent_sha1)
+		target = commit_parent_symlink.get_target_object()
 		
-		self.assertSymLink(parent_commit_dir_path, parent_commit_symlink_path)
-
-
-if __name__ == "__main__":
-	#import sys;sys.argv = ['', 'Test.test_']
-	unittest.main()
+		self.assertIsInstance(target, Directory)
+		self.assertEqual(tested_parent_sha1, target.get_context_value(CommitContextNames.SHA1))

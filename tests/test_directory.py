@@ -141,8 +141,3 @@ class TestGetPathMethod(TestBase):
 		path = child.get_path()
 		
 		self.assertEqual(NON_ROOT_DIR_PATH + '/' + CHILD_NAME, path)
-
-
-if __name__ == "__main__":
-	#import sys;sys.argv = ['', 'Test.testName']
-	unittest.main()
