@@ -76,10 +76,16 @@ class MockDirStructure(object):
 	
 	Item = namedtuple('Item', 'item_name, dir_name')
 	
-	def __init__(self, commits_dir_items=[], branches_dir_items=[], trees_dir_items=[]):
+	def __init__(self,
+				commits_dir_items=[],
+				branches_dir_items=[],
+				trees_dir_items=[],
+				blobs_dir_items=[]
+			):
 		self.__branches_dir = self.Dir('branches_dir', branches_dir_items)
 		self.__commits_dir = self.Dir('commits_dir', commits_dir_items)
 		self.__trees_dir = self.Dir('trees_dir', trees_dir_items)
+		self.__blobs_dir = self.Dir('blobs_dir', blobs_dir_items)
 	
 	def get_branches_dir(self):
 		return self.__branches_dir
@@ -89,3 +95,6 @@ class MockDirStructure(object):
 	
 	def get_trees_dir(self):
 		return self.__trees_dir
+	
+	def get_blobs_dir(self):
+		return self.__blobs_dir

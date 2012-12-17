@@ -1,6 +1,6 @@
 from dir_structure import DirStructure
 from gitviewfs_objects import Directory, HeadSymLink, BranchesProvider,\
-	CommitsProvider, TreesProvider, BLOBS_DIR, DIR_STRUCTURE_CONTEXT_NAME
+	CommitsProvider, TreesProvider, BlobsProvider, DIR_STRUCTURE_CONTEXT_NAME
 
 
 class Default(DirStructure):
@@ -14,7 +14,7 @@ class Default(DirStructure):
 			Directory(name='objects', items=[
 				self.get_commits_dir(),
 				self.get_trees_dir(),
-				BLOBS_DIR,
+				self.get_blobs_dir(),
 			])
 		])
 	
@@ -26,3 +26,6 @@ class Default(DirStructure):
 	
 	def _get_trees_dir(self):
 		return Directory(name='trees', items=[TreesProvider()])
+	
+	def _get_blobs_dir(self):
+		return Directory(name='blobs', items=[BlobsProvider()])

@@ -39,13 +39,9 @@ def with_clear_file_type(stat_mode):
 
 
 def set_parent_dir(item, parent_dir):
-		'''
-	# WARNING: this block must be uncommented when all the definition is moved
-	# to the directory structure abstraction
 	if hasattr(item, 'parent_dir'):
 		assert item.parent_dir is parent_dir, '%r is not %r' % (item.parent_dir, parent_dir)
 	else:
-	'''
 		item.parent_dir = parent_dir
 
 
@@ -406,12 +402,14 @@ class TreeDirItem(SymLink):
 		items = parser.parse(tree_sha1)
 		item = items[self.name]
 		
+		dir_struct = self.get_context_value(DIR_STRUCTURE_CONTEXT_NAME)
+		
 		if item.type == 'blob':
-			target_object = BLOBS_DIR.get_item(item.sha1)
+			target_dir = dir_struct.get_blobs_dir()
 		elif item.type == 'tree':
-			dir_struct = self.get_context_value(DIR_STRUCTURE_CONTEXT_NAME)
-			trees_dir = dir_struct.get_trees_dir()
-			target_object = trees_dir.get_item(item.sha1)
+			target_dir = dir_struct.get_trees_dir()
+		
+		target_object = target_dir.get_item(item.sha1)
 		
 		return target_object
 
@@ -437,8 +435,6 @@ class BlobFile(RegularFile):
 		size = int(size_string)
 		return size
 
-
-BLOBS_DIR = Directory(name='blobs', items=[BlobsProvider()])
 
 COMMIT_DIR_TEMPLATE = template(Directory, items=[
 	template(CommitMessageFile, name='message'),
