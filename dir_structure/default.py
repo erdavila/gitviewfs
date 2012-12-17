@@ -2,8 +2,8 @@ from dir_structure import DirStructure
 from gitviewfs_objects import Directory, HeadSymLink, BranchesProvider,\
 	CommitsProvider, TreesProvider, BlobsProvider, CommitMessageFile,\
 	CommitPersonNameFile, CommitPersonEmailFile, CommitPersonDateFile,\
-	CommitTreeSymLink, CommitParentsProvider, template, DIR_STRUCTURE_CONTEXT_NAME,\
-	CommitContextNames, CommitPersonTypes
+	CommitTreeSymLink, CommitParentsProvider, TreeDirItemsProvider, template,\
+	DIR_STRUCTURE_CONTEXT_NAME, CommitContextNames, CommitPersonTypes
 
 
 class Default(DirStructure):
@@ -49,3 +49,6 @@ class Default(DirStructure):
 			template(CommitTreeSymLink, name='tree'),
 			template(Directory, name='parents', items=[template(CommitParentsProvider)])
 		])
+	
+	def _get_tree_dir_template(self):
+		return template(Directory, items=[template(TreeDirItemsProvider)])

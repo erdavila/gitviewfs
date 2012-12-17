@@ -3,7 +3,6 @@ import shutil
 import subprocess
 import tempfile
 import unittest
-from collections import namedtuple
 
 from gitviewfs_objects import Directory
 
@@ -81,6 +80,16 @@ class MockDirStructure(object):
 			else:
 				raise ValueError('No item named %r in %s' % (name, self.name))
 	
+	class DirTemplate(object):
+		def __init__(self, name):
+			self.name = name
+		def create_instance(self, name, **kwargs):
+			return MockDirStructure.Item(
+					name=name,
+					source=self.name,
+					kwargs=kwargs,
+			)
+	
 	def __init__(self,
 				commits_dir_items=[],
 				branches_dir_items=[],
@@ -91,6 +100,8 @@ class MockDirStructure(object):
 		self.__commits_dir = self.Dir('commits_dir', commits_dir_items)
 		self.__trees_dir = self.Dir('trees_dir', trees_dir_items)
 		self.__blobs_dir = self.Dir('blobs_dir', blobs_dir_items)
+		self.__commit_dir_template = self.DirTemplate('commit_dir_template')
+		self.__tree_dir_template = self.DirTemplate('tree_dir_template')
 	
 	def get_branches_dir(self):
 		return self.__branches_dir
@@ -105,11 +116,7 @@ class MockDirStructure(object):
 		return self.__blobs_dir
 	
 	def get_commit_dir_template(self):
-		class MockCommitDirTemplate(object):
-			def create_instance(self, name, **kwargs):
-				return MockDirStructure.Item(
-						name=name,
-						source='commit_dir_template',
-						kwargs=kwargs,
-				)
-		return MockCommitDirTemplate()
+		return self.__commit_dir_template
+	
+	def get_tree_dir_template(self):
+		return self.__tree_dir_template

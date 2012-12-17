@@ -374,8 +374,11 @@ class TreesProvider(DirItemsProvider):
 		return []
 	
 	def _get_item(self, name):
+		dir_struct = self.parent_dir.get_context_value(DIR_STRUCTURE_CONTEXT_NAME)
+		tree_dir_template = dir_struct.get_tree_dir_template()
+		
 		context_values = {TreeContextNames.SHA1:name}
-		return TREE_DIR_TEMPLATE.create_instance(name=name, context_values=context_values)
+		return tree_dir_template.create_instance(name=name, context_values=context_values)
 
 
 class TreeContextNames(object):
@@ -437,6 +440,3 @@ class BlobFile(RegularFile):
 		size_string = subprocess.check_output(['git', 'cat-file', '-s', self.name])
 		size = int(size_string)
 		return size
-
-
-TREE_DIR_TEMPLATE = template(Directory, items=[template(TreeDirItemsProvider)])

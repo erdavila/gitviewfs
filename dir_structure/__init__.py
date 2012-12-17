@@ -48,6 +48,10 @@ class DirStructure(object):
 	@abstractmethod
 	def _get_commit_dir_template(self): pass
 	
+	def  get_tree_dir_template(self): return self.__get_cached_attribute('tree_dir_template')
+	@abstractmethod
+	def _get_tree_dir_template(self): pass
+	
 	def __get_cached_attribute(self, attribute):
 		try:
 			value = getattr(self, attribute)
