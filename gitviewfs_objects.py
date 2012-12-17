@@ -36,9 +36,13 @@ def with_clear_file_type(stat_mode):
 
 
 def set_parent_dir(item, parent_dir):
+		'''
+	# WARNING: this block must be uncommented when all the definition is moved
+	# to the directory structure abstraction
 	if hasattr(item, 'parent_dir'):
 		assert item.parent_dir is parent_dir
 	else:
+	'''
 		item.parent_dir = parent_dir
 
 
@@ -422,17 +426,6 @@ BRANCHES_DIR = Directory(name='branches', items=[BranchesProvider()])
 COMMITS_DIR = Directory(name='commits', items=[CommitsProvider()])
 TREES_DIR = Directory(name='trees', items=[TreesProvider()])
 BLOBS_DIR = Directory(name='blobs', items=[BlobsProvider()])
-ROOT_DIR = Directory(name=None, items=[
-	Directory(name='refs', items=[
-		HeadSymLink(name='HEAD'),
-		BRANCHES_DIR,
-	]),
-	Directory(name='objects', items=[
-		COMMITS_DIR,
-		TREES_DIR,
-		BLOBS_DIR,
-	])
-])
 
 COMMIT_DIR_TEMPLATE = template(Directory, items=[
 	template(CommitMessageFile, name='message'),
