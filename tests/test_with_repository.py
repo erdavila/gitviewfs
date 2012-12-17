@@ -64,17 +64,22 @@ class TestWithRepository(TestBase):
 
 class MockDirStructure(object):
 	
+	class Item(object):
+		def __init__(self, name, source, **kwargs):
+			self.name = name
+			self.source = source
+			for name, value in kwargs.iteritems():
+				setattr(self, name, value)
+	
 	class Dir(object):
 		def __init__(self, name, items_names):
 			self.name = name
 			self.items_names = set(items_names)
 		def get_item(self, name):
 			if name in self.items_names:
-				return MockDirStructure.Item(item_name=name, dir_name=self.name)
+				return MockDirStructure.Item(name=name, source=self.name)
 			else:
 				raise ValueError('No item named %r in %s' % (name, self.name))
-	
-	Item = namedtuple('Item', 'item_name, dir_name')
 	
 	def __init__(self,
 				commits_dir_items=[],
@@ -98,3 +103,13 @@ class MockDirStructure(object):
 	
 	def get_blobs_dir(self):
 		return self.__blobs_dir
+	
+	def get_commit_dir_template(self):
+		class MockCommitDirTemplate(object):
+			def create_instance(self, name, **kwargs):
+				return MockDirStructure.Item(
+						name=name,
+						source='commit_dir_template',
+						kwargs=kwargs,
+				)
+		return MockCommitDirTemplate()

@@ -4,6 +4,9 @@ from abc import abstractmethod, ABCMeta
 class DirStructure(object):
 	__metaclass__ = ABCMeta
 	
+	def __init__(self):
+		self.get_root_dir()
+	
 	def get_object(self, path):
 		assert path.startswith('/')
 		
@@ -40,6 +43,10 @@ class DirStructure(object):
 	def  get_blobs_dir(self): return self.__get_cached_attribute('blobs_dir')
 	@abstractmethod
 	def _get_blobs_dir(self): pass
+	
+	def  get_commit_dir_template(self): return self.__get_cached_attribute('commit_dir_template')
+	@abstractmethod
+	def _get_commit_dir_template(self): pass
 	
 	def __get_cached_attribute(self, attribute):
 		try:

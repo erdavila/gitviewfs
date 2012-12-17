@@ -41,5 +41,5 @@ class TestCommitParentSymLinkWithRepository(TestWithRepository):
 		target = commit_parent_symlink.get_target_object()
 		
 		self.assertIsInstance(target, MockDirStructure.Item)
-		self.assertEqual(tested_parent_sha1, target.item_name)
-		self.assertEqual('commits_dir', target.dir_name)
+		self.assertEqual(tested_parent_sha1, target.name)
+		self.assertEqual('commits_dir', target.source)

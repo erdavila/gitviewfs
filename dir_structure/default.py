@@ -1,6 +1,9 @@
 from dir_structure import DirStructure
 from gitviewfs_objects import Directory, HeadSymLink, BranchesProvider,\
-	CommitsProvider, TreesProvider, BlobsProvider, DIR_STRUCTURE_CONTEXT_NAME
+	CommitsProvider, TreesProvider, BlobsProvider, CommitMessageFile,\
+	CommitPersonNameFile, CommitPersonEmailFile, CommitPersonDateFile,\
+	CommitTreeSymLink, CommitParentsProvider, template, DIR_STRUCTURE_CONTEXT_NAME,\
+	CommitContextNames, CommitPersonTypes
 
 
 class Default(DirStructure):
@@ -29,3 +32,20 @@ class Default(DirStructure):
 	
 	def _get_blobs_dir(self):
 		return Directory(name='blobs', items=[BlobsProvider()])
+	
+	def _get_commit_dir_template(self):
+		return template(Directory, items=[
+			template(CommitMessageFile, name='message'),
+			template(Directory, name='author', context_values={CommitContextNames.PERSON_TYPE:CommitPersonTypes.AUTHOR}, items=[
+				template(CommitPersonNameFile , name='name' ),
+				template(CommitPersonEmailFile, name='email'),
+				template(CommitPersonDateFile , name='date' ),
+			]),
+			template(Directory, name='committer', context_values={CommitContextNames.PERSON_TYPE:CommitPersonTypes.COMMITTER}, items=[
+				template(CommitPersonNameFile , name='name' ),
+				template(CommitPersonEmailFile, name='email'),
+				template(CommitPersonDateFile , name='date' ),
+			]),
+			template(CommitTreeSymLink, name='tree'),
+			template(Directory, name='parents', items=[template(CommitParentsProvider)])
+		])

@@ -258,8 +258,11 @@ class CommitPersonTypes(object):
 class CommitsProvider(DirItemsProvider):
 	
 	def _get_item(self, name):
+		dir_struct = self.parent_dir.get_context_value(DIR_STRUCTURE_CONTEXT_NAME)
+		commit_dir_template = dir_struct.get_commit_dir_template()
+		
 		context_values = { CommitContextNames.SHA1 : name }
-		return COMMIT_DIR_TEMPLATE.create_instance(name=name, context_values=context_values)
+		return commit_dir_template.create_instance(name=name, context_values=context_values)
 	
 	def get_items_names(self):
 		return []
@@ -435,21 +438,5 @@ class BlobFile(RegularFile):
 		size = int(size_string)
 		return size
 
-
-COMMIT_DIR_TEMPLATE = template(Directory, items=[
-	template(CommitMessageFile, name='message'),
-	template(Directory, name='author', context_values={CommitContextNames.PERSON_TYPE:CommitPersonTypes.AUTHOR}, items=[
-		template(CommitPersonNameFile , name='name' ),
-		template(CommitPersonEmailFile, name='email'),
-		template(CommitPersonDateFile , name='date' ),
-	]),
-	template(Directory, name='committer', context_values={CommitContextNames.PERSON_TYPE:CommitPersonTypes.COMMITTER}, items=[
-		template(CommitPersonNameFile , name='name' ),
-		template(CommitPersonEmailFile, name='email'),
-		template(CommitPersonDateFile , name='date' ),
-	]),
-	template(CommitTreeSymLink, name='tree'),
-	template(Directory, name='parents', items=[template(CommitParentsProvider)])
-])
 
 TREE_DIR_TEMPLATE = template(Directory, items=[template(TreeDirItemsProvider)])

@@ -12,5 +12,5 @@ class TestHeadSymLink(TestWithRepository):
 		target_object = head_sym_link.get_target_object()
 		
 		self.assertIsInstance(target_object, MockDirStructure.Item)
-		self.assertEqual('master', target_object.item_name)
-		self.assertEqual('branches_dir', target_object.dir_name)
+		self.assertEqual('master', target_object.name)
+		self.assertEqual('branches_dir', target_object.source)

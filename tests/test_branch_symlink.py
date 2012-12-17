@@ -16,5 +16,5 @@ class TestBranchSymLink(TestWithRepository):
 		target = branch_symlink.get_target_object()
 		
 		self.assertIsInstance(target, MockDirStructure.Item)
-		self.assertEqual(commit_sha1, target.item_name)
-		self.assertEqual('commits_dir', target.dir_name)
+		self.assertEqual(commit_sha1, target.name)
+		self.assertEqual('commits_dir', target.source)
