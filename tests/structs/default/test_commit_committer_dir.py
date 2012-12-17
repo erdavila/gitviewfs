@@ -1,7 +1,8 @@
 import os
 import unittest
 
-from gitviewfs_objects import COMMITS_DIR, Directory
+from gitviewfs_objects import Directory
+import dir_structure.default
 from tests.structs.default import paths
 from tests.structs.default.utils import TestIntegration,\
 	DefaultDirStructPathTest
@@ -16,7 +17,9 @@ class CommitCommitterDirPathTest(DefaultDirStructPathTest):
 class TestCommitCommitterDir(unittest.TestCase):
 	
 	def test_get_items_names(self):
-		commit_dir = COMMITS_DIR.get_item('a1b2c3d4')
+		dir_struct = dir_structure.default.Default()
+		commits_dir = dir_struct.get_commits_dir()
+		commit_dir = commits_dir.get_item('a1b2c3d4')
 		commit_committer_dir = commit_dir.get_item('committer')
 		
 		items = commit_committer_dir.get_items_names()

@@ -1,5 +1,4 @@
 from gitviewfs_objects import HeadSymLink, DIR_STRUCTURE_CONTEXT_NAME
-from dir_structure import DirStructure
 from tests.test_with_repository import TestWithRepository
 
 
@@ -8,9 +7,8 @@ class TestHeadSymLink(TestWithRepository):
 	def test_target(self):
 		self.create_and_commit_file()
 		FAKE_TARGET = object()
-		class FakeDirStructure(DirStructure):
-			def _get_root_dir(self): pass
-			def _get_branches_dir(self):
+		class FakeDirStructure(object):
+			def get_branches_dir(self):
 				class FakeBranchesDir(object):
 					def get_item(self, name):
 						return FAKE_TARGET

@@ -29,6 +29,10 @@ class DirStructure(object):
 	@abstractmethod
 	def _get_branches_dir(self): pass
 	
+	def  get_commits_dir(self): return self.__get_cached_attribute('commits_dir')
+	@abstractmethod
+	def _get_commits_dir(self): pass
+	
 	def __get_cached_attribute(self, attribute):
 		try:
 			value = getattr(self, attribute)

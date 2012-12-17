@@ -237,7 +237,9 @@ class BranchSymLink(SymLink):
 	def get_target_object(self):
 		branch = self.name
 		commit_sha1 = subprocess.check_output(['git', 'rev-parse', branch]).strip()
-		commit_dir = COMMITS_DIR.get_item(commit_sha1)
+		dir_struct = self.get_context_value(DIR_STRUCTURE_CONTEXT_NAME)
+		commits_dir = dir_struct.get_commits_dir()
+		commit_dir = commits_dir.get_item(commit_sha1)
 		return commit_dir
 
 
@@ -356,7 +358,10 @@ class CommitParentSymLink(SymLink):
 		parent_index = self.parent_number - 1
 		parent_sha1 = commit.parents[parent_index]
 		
-		parent_commit_dir = COMMITS_DIR.get_item(parent_sha1)
+		dir_struct = self.get_context_value(DIR_STRUCTURE_CONTEXT_NAME)
+		commits_dir = dir_struct.get_commits_dir()
+		parent_commit_dir = commits_dir.get_item(parent_sha1)
+		
 		return parent_commit_dir
 
 
@@ -427,7 +432,6 @@ class BlobFile(RegularFile):
 		return size
 
 
-COMMITS_DIR = Directory(name='commits', items=[CommitsProvider()])
 TREES_DIR = Directory(name='trees', items=[TreesProvider()])
 BLOBS_DIR = Directory(name='blobs', items=[BlobsProvider()])
 
