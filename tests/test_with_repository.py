@@ -71,15 +71,21 @@ class MockDirStructure(object):
 		def get_item(self, name):
 			if name in self.items_names:
 				return MockDirStructure.Item(item_name=name, dir_name=self.name)
+			else:
+				raise ValueError('No item named %r in %s' % (name, self.name))
 	
 	Item = namedtuple('Item', 'item_name, dir_name')
 	
-	def __init__(self, commits_dir_items=[], branches_dir_items=[]):
+	def __init__(self, commits_dir_items=[], branches_dir_items=[], trees_dir_items=[]):
 		self.__branches_dir = self.Dir('branches_dir', branches_dir_items)
 		self.__commits_dir = self.Dir('commits_dir', commits_dir_items)
+		self.__trees_dir = self.Dir('trees_dir', trees_dir_items)
 	
 	def get_branches_dir(self):
 		return self.__branches_dir
 	
 	def get_commits_dir(self):
 		return self.__commits_dir
+	
+	def get_trees_dir(self):
+		return self.__trees_dir

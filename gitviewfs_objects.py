@@ -43,7 +43,7 @@ def set_parent_dir(item, parent_dir):
 	# WARNING: this block must be uncommented when all the definition is moved
 	# to the directory structure abstraction
 	if hasattr(item, 'parent_dir'):
-		assert item.parent_dir is parent_dir
+		assert item.parent_dir is parent_dir, '%r is not %r' % (item.parent_dir, parent_dir)
 	else:
 	'''
 		item.parent_dir = parent_dir
@@ -320,7 +320,11 @@ class CommitTreeSymLink(SymLink):
 	def get_target_object(self):
 		commit_sha1 = self.get_context_value(CommitContextNames.SHA1)
 		tree_sha1 = subprocess.check_output(['git', 'rev-parse', commit_sha1 + '^{tree}']).strip()
-		tree_dir = TREES_DIR.get_item(tree_sha1)
+		
+		dir_struct = self.get_context_value(DIR_STRUCTURE_CONTEXT_NAME)
+		trees_dir = dir_struct.get_trees_dir()
+		tree_dir = trees_dir.get_item(tree_sha1)
+		
 		return tree_dir
 
 
@@ -405,7 +409,9 @@ class TreeDirItem(SymLink):
 		if item.type == 'blob':
 			target_object = BLOBS_DIR.get_item(item.sha1)
 		elif item.type == 'tree':
-			target_object = TREES_DIR.get_item(item.sha1)
+			dir_struct = self.get_context_value(DIR_STRUCTURE_CONTEXT_NAME)
+			trees_dir = dir_struct.get_trees_dir()
+			target_object = trees_dir.get_item(item.sha1)
 		
 		return target_object
 
@@ -432,7 +438,6 @@ class BlobFile(RegularFile):
 		return size
 
 
-TREES_DIR = Directory(name='trees', items=[TreesProvider()])
 BLOBS_DIR = Directory(name='blobs', items=[BlobsProvider()])
 
 COMMIT_DIR_TEMPLATE = template(Directory, items=[

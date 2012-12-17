@@ -1,8 +1,9 @@
 import subprocess
 
-from tests.test_with_repository import TestWithRepository
+from tests.test_with_repository import TestWithRepository, MockDirStructure
 from gitviewfs_objects import Directory, TreeContextNames, TreeDirItem, BlobFile,\
-	TreeDirItemsProvider
+	TreeDirItemsProvider, DIR_STRUCTURE_CONTEXT_NAME
+from git_objects_parser import GitCommitParser, GitTreeParser
 
 
 class TestTreeDirItemWithRepository(TestWithRepository):
@@ -23,8 +24,15 @@ class TestTreeDirItemWithRepository(TestWithRepository):
 	
 	def test_subdir_as_tree(self):
 		item = TreeDirItem(name=self.subdirname)
-		Directory(name=None, items=[item], context_values=self.context_values)
+		
+		parser = GitTreeParser()
+		tree_items = parser.parse('HEAD^{tree}')
+		subdir_sha1 = tree_items[self.subdirname].sha1
+		
+		context_values = self.context_values.copy()
+		context_values[DIR_STRUCTURE_CONTEXT_NAME] = MockDirStructure(trees_dir_items=[subdir_sha1])
+		Directory(name=None, items=[item], context_values=context_values)
 		
 		target = item.get_target_object()
 		
-		self.assertIsDirectoryWithProvider(target, TreeDirItemsProvider)
+		self.assertIsInstance(target, MockDirStructure.Item)
