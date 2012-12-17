@@ -1,19 +1,16 @@
 import os
 import subprocess
 
-from gitviewfs_objects import get_gitviewfs_object, TreeDirItemsProvider
+from gitviewfs_objects import TreeDirItemsProvider
 from tests.structs.default import paths
-from tests.structs.default.test_integration import TestIntegration
-from tests.test_with_repository import TestBase
+from tests.structs.default.utils import TestIntegration,\
+	DefaultDirStructPathTest
 
 
-class TestTreeDir(TestBase):
+class TreeDirPathTest(DefaultDirStructPathTest):
 	
 	def test_path(self):
-		tree_dir = get_gitviewfs_object(paths.TREE_DIR)
-		
-		self.assertIsDirectoryWithProvider(tree_dir, TreeDirItemsProvider)
-		self.assertEqual(paths.TREE_DIR, tree_dir.get_path())
+		self.assertPathIsDirectoryWithProvider(paths.TREE_DIR, TreeDirItemsProvider)
 
 
 class TestTreeDirIntegration(TestIntegration):

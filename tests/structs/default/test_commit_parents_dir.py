@@ -1,19 +1,16 @@
 import os
 import subprocess
 
-from tests.structs.default.test_integration import TestIntegration
-from gitviewfs_objects import get_gitviewfs_object, CommitParentsProvider
+from gitviewfs_objects import CommitParentsProvider
 from tests.structs.default import paths
-from tests.test_with_repository import TestBase
+from tests.structs.default.utils import TestIntegration,\
+	DefaultDirStructPathTest
 
 
-class TestCommitParentsDir(TestBase):
+class CommitParentsDirPathTest(DefaultDirStructPathTest):
 
 	def test_path(self):
-		commit_parents_dir = get_gitviewfs_object(paths.COMMIT_PARENTS_DIR)
-		
-		self.assertIsDirectoryWithProvider(commit_parents_dir, CommitParentsProvider)
-		self.assertEqual(paths.COMMIT_PARENTS_DIR, commit_parents_dir.get_path())
+		self.assertPathIsDirectoryWithProvider(paths.COMMIT_PARENTS_DIR, CommitParentsProvider)
 
 
 class TestCommitParentsDirIntegration(TestIntegration):

@@ -1,3 +1,4 @@
+from abc import ABCMeta, abstractmethod
 import os.path
 import shutil
 import subprocess
@@ -5,7 +6,27 @@ import tempfile
 import time
 
 import gitviewfs
-from tests.test_with_repository import TestWithRepository
+from tests.test_with_repository import TestWithRepository, TestBase
+
+
+class DirStructPathTest(TestBase):
+	__metaclass__ = ABCMeta
+	
+	def assertPathIs(self, path, Class):
+		self._assertPath(path)
+		self.assertIsInstance(self.obj, Class)
+	
+	def assertPathIsDirectoryWithProvider(self, path, ProviderClass):
+		self._assertPath(path)
+		self.assertIsDirectoryWithProvider(self.obj, ProviderClass)
+	
+	def _assertPath(self, path):
+		dir_struct = self._get_dir_structure()
+		self.obj = dir_struct.get_object(path)
+		self.assertEqual(path, self.obj.get_path())
+	
+	@abstractmethod
+	def _get_dir_structure(self): pass
 
 
 class TestIntegrationBase(TestWithRepository):

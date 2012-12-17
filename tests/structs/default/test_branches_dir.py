@@ -1,19 +1,16 @@
 import os
 import subprocess
 
-from gitviewfs_objects import get_gitviewfs_object, BranchesProvider
+from gitviewfs_objects import BranchesProvider
 from tests.structs.default import paths
-from tests.structs.default.test_integration import TestIntegration
-from tests.test_with_repository import TestBase
+from tests.structs.default.utils import TestIntegration,\
+	DefaultDirStructPathTest
 
 
-class TestBranchesDir(TestBase):
+class TestBranchesDir(DefaultDirStructPathTest):
 	
 	def test_path(self):
-		branches_dir = get_gitviewfs_object(paths.BRANCHES_DIR)
-		
-		self.assertIsDirectoryWithProvider(branches_dir, BranchesProvider)
-		self.assertEqual(paths.BRANCHES_DIR, branches_dir.get_path())
+		self.assertPathIsDirectoryWithProvider(paths.BRANCHES_DIR, BranchesProvider)
 	
 
 class TestBranchesDirIntegration(TestIntegration):

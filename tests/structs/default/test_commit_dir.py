@@ -2,21 +2,22 @@ import os
 import subprocess
 import unittest
 
-from gitviewfs_objects import get_gitviewfs_object, Directory
+from gitviewfs_objects import Directory, COMMIT_DIR_TEMPLATE
 from tests.structs.default import paths
-from tests.structs.default.test_integration import TestIntegration
+from tests.structs.default.utils import TestIntegration,\
+	DefaultDirStructPathTest
+
+
+class CommitDirPathTest(DefaultDirStructPathTest):
+	
+	def test_path(self):
+		self.assertPathIs(paths.COMMIT_DIR, Directory)
 
 
 class TestCommitDir(unittest.TestCase):
 	
-	def test_path(self):
-		commit_dir = get_gitviewfs_object(paths.COMMIT_DIR)
-		
-		self.assertIsInstance(commit_dir, Directory)
-		self.assertEqual(paths.COMMIT_DIR, commit_dir.get_path())
-	
 	def test_get_items_names(self):
-		commit_dir = get_gitviewfs_object(paths.COMMIT_DIR)
+		commit_dir = COMMIT_DIR_TEMPLATE.create_instance(name='a1b2c3d4')
 		
 		items = commit_dir.get_items_names()
 		

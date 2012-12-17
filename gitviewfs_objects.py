@@ -35,24 +35,6 @@ def with_clear_file_type(stat_mode):
 	return stat_mode
 
 
-def get_gitviewfs_object(path):
-	assert path.startswith('/')
-	
-	if path == '/':
-		return ROOT_DIR
-	
-	path_parts = path.split('/')
-	assert path_parts[0] == ''
-	path_parts.pop(0)
-	
-	item = ROOT_DIR
-	while len(path_parts) > 0:
-		first_part = path_parts.pop(0)
-		item = item.get_item(first_part)
-	
-	return item
-
-
 def set_parent_dir(item, parent_dir):
 	if hasattr(item, 'parent_dir'):
 		assert item.parent_dir is parent_dir

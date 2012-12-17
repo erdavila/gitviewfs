@@ -1,18 +1,15 @@
 import subprocess
-import unittest
 
-from gitviewfs_objects import get_gitviewfs_object, BranchSymLink
+from gitviewfs_objects import BranchSymLink
 from tests.structs.default import paths
-from tests.structs.default.test_integration import TestIntegration
+from tests.structs.default.utils import TestIntegration, DefaultDirStructPathTest
 
 
-class TestBranchSymLink(unittest.TestCase):
+class TestBranchSymLink(DefaultDirStructPathTest):
 	
 	def test_path(self):
-		branch_symlink = get_gitviewfs_object(paths.BRANCH_SYMLINK)
-		
-		self.assertIsInstance(branch_symlink, BranchSymLink)
-		self.assertEqual(paths.BRANCH_SYMLINK, branch_symlink.get_path())
+		self.assertPathIs(paths.BRANCH_SYMLINK, BranchSymLink)
+
 
 class TestBranchSymLinkIntegration(TestIntegration):
 

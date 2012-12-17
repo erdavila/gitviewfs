@@ -1,18 +1,14 @@
 import subprocess
-import unittest
 
-from gitviewfs_objects import get_gitviewfs_object, BlobFile
+from gitviewfs_objects import BlobFile
 from tests.structs.default import paths
-from tests.structs.default.test_integration import TestIntegration
+from tests.structs.default.utils import TestIntegration, DefaultDirStructPathTest
 
 
-class TestBlobFile(unittest.TestCase):
+class TestBlobFile(DefaultDirStructPathTest):
 	
 	def test_path(self):
-		blob_file = get_gitviewfs_object(paths.BLOB_FILE)
-		
-		self.assertIsInstance(blob_file, BlobFile)
-		self.assertEqual(paths.BLOB_FILE, blob_file.get_path())
+		self.assertPathIs(paths.BLOB_FILE, BlobFile)
 
 
 class TestBlobFileIntegration(TestIntegration):

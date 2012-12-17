@@ -1,17 +1,13 @@
-import unittest
-
-from gitviewfs_objects import HeadSymLink, get_gitviewfs_object
+from gitviewfs_objects import HeadSymLink
 from tests.structs.default import paths
-from tests.structs.default.test_integration import TestIntegration
+from tests.structs.default.utils import TestIntegration,\
+	DefaultDirStructPathTest
 
 
-class TestHeadSymLink(unittest.TestCase):
+class HeadSymLinkPathTest(DefaultDirStructPathTest):
 	
 	def test_path(self):
-		head_symlink = get_gitviewfs_object(paths.HEAD_SYMLINK)
-		
-		self.assertIsInstance(head_symlink, HeadSymLink)
-		self.assertEqual(paths.HEAD_SYMLINK, head_symlink.get_path())
+		self.assertPathIs(paths.HEAD_SYMLINK, HeadSymLink)
 
 
 class TestHeadSymLinkIntegration(TestIntegration):

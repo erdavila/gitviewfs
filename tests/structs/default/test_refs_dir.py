@@ -1,18 +1,19 @@
 import os
 import unittest
 
-from gitviewfs_objects import get_gitviewfs_object, Directory, ROOT_DIR
+from gitviewfs_objects import Directory, ROOT_DIR
 from tests.structs.default import paths
-from tests.structs.default.test_integration import TestIntegration
+from tests.structs.default.utils import TestIntegration,\
+	DefaultDirStructPathTest
 
 
-class TestRefsDir(unittest.TestCase):
+class RefsDirPathTest(DefaultDirStructPathTest):
 	
 	def test_path(self):
-		refs_dir = get_gitviewfs_object(paths.REFS_DIR)
-		
-		self.assertIsInstance(refs_dir, Directory)
-		self.assertEqual(paths.REFS_DIR, refs_dir.get_path())
+		self.assertPathIs(paths.REFS_DIR, Directory)
+	
+
+class TestRefsDir(unittest.TestCase):
 
 	def test_get_items_names(self):
 		refs_dir = ROOT_DIR.get_item('refs')

@@ -1,18 +1,15 @@
 import subprocess
-import unittest
 
-from gitviewfs_objects import get_gitviewfs_object, CommitParentSymLink
+from gitviewfs_objects import CommitParentSymLink
 from tests.structs.default import paths
-from tests.structs.default.test_integration import TestIntegration
+from tests.structs.default.utils import TestIntegration,\
+	DefaultDirStructPathTest
 
 
-class TestCommitParentSymlink(unittest.TestCase):
+class CommitParentSymlinkPathTest(DefaultDirStructPathTest):
 
 	def test_path(self):
-		commit_parent_symlink = get_gitviewfs_object(paths.COMMIT_PARENT_SYMLINK)
-		
-		self.assertIsInstance(commit_parent_symlink, CommitParentSymLink)
-		self.assertEqual(paths.COMMIT_PARENT_SYMLINK, commit_parent_symlink.get_path())
+		self.assertPathIs(paths.COMMIT_PARENT_SYMLINK, CommitParentSymLink)
 
 
 class TestCommitParentSymlinkIntegration(TestIntegration):

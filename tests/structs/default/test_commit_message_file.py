@@ -1,18 +1,15 @@
 import subprocess
-import unittest
 
+from gitviewfs_objects import CommitMessageFile
 from tests.structs.default import paths
-from tests.structs.default.test_integration import TestIntegration
-from gitviewfs_objects import get_gitviewfs_object, CommitMessageFile
+from tests.structs.default.utils import TestIntegration,\
+	DefaultDirStructPathTest
 
 
-class TestCommitMessageFile(unittest.TestCase):
+class CommitMessageFilePathTest(DefaultDirStructPathTest):
 	
 	def test_path(self):
-		commit_message_file = get_gitviewfs_object(paths.COMMIT_MESSAGE_FILE)
-		
-		self.assertIsInstance(commit_message_file, CommitMessageFile)
-		self.assertEqual(paths.COMMIT_MESSAGE_FILE, commit_message_file.get_path())
+		self.assertPathIs(paths.COMMIT_MESSAGE_FILE, CommitMessageFile)
 
 
 class TestCommitMessageFileIntegration(TestIntegration):

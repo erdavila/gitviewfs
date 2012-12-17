@@ -3,8 +3,10 @@ from __future__ import print_function
 import os, sys
 import fuse
 from fuse import Fuse
-from gitviewfs_objects import get_gitviewfs_object
+import dir_structure.default
+'''
 import errno
+'''
 
 
 if not hasattr(fuse, '__version__'):
@@ -38,18 +40,18 @@ class GitViewFS(Fuse):
 #			print "mythread: ticking"
 
 	def getattr(self, path):
-		obj = get_gitviewfs_object(path)
+		obj = self.dir_struct.get_object(path)
 		return obj.get_stat()
 	
 	def readlink(self, path):
-		symlink = get_gitviewfs_object(path)
+		symlink = self.dir_struct.get_object(path)
 		target_path = symlink.get_target_path()
 		parent_path, _ = os.path.split(path)
 		relative_target_path = os.path.relpath(target_path, parent_path)
 		return relative_target_path
 
 	def readdir(self, path, offset):
-		obj = get_gitviewfs_object(path)
+		obj = self.dir_struct.get_object(path)
 		for item_name in obj.get_items_names():
 			yield fuse.Direntry(item_name)
 
@@ -99,32 +101,40 @@ class GitViewFS(Fuse):
 		"""
 		return os.statvfs(".")
 
+	'''
 	def fsinit(self):
 		os.chdir(self.repo)
+	'''
 
-	class GitViewFSFile(object):
-
-		def __init__(self, path, flags, *mode):
-			self.file = get_gitviewfs_object(path)
-
-		def read(self, length, offset):
-			content = self.file.get_content()
-			return content[offset : offset+length]
-
-		def fgetattr(self):
-			return self.file.get_stat()
+	def get_file_class(self, _dir_struct):
+		
+		class GitViewFSFile(object):
+			
+			dir_struct = _dir_struct
+			
+			def __init__(self, path, flags, *mode):
+				self.file = self.dir_struct.get_object(path)
+	
+			def read(self, length, offset):
+				content = self.file.get_content()
+				return content[offset : offset+length]
+	
+			def fgetattr(self):
+				return self.file.get_stat()
+		
+		return GitViewFSFile
 
 	def main(self, *a, **kw):
-		self.file_class = self.GitViewFSFile
+		self.dir_struct = dir_structure.default.Default()
+		self.file_class = self.get_file_class(self.dir_struct)
 		return Fuse.main(self, *a, **kw)
 
 
 def main():
-
 	server = GitViewFS(version="%prog 0.1", dash_s_do='setsingle')
 
 	# Disable multithreading: if you want to use it, protect all method of
-	# XmlFile class with locks, in order to prevent race conditions
+	# GitViewFSFile class with locks, in order to prevent race conditions
 	server.multithreaded = False
 
 	server.parser.add_option(mountopt="repo", metavar="PATH", default='.',

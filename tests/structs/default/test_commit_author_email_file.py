@@ -1,20 +1,17 @@
 import subprocess
-import unittest
 
-from tests.structs.default import paths
-from tests.structs.default.test_integration import TestIntegration
 from gitviewfs_objects import CommitPersonEmailFile, CommitContextNames,\
-	get_gitviewfs_object, CommitPersonTypes
+	CommitPersonTypes
+from tests.structs.default import paths
+from tests.structs.default.utils import TestIntegration,\
+	DefaultDirStructPathTest
 
 
-class TestCommitAuthorEmailFile(unittest.TestCase):
+class CommitAuthorEmailFilePathTest(DefaultDirStructPathTest):
 	
 	def test_path(self):
-		commit_author_email_file = get_gitviewfs_object(paths.COMMIT_AUTHOR_EMAIL_FILE)
-		
-		self.assertIsInstance(commit_author_email_file, CommitPersonEmailFile)
-		self.assertEqual(CommitPersonTypes.AUTHOR, commit_author_email_file.get_context_value(CommitContextNames.PERSON_TYPE))
-		self.assertEqual(paths.COMMIT_AUTHOR_EMAIL_FILE, commit_author_email_file.get_path())
+		self.assertPathIs(paths.COMMIT_AUTHOR_EMAIL_FILE, CommitPersonEmailFile)
+		self.assertEqual(CommitPersonTypes.AUTHOR, self.obj.get_context_value(CommitContextNames.PERSON_TYPE))
 
 
 class TestCommitAuthorEmailFileIntegration(TestIntegration):

@@ -1,12 +1,9 @@
-from gitviewfs_objects import get_gitviewfs_object, BlobsProvider
+from gitviewfs_objects import BlobsProvider
 from tests.structs.default import paths
-from tests.test_with_repository import TestWithRepository
+from tests.structs.default.utils import DefaultDirStructPathTest
 
 
-class TestBlobsDirWithRepository(TestWithRepository):
+class BlobsDirPathTest(DefaultDirStructPathTest):
 	
 	def test_path(self):
-		blobs_dir = get_gitviewfs_object(paths.BLOBS_DIR)
-		
-		self.assertIsDirectoryWithProvider(blobs_dir, BlobsProvider)
-		self.assertEqual(paths.BLOBS_DIR, blobs_dir.get_path())
+		self.assertPathIsDirectoryWithProvider(paths.BLOBS_DIR, BlobsProvider)
