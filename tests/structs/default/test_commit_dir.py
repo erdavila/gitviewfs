@@ -4,8 +4,8 @@ import unittest
 
 from gitviewfs_objects import Directory, COMMIT_DIR_TEMPLATE
 from tests.structs.default import paths
-from tests.structs.default.utils import TestIntegration,\
-	DefaultDirStructPathTest
+from tests.structs.default.utils import DefaultDirStructPathTest,\
+	TestIntegration
 
 
 class CommitDirPathTest(DefaultDirStructPathTest):

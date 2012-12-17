@@ -4,8 +4,8 @@ import unittest
 from gitviewfs_objects import Directory
 import dir_structure.default
 from tests.structs.default import paths
-from tests.structs.default.utils import TestIntegration,\
-	DefaultDirStructPathTest
+from tests.structs.default.utils import DefaultDirStructPathTest,\
+	TestIntegration
 
 
 class RefsDirPathTest(DefaultDirStructPathTest):

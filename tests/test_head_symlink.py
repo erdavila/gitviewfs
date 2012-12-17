@@ -1,4 +1,5 @@
-from gitviewfs_objects import HeadSymLink, BranchSymLink
+from gitviewfs_objects import HeadSymLink, DIR_STRUCTURE_CONTEXT_NAME
+from dir_structure import DirStructure
 from tests.test_with_repository import TestWithRepository
 
 
@@ -6,6 +7,17 @@ class TestHeadSymLink(TestWithRepository):
 
 	def test_target(self):
 		self.create_and_commit_file()
-		head_sym_link = HeadSymLink(name=None)
+		FAKE_TARGET = object()
+		class FakeDirStructure(DirStructure):
+			def _get_root_dir(self): pass
+			def _get_branches_dir(self):
+				class FakeBranchesDir(object):
+					def get_item(self, name):
+						return FAKE_TARGET
+				return FakeBranchesDir()
+		dir_struct = FakeDirStructure()
+		head_sym_link = HeadSymLink(name=None, context_values={DIR_STRUCTURE_CONTEXT_NAME:dir_struct})
+		
 		target_object = head_sym_link.get_target_object()
-		self.assertIsInstance(target_object, BranchSymLink)
+		
+		self.assertIs(FAKE_TARGET, target_object)

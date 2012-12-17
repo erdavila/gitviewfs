@@ -7,6 +7,9 @@ from abc import abstractmethod, ABCMeta
 from git_objects_parser import GitCommitParser, GitTreeParser
 
 
+DIR_STRUCTURE_CONTEXT_NAME = 'dir-structure'
+
+
 def without_write_permissions(stat_mode):
 	stat_mode &= ~(stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH)
 	return stat_mode
@@ -212,7 +215,9 @@ class HeadSymLink(SymLink):
 	
 	def get_target_object(self):
 		branch = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).strip()
-		branch_symlink = BRANCHES_DIR.get_item(branch)
+		dir_struct = self.get_context_value(DIR_STRUCTURE_CONTEXT_NAME)
+		branches_dir = dir_struct.get_branches_dir()
+		branch_symlink = branches_dir.get_item(branch)
 		return branch_symlink
 
 
@@ -422,7 +427,6 @@ class BlobFile(RegularFile):
 		return size
 
 
-BRANCHES_DIR = Directory(name='branches', items=[BranchesProvider()])
 COMMITS_DIR = Directory(name='commits', items=[CommitsProvider()])
 TREES_DIR = Directory(name='trees', items=[TreesProvider()])
 BLOBS_DIR = Directory(name='blobs', items=[BlobsProvider()])
