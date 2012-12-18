@@ -2,7 +2,7 @@ import subprocess
 
 from gitviewfs_objects import CommitParentSymLink, CommitContextNames, Directory,\
 	DIR_STRUCTURE_CONTEXT_NAME
-from tests.test_with_repository import TestWithRepository
+from tests.test_with_repository import TestWithRepository, MockDirStructure
 
 
 class TestCommitParentSymLinkWithRepository(TestWithRepository):
@@ -27,26 +27,19 @@ class TestCommitParentSymLinkWithRepository(TestWithRepository):
 		TESTED_PARENT_INDEX = TESTED_PARENT_NUMBER - 1
 		tested_parent_sha1 = subprocess.check_output(['git', 'rev-parse', branches[TESTED_PARENT_INDEX]]).strip()
 		
-		test = self
-		FAKE_TARGET = object()
-		class FakeDirStruct(object):
-			def get_commits_dir(self):
-				class FakeCommitsDir(object):
-					def get_item(self, name):
-						test.assertEqual(tested_parent_sha1, name)
-						return FAKE_TARGET
-				return FakeCommitsDir()
-		fake_dir_struct = FakeDirStruct()
+		dir_struct = MockDirStructure(commits_dir_items=[tested_parent_sha1])
 		
 		commit_parent_symlink = CommitParentSymLink(name=None, parent_number=TESTED_PARENT_NUMBER)
 		Directory(name=None,
 				items=[commit_parent_symlink],
 				context_values={
 					CommitContextNames.SHA1 : 'HEAD',
-					DIR_STRUCTURE_CONTEXT_NAME : fake_dir_struct,
+					DIR_STRUCTURE_CONTEXT_NAME : dir_struct,
 				}
 		)
 		
 		target = commit_parent_symlink.get_target_object()
 		
-		self.assertIs(FAKE_TARGET, target)
+		self.assertIsInstance(target, MockDirStructure.Item)
+		self.assertEqual(tested_parent_sha1, target.item_name)
+		self.assertEqual('commits_dir', target.dir_name)

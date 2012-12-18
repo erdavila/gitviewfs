@@ -3,6 +3,7 @@ import shutil
 import subprocess
 import tempfile
 import unittest
+from collections import namedtuple
 
 from gitviewfs_objects import Directory
 
@@ -59,3 +60,26 @@ class TestWithRepository(TestBase):
 		subprocess.check_call(['git', 'commit', '-m', 'Add file'])
 		
 		return filename, subdirname
+
+
+class MockDirStructure(object):
+	
+	class Dir(object):
+		def __init__(self, name, items_names):
+			self.name = name
+			self.items_names = set(items_names)
+		def get_item(self, name):
+			if name in self.items_names:
+				return MockDirStructure.Item(item_name=name, dir_name=self.name)
+	
+	Item = namedtuple('Item', 'item_name, dir_name')
+	
+	def __init__(self, commits_dir_items=[], branches_dir_items=[]):
+		self.__branches_dir = self.Dir('branches_dir', branches_dir_items)
+		self.__commits_dir = self.Dir('commits_dir', commits_dir_items)
+	
+	def get_branches_dir(self):
+		return self.__branches_dir
+	
+	def get_commits_dir(self):
+		return self.__commits_dir
