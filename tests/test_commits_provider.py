@@ -2,10 +2,10 @@ import unittest
 
 from gitviewfs_objects import CommitsProvider, Directory,\
 	DIR_STRUCTURE_CONTEXT_NAME
-from tests.test_with_repository import MockDirStructure
+from tests.utils import MockDirStructure
 
 
-class TestCommitsProvider(unittest.TestCase):
+class CommitsProviderTest(unittest.TestCase):
 	
 	def test_get_item(self):
 		provider = CommitsProvider()

@@ -1,15 +1,15 @@
 import subprocess
 
-from tests.test_with_repository import TestWithRepository, MockDirStructure
+from tests.utils import BaseTestWithRepository, MockDirStructure
 from gitviewfs_objects import Directory, TreeContextNames, TreeDirItem,\
 	DIR_STRUCTURE_CONTEXT_NAME
 from git_objects_parser import GitTreeParser
 
 
-class TestTreeDirItemWithRepository(TestWithRepository):
+class TreeDirItemWithRepositoryTest(BaseTestWithRepository):
 
 	def setUp(self):
-		super(TestTreeDirItemWithRepository, self).setUp()
+		super(TreeDirItemWithRepositoryTest, self).setUp()
 		self.filename, self.subdirname = self.create_and_commit_file_and_subdir()
 		tree_sha1 = subprocess.check_output(['git', 'rev-parse', 'HEAD^{tree}']).strip()
 		self.context_values = {TreeContextNames.SHA1:tree_sha1}

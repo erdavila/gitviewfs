@@ -2,16 +2,17 @@ import subprocess
 
 from gitviewfs_objects import BranchSymLink
 from tests.structs.default import paths
-from tests.structs.default.utils import TestIntegration, DefaultDirStructPathTest
+from tests.structs.default.utils import BaseDefaultDirStructTest,\
+	BaseDefaultDirStructIntegrationTest
 
 
-class TestBranchSymLink(DefaultDirStructPathTest):
+class BranchSymLinkTest(BaseDefaultDirStructTest):
 	
 	def test_path(self):
 		self.assertPathIs(paths.BRANCH_SYMLINK, BranchSymLink)
 
 
-class TestBranchSymLinkIntegration(TestIntegration):
+class BranchSymLinkIntegrationTest(BaseDefaultDirStructIntegrationTest):
 
 	def test_target(self):
 		BRANCH = 'master'

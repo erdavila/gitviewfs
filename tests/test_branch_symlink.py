@@ -1,10 +1,10 @@
 import subprocess
 
 from gitviewfs_objects import BranchSymLink, DIR_STRUCTURE_CONTEXT_NAME
-from tests.test_with_repository import TestWithRepository, MockDirStructure
+from tests.utils import BaseTestWithRepository, MockDirStructure
 
 
-class TestBranchSymLink(TestWithRepository):
+class BranchSymLinkTest(BaseTestWithRepository):
 
 	def test_target(self):
 		BRANCH = 'master'

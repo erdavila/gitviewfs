@@ -1,10 +1,10 @@
 from gitviewfs_objects import CommitContextNames, CommitPersonTypes,\
 	CommitPersonEmailFile
-from tests.test_with_repository import TestWithRepository
+from tests.utils import BaseTestWithRepository
 import subprocess
 
 
-class TestCommitPersonEmailFileWithRepository(TestWithRepository):
+class CommitPersonEmailFileWithRepositoryTest(BaseTestWithRepository):
 
 	def test_get_content_author(self):
 		AUTHOR_NAME = 'Author Name'

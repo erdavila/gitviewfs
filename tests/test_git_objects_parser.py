@@ -3,10 +3,10 @@ import os.path
 import re
 
 from git_objects_parser import GitCommitParser, GitTreeParser
-from tests.test_with_repository import TestWithRepository
+from tests.utils import BaseTestWithRepository
 
 
-class TestGitCommitParser(unittest.TestCase):
+class GitCommitParserTest(unittest.TestCase):
 	
 	PARENT_1_SHA1 = 'abcdefabcdefabcdefabcdefabcdefabcdefabcd'
 	PARENT_2_SHA1 = 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2'
@@ -93,7 +93,7 @@ class TestGitCommitParser(unittest.TestCase):
 		return ''.join(line + '\n' for line in lines)
 
 
-class TestGitTreeParser(TestWithRepository):
+class GitTreeParserTest(BaseTestWithRepository):
 	
 	def test_parse(self):
 		FILENAME = 'file.txt'

@@ -1,8 +1,8 @@
 from gitviewfs_objects import HeadSymLink, DIR_STRUCTURE_CONTEXT_NAME
-from tests.test_with_repository import TestWithRepository, MockDirStructure
+from tests.utils import BaseTestWithRepository, MockDirStructure
 
 
-class TestHeadSymLink(TestWithRepository):
+class HeadSymLinkTest(BaseTestWithRepository):
 
 	def test_target(self):
 		self.create_and_commit_file()

@@ -2,7 +2,7 @@ import unittest
 from gitviewfs_objects import BlobsProvider, BlobFile
 
 
-class TestBlobsProvider(unittest.TestCase):
+class BlobsProviderTest(unittest.TestCase):
 
 	def test_get_items_names(self):
 		provider = BlobsProvider()

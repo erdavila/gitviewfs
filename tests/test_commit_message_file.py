@@ -1,10 +1,10 @@
 import subprocess
 
-from tests.test_with_repository import TestWithRepository
+from tests.utils import BaseTestWithRepository
 from gitviewfs_objects import CommitMessageFile, CommitContextNames, Directory
 
 
-class TestCommitMessageFileWithRepository(TestWithRepository):
+class CommitMessageFileWithRepositoryTest(BaseTestWithRepository):
 	
 	def test_content(self):
 		MESSAGE = 'This is a commit message'

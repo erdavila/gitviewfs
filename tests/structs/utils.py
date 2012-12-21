@@ -6,30 +6,31 @@ import tempfile
 import time
 
 import gitviewfs
-from tests.test_with_repository import TestWithRepository, TestBase
+from tests.utils import BaseTestWithRepository, BaseTest
 
 
-class DirStructPathTest(TestBase):
+class BaseDirStructTest(BaseTest):
 	__metaclass__ = ABCMeta
 	
+	@abstractmethod
+	def _get_dir_structure(self):
+		raise NotImplemented()
+	
 	def assertPathIs(self, path, Class):
-		self._assertPath(path)
+		self.__assertPath(path)
 		self.assertIsInstance(self.obj, Class)
 	
 	def assertPathIsDirectoryWithProvider(self, path, ProviderClass):
-		self._assertPath(path)
+		self.__assertPath(path)
 		self.assertIsDirectoryWithProvider(self.obj, ProviderClass)
 	
-	def _assertPath(self, path):
+	def __assertPath(self, path):
 		dir_struct = self._get_dir_structure()
 		self.obj = dir_struct.get_object(path)
 		self.assertEqual(path, self.obj.get_path())
-	
-	@abstractmethod
-	def _get_dir_structure(self): pass
 
 
-class TestIntegrationBase(TestWithRepository):
+class BaseIntegrationTest(BaseTestWithRepository):
 
 	def __gitviewfs_cmd_path(self):
 		main_file_path = gitviewfs.__file__
@@ -42,7 +43,7 @@ class TestIntegrationBase(TestWithRepository):
 		return path
 
 	def setUp(self):
-		TestWithRepository.setUp(self)
+		BaseTestWithRepository.setUp(self)
 		
 		self.mountpoint = tempfile.mkdtemp(prefix='gitviewfs-mountpoint-', suffix='.tmp')
 		subprocess.Popen([
@@ -67,7 +68,7 @@ class TestIntegrationBase(TestWithRepository):
 		subprocess.check_call(['fusermount', '-u', self.mountpoint])
 		shutil.rmtree(self.mountpoint)
 		
-		TestWithRepository.tearDown(self)
+		BaseTestWithRepository.tearDown(self)
 	
 	def assertSymLink(self, expected_absolute_path, symlink_path):
 		target_path = os.readlink(symlink_path)

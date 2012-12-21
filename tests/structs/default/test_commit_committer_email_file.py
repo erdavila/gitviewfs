@@ -3,18 +3,18 @@ import subprocess
 from gitviewfs_objects import CommitPersonEmailFile, CommitContextNames,\
 	CommitPersonTypes
 from tests.structs.default import paths
-from tests.structs.default.utils import TestIntegration,\
-	DefaultDirStructPathTest
+from tests.structs.default.utils import BaseDefaultDirStructTest,\
+	BaseDefaultDirStructIntegrationTest
 
 
-class CommitCommitterEmailFilePathTest(DefaultDirStructPathTest):
+class CommitCommitterEmailFilePathTest(BaseDefaultDirStructTest):
 	
 	def test_path(self):
 		self.assertPathIs(paths.COMMIT_COMMITTER_EMAIL_FILE, CommitPersonEmailFile)
 		self.assertEqual(CommitPersonTypes.COMMITTER, self.obj.get_context_value(CommitContextNames.PERSON_TYPE))
 
 
-class TestCommitCommitterEmailFileIntegration(TestIntegration):
+class CommitCommitterEmailFileIntegrationTest(BaseDefaultDirStructIntegrationTest):
 	
 	def test_content(self):
 		COMMITTER_EMAIL = 'committer@yes.net'

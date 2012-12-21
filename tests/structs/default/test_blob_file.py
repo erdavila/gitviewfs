@@ -2,16 +2,17 @@ import subprocess
 
 from gitviewfs_objects import BlobFile
 from tests.structs.default import paths
-from tests.structs.default.utils import TestIntegration, DefaultDirStructPathTest
+from tests.structs.default.utils import BaseDefaultDirStructTest,\
+	BaseDefaultDirStructIntegrationTest
 
 
-class TestBlobFile(DefaultDirStructPathTest):
+class BlobFileTest(BaseDefaultDirStructTest):
 	
 	def test_path(self):
 		self.assertPathIs(paths.BLOB_FILE, BlobFile)
 
 
-class TestBlobFileIntegration(TestIntegration):
+class BlobFileIntegrationTest(BaseDefaultDirStructIntegrationTest):
 	
 	def test_blob_content(self):
 		filename, content = self.create_and_commit_file()

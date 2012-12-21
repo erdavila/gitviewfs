@@ -4,7 +4,7 @@ from gitviewfs_objects import RegularFile
 import stat
 
 
-class TestRegularFile(unittest.TestCase):
+class RegularFileTest(unittest.TestCase):
 	
 	def test_get_stat(self):
 		CONTENT_SIZE = 1234

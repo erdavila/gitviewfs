@@ -3,7 +3,7 @@ import unittest
 from gitviewfs_objects import GitViewFSObject, Directory
 
 
-class TestGitViewFSObject(unittest.TestCase):
+class GitViewFSObjectTest(unittest.TestCase):
 
 	def test_context_values(self):
 		NAME1 = 'name1'

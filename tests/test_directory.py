@@ -3,7 +3,7 @@ import unittest
 from gitviewfs_objects import DirItemsProvider, Directory, GitViewFSObject
 
 
-class TestBase(unittest.TestCase):
+class BaseTest(unittest.TestCase):
 	
 	class MockItem(GitViewFSObject):
 		def __init__(self, name):
@@ -33,7 +33,7 @@ class TestBase(unittest.TestCase):
 		self.directory = Directory(name='', items=[self.mock_item, self.subdir, mock_provider])
 
 
-class TestDirectoryListMethod(TestBase):
+class DirectoryListMethodTest(BaseTest):
 	
 	def test_providers_as_items(self):
 		ITEMS_NAMES_1 = ('item1', 'item2', 'item3')
@@ -72,7 +72,7 @@ class TestDirectoryListMethod(TestBase):
 		self.assertItemsEqual([self.SUBDIR_NAME, self.ITEM_NAME] + self.PROVIDER_ITEMS_NAMES, items)
 
 
-class TestDirectoryGetItemMethod(TestBase):
+class DirectoryGetItemMethodTest(BaseTest):
 	
 	def setUp(self):
 		self.create_directory_with_multiple_items()
@@ -91,7 +91,7 @@ class TestDirectoryGetItemMethod(TestBase):
 		self.assertIs(item, self.PROVIDER_ITEMS[INDEX])
 
 
-class TestParentDirIsSet(TestBase):
+class ParentDirIsSetTest(BaseTest):
 	
 	def setUp(self):
 		self.create_directory_with_multiple_items()
@@ -108,7 +108,7 @@ class TestParentDirIsSet(TestBase):
 			self.assertIs(self.directory, item.parent_dir)
 
 
-class TestGetPathMethod(TestBase):
+class GetPathMethodTest(BaseTest):
 	
 	def test_root(self):
 		ROOT_DIR = Directory(name='does not matter', items=[])

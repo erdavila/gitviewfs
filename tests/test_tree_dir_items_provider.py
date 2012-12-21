@@ -3,10 +3,10 @@ import unittest
 
 from gitviewfs_objects import TreeDirItemsProvider, Directory, TreeContextNames,\
 	TreeDirItem
-from tests.test_with_repository import TestWithRepository
+from tests.utils import BaseTestWithRepository
 	
 
-class TestTreeDirItemsProvider(unittest.TestCase):
+class TreeDirItemsProviderTest(unittest.TestCase):
 	
 	def test_get_item(self):
 		SHA1 = 'a1b2c3d4'
@@ -17,7 +17,7 @@ class TestTreeDirItemsProvider(unittest.TestCase):
 		self.assertIsInstance(item, TreeDirItem)
 
 
-class TestTreeDirItemsProviderWithRepository(TestWithRepository):
+class TreeDirItemsProviderWithRepositoryTest(BaseTestWithRepository):
 
 	def test_get_items_names(self):
 		FILE_NAME = 'filename.txt'

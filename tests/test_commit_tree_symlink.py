@@ -1,10 +1,10 @@
 from gitviewfs_objects import CommitTreeSymLink, CommitContextNames,\
 	DIR_STRUCTURE_CONTEXT_NAME
-from tests.test_with_repository import TestWithRepository, MockDirStructure
+from tests.utils import BaseTestWithRepository, MockDirStructure
 import subprocess
 
 
-class TestCommitTreeSymLinkWithRepository(TestWithRepository):
+class CommitTreeSymLinkWithRepositoryTest(BaseTestWithRepository):
 	
 	def test_get_target_object(self):
 		self.create_and_commit_file()

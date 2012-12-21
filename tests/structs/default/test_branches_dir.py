@@ -3,17 +3,17 @@ import subprocess
 
 from gitviewfs_objects import BranchesProvider
 from tests.structs.default import paths
-from tests.structs.default.utils import TestIntegration,\
-	DefaultDirStructPathTest
+from tests.structs.default.utils import BaseDefaultDirStructTest,\
+	BaseDefaultDirStructIntegrationTest
 
 
-class TestBranchesDir(DefaultDirStructPathTest):
+class BranchesDirTest(BaseDefaultDirStructTest):
 	
 	def test_path(self):
 		self.assertPathIsDirectoryWithProvider(paths.BRANCHES_DIR, BranchesProvider)
 	
 
-class TestBranchesDirIntegration(TestIntegration):
+class BranchesDirIntegrationTest(BaseDefaultDirStructIntegrationTest):
 	
 	def test_list(self):
 		self.create_and_commit_file('some content')

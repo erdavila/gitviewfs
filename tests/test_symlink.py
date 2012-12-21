@@ -4,7 +4,7 @@ import stat
 from gitviewfs_objects import SymLink
 
 
-class TestSymlink(unittest.TestCase):
+class SymlinkTest(unittest.TestCase):
 	
 	def test_is_symlink(self):
 		class MockSymLink(SymLink):

@@ -4,17 +4,17 @@ import unittest
 from gitviewfs_objects import Directory
 import dir_structure.default
 from tests.structs.default import paths
-from tests.structs.default.utils import DefaultDirStructPathTest,\
-	TestIntegration
+from tests.structs.default.utils import BaseDefaultDirStructTest,\
+	BaseDefaultDirStructIntegrationTest
 
 
-class RefsDirPathTest(DefaultDirStructPathTest):
+class RefsDirPathTest(BaseDefaultDirStructTest):
 	
 	def test_path(self):
 		self.assertPathIs(paths.REFS_DIR, Directory)
 	
 
-class TestRefsDir(unittest.TestCase):
+class RefsDirTest(unittest.TestCase):
 
 	def test_get_items_names(self):
 		dir_struct = dir_structure.default.Default()
@@ -25,7 +25,7 @@ class TestRefsDir(unittest.TestCase):
 		self.assertItemsEqual(['HEAD', 'branches'], items)
 
 
-class TestRefsDirIntegration(TestIntegration):
+class RefsDirIntegrationTest(BaseDefaultDirStructIntegrationTest):
 	
 	def test_list(self):
 		refs_dir_path = self.make_refs_dir_path()

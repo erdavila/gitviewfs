@@ -3,17 +3,17 @@ import subprocess
 
 from gitviewfs_objects import TreeDirItemsProvider
 from tests.structs.default import paths
-from tests.structs.default.utils import TestIntegration,\
-	DefaultDirStructPathTest
+from tests.structs.default.utils import BaseDefaultDirStructTest,\
+	BaseDefaultDirStructIntegrationTest
 
 
-class TreeDirPathTest(DefaultDirStructPathTest):
+class TreeDirPathTest(BaseDefaultDirStructTest):
 	
 	def test_path(self):
 		self.assertPathIsDirectoryWithProvider(paths.TREE_DIR, TreeDirItemsProvider)
 
 
-class TestTreeDirIntegration(TestIntegration):
+class TreeDirIntegrationTest(BaseDefaultDirStructIntegrationTest):
 	
 	def test_list(self):
 		filename, subdirname = self.create_and_commit_file_and_subdir()

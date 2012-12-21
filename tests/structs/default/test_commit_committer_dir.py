@@ -4,17 +4,17 @@ import unittest
 from gitviewfs_objects import Directory
 import dir_structure.default
 from tests.structs.default import paths
-from tests.structs.default.utils import TestIntegration,\
-	DefaultDirStructPathTest
+from tests.structs.default.utils import BaseDefaultDirStructTest,\
+	BaseDefaultDirStructIntegrationTest
 
 
-class CommitCommitterDirPathTest(DefaultDirStructPathTest):
+class CommitCommitterDirPathTest(BaseDefaultDirStructTest):
 
 	def test_path(self):
 		self.assertPathIs(paths.COMMIT_COMMITTER_DIR, Directory)
 
 
-class TestCommitCommitterDir(unittest.TestCase):
+class CommitCommitterDirTest(unittest.TestCase):
 	
 	def test_get_items_names(self):
 		dir_struct = dir_structure.default.Default()
@@ -27,7 +27,7 @@ class TestCommitCommitterDir(unittest.TestCase):
 		self.assertItemsEqual(['name', 'email', 'date'], items)
 
 
-class TestCommitCommitterDirIntegration(TestIntegration):
+class CommitCommitterDirIntegrationTest(BaseDefaultDirStructIntegrationTest):
 	
 	def test_list(self):
 		commit_sha1 = paths.SAMPLE_HASH

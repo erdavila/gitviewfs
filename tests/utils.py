@@ -7,14 +7,14 @@ import unittest
 from gitviewfs_objects import Directory
 
 
-class TestBase(unittest.TestCase):
+class BaseTest(unittest.TestCase):
 
 	def assertIsDirectoryWithProvider(self, obj, ProviderClass):
 		self.assertIsInstance(obj, Directory)
 		self.assertTrue(any(isinstance(target_item, ProviderClass) for target_item in obj.items))
 
 
-class TestWithRepository(TestBase):
+class BaseTestWithRepository(BaseTest):
 	
 	def setUp(self):
 		self.repo = tempfile.mkdtemp(prefix='gitviewfs-repo-', suffix='.tmp')

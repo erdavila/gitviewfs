@@ -2,17 +2,17 @@ import subprocess
 
 from gitviewfs_objects import CommitMessageFile
 from tests.structs.default import paths
-from tests.structs.default.utils import TestIntegration,\
-	DefaultDirStructPathTest
+from tests.structs.default.utils import BaseDefaultDirStructTest,\
+	BaseDefaultDirStructIntegrationTest
 
 
-class CommitMessageFilePathTest(DefaultDirStructPathTest):
+class CommitMessageFilePathTest(BaseDefaultDirStructTest):
 	
 	def test_path(self):
 		self.assertPathIs(paths.COMMIT_MESSAGE_FILE, CommitMessageFile)
 
 
-class TestCommitMessageFileIntegration(TestIntegration):
+class CommitMessageFileIntegrationTest(BaseDefaultDirStructIntegrationTest):
 	
 	def test_content(self):
 		self.message = '''

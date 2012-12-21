@@ -2,10 +2,10 @@ import subprocess
 
 from gitviewfs_objects import CommitParentSymLink, CommitContextNames, Directory,\
 	DIR_STRUCTURE_CONTEXT_NAME
-from tests.test_with_repository import TestWithRepository, MockDirStructure
+from tests.utils import BaseTestWithRepository, MockDirStructure
 
 
-class TestCommitParentSymLinkWithRepository(TestWithRepository):
+class CommitParentSymLinkWithRepositoryTest(BaseTestWithRepository):
 
 
 	def test_get_target_object(self):

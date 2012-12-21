@@ -1,10 +1,10 @@
 import subprocess
 
 from gitviewfs_objects import BlobFile
-from tests.test_with_repository import TestWithRepository
+from tests.utils import BaseTestWithRepository
 
 
-class TestBlobFileWithRepository(TestWithRepository):
+class BlobFileWithRepositoryTest(BaseTestWithRepository):
 
 	def test_get_content(self):
 		filename, content = self.create_and_commit_file()

@@ -2,10 +2,10 @@ import unittest
 
 from gitviewfs_objects import TreesProvider, Directory,\
 	DIR_STRUCTURE_CONTEXT_NAME
-from tests.test_with_repository import MockDirStructure
+from tests.utils import MockDirStructure
 
 
-class TestTreesProvider(unittest.TestCase):
+class TreesProviderTest(unittest.TestCase):
 
 	def test_get_items_names(self):
 		provider = TreesProvider()

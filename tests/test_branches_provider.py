@@ -1,11 +1,11 @@
 import unittest
 import subprocess
 
-from tests.test_with_repository import TestWithRepository
+from tests.utils import BaseTestWithRepository
 from gitviewfs_objects import BranchesProvider, SymLink
 
 
-class TestBranchesProvider(unittest.TestCase):
+class BranchesProviderTest(unittest.TestCase):
 	
 	def test_get_item(self):
 		provider = BranchesProvider()
@@ -17,7 +17,7 @@ class TestBranchesProvider(unittest.TestCase):
 		self.assertEqual(NAME, item.name)
 
 
-class TestBranchesProviderWithRepository(TestWithRepository):
+class BranchesProviderWithRepositoryTest(BaseTestWithRepository):
 
 	def test_get_items_names(self):
 		self.create_and_commit_file('some content')

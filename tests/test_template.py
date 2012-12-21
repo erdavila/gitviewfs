@@ -2,7 +2,7 @@ import unittest
 from gitviewfs_objects import template
 
 
-class TestTemplate(unittest.TestCase):
+class TemplateTest(unittest.TestCase):
 	
 	def test_create_instance(self):
 		class Class(object): pass

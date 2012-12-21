@@ -1,12 +1,12 @@
 import subprocess
 import unittest
 
-from tests.test_with_repository import TestWithRepository
+from tests.utils import BaseTestWithRepository
 from gitviewfs_objects import Directory, CommitContextNames,\
 	CommitParentsProvider, CommitParentSymLink
 
 
-class TestCommitParentsProvider(unittest.TestCase):
+class CommitParentsProviderTest(unittest.TestCase):
 	
 	def test_get_item(self):
 		provider = CommitParentsProvider()
@@ -33,7 +33,7 @@ class TestCommitParentsProvider(unittest.TestCase):
 		self.assertEqual(item.parent_number, PARENT_NUMBER)
 
 
-class TestCommitParentsProviderWithRepository(TestWithRepository):
+class CommitParentsProviderWithRepositoryTest(BaseTestWithRepository):
 
 	def test_list_single_parent(self):
 		self._test_list_parents(num_parents=1)

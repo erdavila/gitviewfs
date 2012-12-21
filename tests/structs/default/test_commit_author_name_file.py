@@ -3,18 +3,18 @@ import subprocess
 from gitviewfs_objects import CommitPersonNameFile, CommitContextNames,\
 	CommitPersonTypes
 from tests.structs.default import paths
-from tests.structs.default.utils import TestIntegration,\
-	DefaultDirStructPathTest
+from tests.structs.default.utils import BaseDefaultDirStructTest,\
+	BaseDefaultDirStructIntegrationTest
 
 
-class CommitAuthorNameFilePathTest(DefaultDirStructPathTest):
+class CommitAuthorNameFilePathTest(BaseDefaultDirStructTest):
 	
 	def test_path(self):
 		self.assertPathIs(paths.COMMIT_AUTHOR_NAME_FILE, CommitPersonNameFile)
 		self.assertEqual(CommitPersonTypes.AUTHOR, self.obj.get_context_value(CommitContextNames.PERSON_TYPE))
 
 
-class TestCommitAuthorNameFileIntegration(TestIntegration):
+class CommitAuthorNameFileIntegrationTest(BaseDefaultDirStructIntegrationTest):
 	
 	def test_content(self):
 		AUTHOR_NAME = 'The Name'

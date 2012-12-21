@@ -1,16 +1,16 @@
 from gitviewfs_objects import HeadSymLink
 from tests.structs.default import paths
-from tests.structs.default.utils import TestIntegration,\
-	DefaultDirStructPathTest
+from tests.structs.default.utils import BaseDefaultDirStructTest,\
+	BaseDefaultDirStructIntegrationTest
 
 
-class HeadSymLinkPathTest(DefaultDirStructPathTest):
+class HeadSymLinkPathTest(BaseDefaultDirStructTest):
 	
 	def test_path(self):
 		self.assertPathIs(paths.HEAD_SYMLINK, HeadSymLink)
 
 
-class TestHeadSymLinkIntegration(TestIntegration):
+class HeadSymLinkIntegrationTest(BaseDefaultDirStructIntegrationTest):
 	
 	def test_target(self):
 		self.create_and_commit_file()
