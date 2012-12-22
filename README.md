@@ -9,7 +9,7 @@ browsing branches, tags, commits, directories and files in your repository.
 
 How to Use It
 ===========
-This was tested on a Linux Mint 13 64-bit and should work the same way on other
+It was tested on a Linux Mint 13 64-bit and should work the same way on other
 up-to-date Debian-based distros.
 
 * First you need to install python-fuse:
@@ -27,17 +27,23 @@ Since it uses FUSE, you don't need `root` privileges to mount the filesystem.
 * `cd` into `<MOUNTPOINT>` and browse its file hierarchy.
 
 
-When you are done, umount the filesystem with:
+When you are done, unmount the filesystem with:
 ``` shell
 fusermount -u <MOUNTPOINT>
 ```
 
 
-The Filesystem Hierarchy
+The Filesystem Structure
 =====================
-The items bellow describe what you will find under the mountpoint after mounting
-the filesystem. The main idea is that references from a Git object to another
-object are viewed as symlinks.
+The main idea of Gitviewfs is that references from a Git object to another object
+are viewed as symlinks.
+
+The directory structure can be chosen by using the optional arguments `-o struct=STRUCT`,
+where STRUCT can be "`default`" or "`shallow`".
+
+### The `default` directory structure
+The items below describe what you will find under the mountpoint after mounting
+the filesystem with the `default` directory structure:
 * `/refs/HEAD` - a symlink pointing to a branch in `/refs/branches/` according to
 the current branch in your repository.
 * `/refs/branches/` - a directory that lists the local branches in your repository.
@@ -61,8 +67,18 @@ the current branch in your repository.
 * `/objects/blobs/<BLOB-SHA1>` - a file whose content is the content of a
   regular file that was committed or the target of a symlink that was committed.
 
+### The `shallow` directory structure
+While the `default` directory structure provides a more organized filesystem
+structure, the `shallow` directory structure provides a filesystem with fewer
+directory levels. The main differences of `shallow` to the `default` directory
+structures are:
+* There are no `refs` or `objects` directories. Their content can be found directly
+at the root level.
+* Inside a commit directory there are no `author`, `committer` or `parents` directories.
+Their content can be found directly at the commit directory.
 
-### Limitations
+
+## Limitations
 * It provides a **read-only view** of a Git repository.
 * It currently does not tell you if a blob referenced by a tree is a regular
   file or a symlink (how can this be implemented?).
@@ -72,7 +88,7 @@ the current branch in your repository.
   local branches, remote branches or lightweight tags are not listed.
 
 
-### Implementation Pending
+## Implementation Pending
 * Should check if repo argument is really a Git repository
 * Branches with "/" in name
 * Bare repository (has refs/HEAD?)
@@ -85,16 +101,9 @@ the current branch in your repository.
 * Tags pointing to an object which is not a commit
 * notes
 * objects replacement
-* Handle errors:
-	* ls MOUNT-POINT/objects/trees
-	* ls MOUNT-POINT/objects/commits
-	* ls MOUNT-POINT/objects/blobs
-	* ls MOUNT-POINT/objects/tags
-	* ...
 * Handle conflicting names
 	* branch x tag
 	* branch x sha1
 	* tag x sha1
 	* ...
-* Handle commit without parents
 
