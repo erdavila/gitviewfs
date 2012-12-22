@@ -31,6 +31,7 @@ class BaseDirStructTest(BaseTest):
 
 
 class BaseIntegrationTest(BaseTestWithRepository):
+	__metaclass__ = ABCMeta
 
 	def __gitviewfs_cmd_path(self):
 		main_file_path = gitviewfs.__file__
@@ -51,8 +52,13 @@ class BaseIntegrationTest(BaseTestWithRepository):
 				self.mountpoint,
 				'-d',
 				'-o', 'repo=' + self.repo,
+				'-o', 'struct=' + self.get_dir_struct_name()
 		])
 		self._wait_mountpoint_available()
+	
+	@abstractmethod
+	def get_dir_struct_name(self):
+		raise NotImplementedError()
 	
 	def _wait_mountpoint_available(self):
 		SLEEP_DURATION = 0.001 # in seconds

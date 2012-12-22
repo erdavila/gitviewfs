@@ -86,8 +86,9 @@ class DirItemsProvider(object):
 	
 	def get_item(self, name):
 		item = self._get_item(name)
-		item.set_parent_dir(self.parent_dir)
-		return item
+		if item is not None:
+			item.set_parent_dir(self.parent_dir)
+			return item
 	
 	@abstractmethod
 	def _get_item(self, name): pass
@@ -333,9 +334,14 @@ class CommitParentsProvider(DirItemsProvider):
 		self.prefix = prefix
 	
 	def _get_item(self, name):
-		assert name.startswith(self.prefix)
-		parent_number = int(name[len(self.prefix):])
-		return CommitParentSymLink(name=name, parent_number=parent_number)
+		if name.startswith(self.prefix):
+			parent_number_string = name[len(self.prefix):]
+			try:
+				parent_number = int(parent_number_string, 10)
+			except ValueError:
+				pass
+			else:
+				return CommitParentSymLink(name=name, parent_number=parent_number)
 	
 	def get_items_names(self):
 		parser = GitCommitParser()

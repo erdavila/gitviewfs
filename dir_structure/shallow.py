@@ -6,19 +6,15 @@ from gitviewfs_objects import Directory, HeadSymLink, BranchesProvider,\
 	DIR_STRUCTURE_CONTEXT_NAME, CommitContextNames, CommitPersonTypes
 
 
-class Default(DirStructure):
+class Shallow(DirStructure):
 	
 	def _get_root_dir(self):
 		return Directory(name=None, context_values={DIR_STRUCTURE_CONTEXT_NAME:self}, items=[
-			Directory(name='refs', items=[
-				HeadSymLink(name='HEAD'),
-				self.get_branches_dir(),
-			]),
-			Directory(name='objects', items=[
-				self.get_commits_dir(),
-				self.get_trees_dir(),
-				self.get_blobs_dir(),
-			])
+			HeadSymLink(name='HEAD'),
+			self.get_branches_dir(),
+			self.get_commits_dir(),
+			self.get_trees_dir(),
+			self.get_blobs_dir(),
 		])
 	
 	def _get_branches_dir(self):
@@ -34,20 +30,18 @@ class Default(DirStructure):
 		return Directory(name='blobs', items=[BlobsProvider()])
 	
 	def _get_commit_dir_template(self):
+		AUTHOR_CONTEXT_VALUES    = {CommitContextNames.PERSON_TYPE:CommitPersonTypes.AUTHOR}
+		COMMITTER_CONTEXT_VALUES = {CommitContextNames.PERSON_TYPE:CommitPersonTypes.COMMITTER}
 		return template(Directory, items=[
 			template(CommitMessageFile, name='message'),
-			template(Directory, name='author', context_values={CommitContextNames.PERSON_TYPE:CommitPersonTypes.AUTHOR}, items=[
-				template(CommitPersonNameFile , name='name' ),
-				template(CommitPersonEmailFile, name='email'),
-				template(CommitPersonDateFile , name='date' ),
-			]),
-			template(Directory, name='committer', context_values={CommitContextNames.PERSON_TYPE:CommitPersonTypes.COMMITTER}, items=[
-				template(CommitPersonNameFile , name='name' ),
-				template(CommitPersonEmailFile, name='email'),
-				template(CommitPersonDateFile , name='date' ),
-			]),
+			template(CommitPersonNameFile , name='author-name' , context_values=AUTHOR_CONTEXT_VALUES),
+			template(CommitPersonEmailFile, name='author-email', context_values=AUTHOR_CONTEXT_VALUES),
+			template(CommitPersonDateFile , name='author-date' , context_values=AUTHOR_CONTEXT_VALUES),
+			template(CommitPersonNameFile , name='committer-name' , context_values=COMMITTER_CONTEXT_VALUES),
+			template(CommitPersonEmailFile, name='committer-email', context_values=COMMITTER_CONTEXT_VALUES),
+			template(CommitPersonDateFile , name='committer-date' , context_values=COMMITTER_CONTEXT_VALUES),
 			template(CommitTreeSymLink, name='tree'),
-			template(Directory, name='parents', items=[template(CommitParentsProvider)])
+			template(CommitParentsProvider, prefix='parent'),
 		])
 	
 	def _get_tree_dir_template(self):
@@ -55,4 +49,4 @@ class Default(DirStructure):
 
 
 def get_dir_structure():
-	return Default()
+	return Shallow()

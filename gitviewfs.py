@@ -2,6 +2,7 @@
 from __future__ import print_function
 import os, sys
 import fuse
+import importlib
 from fuse import Fuse
 import dir_structure.default
 '''
@@ -19,14 +20,18 @@ fuse.feature_assert('stateful_files', 'has_init')
 
 
 class GitViewFS(Fuse):
-
+	
+	DEFAULT_REPO = '.'
+	DEFAULT_STRUCT = 'default'
+	
 	def __init__(self, *args, **kw):
 		Fuse.__init__(self, *args, **kw)
 
 		# do stuff to set up your filesystem here, if you want
 		#import thread
 		#thread.start_new_thread(self.mythread, ())
-		self.repo = '.'
+		self.repo = self.DEFAULT_REPO
+		self.struct = self.DEFAULT_STRUCT
 
 #	def mythread(self):
 #
@@ -125,7 +130,8 @@ class GitViewFS(Fuse):
 		return GitViewFSFile
 
 	def main(self, *a, **kw):
-		self.dir_struct = dir_structure.default.Default()
+		dir_struct_module = importlib.import_module('dir_structure.' + self.struct)
+		self.dir_struct = dir_struct_module.get_dir_structure()
 		self.file_class = self.get_file_class(self.dir_struct)
 		return Fuse.main(self, *a, **kw)
 
@@ -137,10 +143,12 @@ def main():
 	# GitViewFSFile class with locks, in order to prevent race conditions
 	server.multithreaded = False
 
-	server.parser.add_option(mountopt="repo", metavar="PATH", default='.',
-							 help="browse Git repository from under PATH [default: %default]")
+	server.parser.add_option(mountopt="repo", metavar="PATH", default=server.DEFAULT_REPO,
+							 help="browse Git repository under PATH [default: '%default']")
+	server.parser.add_option(mountopt="struct", metavar="NAME", default=server.DEFAULT_STRUCT,
+							 help="use directory structure NAME ['default' or 'shallow']")
 	server.parse(values=server, errex=1)
-
+	
 	try:
 		if server.fuse_args.mount_expected():
 			os.chdir(server.repo)
